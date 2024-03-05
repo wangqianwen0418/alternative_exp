@@ -49,6 +49,7 @@ def generate_exp(model, X, LAYER_INDEX, INPUT_INDEX, N_SAMPLES, LOCAL_SMOOTHING)
         class_names = json.load(f)
 
     e = shap.GradientExplainer((model, model.features[LAYER_INDEX]), normalize(X), local_smoothing=LOCAL_SMOOTHING)
+
     shap_values, indexes = e.shap_values(
         normalize(to_explain), ranked_outputs=3, nsamples=N_SAMPLES
     )
@@ -63,8 +64,8 @@ def generate_exp(model, X, LAYER_INDEX, INPUT_INDEX, N_SAMPLES, LOCAL_SMOOTHING)
 # %%
 N_SAMPLES = 20 # default 200
 LOCAL_SMOOTHING=1 # [0, 1] 0 for no smoothing
-LAYER_INDEX = 6
-INPUT_INDEX = 2
+LAYER_INDEX = 3
+INPUT_INDEX = 41
 
 generate_exp(model, X, LAYER_INDEX, INPUT_INDEX, N_SAMPLES, LOCAL_SMOOTHING)
 
