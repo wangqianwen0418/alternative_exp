@@ -56,12 +56,13 @@ def generate_exp(model, X, explanation, INPUT_INDEX):
     shap.plots.waterfall(shap_values[INPUT_INDEX])
 
     # shap_values = explainer.shap_values(X_test[0:1])
-    # shap.summary_plot(shap_values, X_test)
+    # shap.summary_plot(shap_values, X)
     # shap.force_plot(explainer.expected_value, shap_values, X_test[0:1])
 
 
 # %%
-generate_exp(rforest, X_test, "tree", 0)
+input_index = 20
+generate_exp(rforest, X_test, "tree", input_index)
 # %%
-generate_exp(rforest, X_test, "kernel", 0)
+generate_exp(rforest, X_test, "kernel", input_index)
 # %%
