@@ -8,6 +8,7 @@ from sklearn.model_selection import train_test_split
 
 import shap
 import pandas as pd
+import altair as alt
 
 X, y = shap.datasets.diabetes()
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
@@ -93,4 +94,34 @@ a= shap_values[:, 2].values #bmi
 b = shap_values[:, 8].values #s5
 indices = [index for index in range(len(a)) if abs(b[index]) > abs(20 * a[index]) ]
 # indices = [index for index in range(len(a)) if abs(a[index]) > abs(20 * b[index]) ]
+# %%
+
+feature_index = 8
+feature_values = X.iloc[:, feature_index].values
+shap_index = np.argsort(np.argsort(np.abs(shap_values.values), axis=1), axis=1)[:, feature_index] #use np.argsort twice to get the ranking index
+
+df = pd.DataFrame({
+    'X': feature_values,
+    'Y': -1 * shap_index + 10
+})
+df['index'] = df.index
+
+alt.Chart(df).mark_point().encode(
+    x=alt.X('X:Q', scale=alt.Scale(domain=(-0.2, 0.2)), title='feature values'),
+    y=alt.Y('Y:Q', scale=alt.Scale(domain=(10, 1)),title='SHAP Ranking'),
+    color=alt.condition(alt.datum.Y <= 1, 
+                                alt.ColorValue('green'), 
+                                alt.ColorValue('orange')),
+    tooltip=['index:Q']
+)
+# %%
+from interpret.glassbox import ExplainableBoostingRegressor
+
+ebm = ExplainableBoostingRegressor()
+ebm.fit(X, y)
+
+from interpret import show
+
+ebm_global = ebm.explain_global()
+show(ebm_global)
 # %%
