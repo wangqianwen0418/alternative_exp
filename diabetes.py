@@ -90,6 +90,29 @@ chart = (x_rule + y_rule + scatter).properties(
 chart
 
 # %%
+feature_index = 2 # 2 is the index of the feature "bmi"
+# 3 is the index of the feature "bp"
+# feature_index = 8 # 8 is the index of the feature "s5"
+feature_shap_values = shap_values[:, feature_index].values
+feature_values = X.iloc[:, feature_index].values
+df = pd.DataFrame({
+    'X': feature_values,
+    'Y': feature_shap_values
+})
+df['index'] = df.index
+
+line = alt.Chart(df).mark_line().encode(
+    x='X',
+    y='mean(Y)'
+)
+
+band = alt.Chart(df).mark_errorband(extent='ci').encode(
+    x=alt.X('X').title('BMI'),
+    y=alt.Y('Y').title('average SHAP value with 95% CI'),
+)
+
+band + line
+# %%
 a= shap_values[:, 2].values #bmi
 b = shap_values[:, 8].values #s5
 indices = [index for index in range(len(a)) if abs(b[index]) > abs(20 * a[index]) ]
@@ -115,13 +138,28 @@ alt.Chart(df).mark_point().encode(
     tooltip=['index:Q']
 )
 # %%
-from interpret.glassbox import ExplainableBoostingRegressor
+# from interpret.glassbox import ExplainableBoostingRegressor
 
-ebm = ExplainableBoostingRegressor()
-ebm.fit(X, y)
+# ebm = ExplainableBoostingRegressor()
+# ebm.fit(X, y)
 
-from interpret import show
+# from interpret import show
 
-ebm_global = ebm.explain_global()
-show(ebm_global)
+# ebm_global = ebm.explain_global()
+# show(ebm_global)
+# %%
+from sklearn.ensemble import HistGradientBoostingRegressor
+from sklearn.inspection import PartialDependenceDisplay
+
+est = HistGradientBoostingRegressor()
+est.fit(X, y)
+PartialDependenceDisplay.from_estimator(est, X, [feature_index])
+# %%
+# partial dependency
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.inspection import PartialDependenceDisplay
+
+est = GradientBoostingRegressor()
+est.fit(X, y)
+PartialDependenceDisplay.from_estimator(est, X, [feature_index])
 # %%
