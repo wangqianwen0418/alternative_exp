@@ -163,3 +163,25 @@ est = GradientBoostingRegressor()
 est.fit(X, y)
 PartialDependenceDisplay.from_estimator(est, X, [feature_index])
 # %%
+# the larger the BMI, the smaller the absolute SHAP value of gender 
+shap.plots.scatter(shap_values[:, 'sex'],color=shap_values[:, 'bmi'], x_jitter=0.5)
+
+#%%
+gender_shap_values = shap_values[:, 1].values
+BMI_values = X.iloc[:, 2].values
+gender_values = ['female' if i>0 else 'male' for i in X.iloc[:, 1].values]
+
+df = pd.DataFrame({
+    'X': BMI_values,
+    'Y': gender_shap_values,
+    'color': gender_values
+})
+df['index'] = df.index
+
+alt.Chart(df).mark_point().encode(
+    x=alt.X('X:Q', title='BMI'),
+    y=alt.Y('Y:Q', title='SHAP value of Gender'),
+    color=alt.Color('color:N'),
+    tooltip=['index:Q']
+    )
+# %%
