@@ -1,0 +1,10 @@
+span.label {
+    padding:1px 5px;
+    border-radius: 5px;
+    margin: 0px 5px;
+}
+
+.MuiPaper-root.parse-input {
+    padding: 20px 15px;
+    margin: 10px 0px;
+}
