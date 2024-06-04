@@ -19,7 +19,8 @@ export default function Swarm(SwarmProps: SwarmProps) {
       
     let colorScale = d3.scaleSequential()
     .domain(d3.extent(colorValues) as [number, number])
-    .interpolator(d3.interpolatePuRd);
+    // .interpolator(d3.interpolatePuRd);
+    .interpolator(d3.interpolateHcl(d3.hcl('008BFF'), d3.hcl('FF004C')))
 
     useEffect(
         () => {
