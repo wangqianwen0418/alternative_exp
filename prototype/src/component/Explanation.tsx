@@ -18,10 +18,21 @@ export default function Explanation({isSubmitted}:props) {
         <Typography variant="h5" gutterBottom>
             Visual Explanation
         </Typography>
-        <svg className="swarm" width={800} height={500}>
+        <svg className="swarm" width={900} height={500}>
             <Swarm xValues={shapValues} colorValues={featureValues} width={400} height={100} id='bmi'/>
             {isSubmitted &&
-            <Scatter yValues={shapValues} xValues={featureValues} width={400} height={300} id='bmi-scatter' offsets={[0, 150]}/>
+            <>
+                <Scatter yValues={shapValues} xValues={featureValues} width={400} height={300} id='bmi-scatter' offsets={[0, 150]}/>
+                
+                <g >
+                    <rect x={450} y={0} width={400} height={200} fill="white" stroke="black"/>
+                    <text x={600} y={50} textAnchor="middle">Other Explanations</text>
+                </g>
+                <g >
+                    <rect x={450} y={250} width={400} height={200} fill="white" stroke="black"/>
+                    <text x={600} y={300} textAnchor="middle">Other Explanations</text>
+                </g>
+            </>
             }
         </svg>
     </Paper>
