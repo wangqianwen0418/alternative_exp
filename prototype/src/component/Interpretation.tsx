@@ -1,5 +1,6 @@
 import {Button, Paper, TextField, Typography, FormControl, InputLabel, Select, MenuItem} from '@mui/material';
 import './Interpretation.css'
+import { useState } from 'react';
 
 function getSelection (label:string, value:string, handleChange: (k:string)=>void, options: string[]) {
     return <FormControl variant="standard" sx={{ m: 1, minWidth: 120, display: 'block' }}>
@@ -28,19 +29,24 @@ function formatText (text:string, entityType: 'feature' | 'relation' | 'predicti
 }
 
 export default function Interpretation() {
+    const [isSubmitted, setIsSubmitted] = useState(false);
+    const [userInput, setUserInput] = useState('');
+
     return <Paper style={{padding: '15px'}} >
         <Typography variant="h5" gutterBottom>
             Interpretation
         </Typography>
         <TextField 
             id="outlined-basic" 
-            label="original input" 
-            defaultValue='Input your interpretation here' 
+            label="Input your interpretation here" 
             multiline
             rows={4} 
             fullWidth
         />
-        <Button variant="contained" color="primary" style={{marginTop: '10px'}} fullWidth>Submit for checking</Button>
+        <Button variant="contained" color="primary" style={{marginTop: '10px'}} fullWidth onClick={()=>setIsSubmitted(!isSubmitted)}>
+            {isSubmitted? 'Clear' : 'Submit for checking'}
+        </Button>
+        {isSubmitted && 
         <Paper className='parse-input' elevation={1}>
          
             {formatText('Diabete Progression', 'prediction')}
@@ -49,5 +55,6 @@ export default function Interpretation() {
             {getSelection('condition', 'when bmi >25', (k)=>{}, ['when bmi >25', 'when bmi <25'])}
          
         </Paper>
+        }
     </Paper>
 }

@@ -20,7 +20,7 @@ export default function Swarm(SwarmProps: SwarmProps) {
     let colorScale = d3.scaleSequential()
     .domain(d3.extent(colorValues) as [number, number])
     // .interpolator(d3.interpolatePuRd);
-    .interpolator(d3.interpolateHcl(d3.hcl('008BFF'), d3.hcl('FF004C')))
+    .interpolator(d3.interpolateHcl(d3.hcl('#008BFB'), d3.hcl('#FF004C')))
 
     useEffect(
         () => {
@@ -36,8 +36,6 @@ export default function Swarm(SwarmProps: SwarmProps) {
         .attr("y", height-6)
         .attr("x", leftTitleMargin + width/2)
         .text("shap value");
-
-
 
         }, 
         [xValues, height, width]

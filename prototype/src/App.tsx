@@ -12,12 +12,13 @@ function App() {
     <Grid item xs={12}>
       <header className="App-header">Are you interpreting correctly?</header>
     </Grid>
-    <Grid item xs={8} className='App-body'>
-      <Explanation />
-    </Grid>
     <Grid item xs={4} className='App-body'>
       <Interpretation />
     </Grid>
+    <Grid item xs={8} className='App-body'>
+      <Explanation />
+    </Grid>
+    
   </Grid>
   );
 }
