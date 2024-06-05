@@ -28,8 +28,13 @@ function formatText (text:string, entityType: 'feature' | 'relation' | 'predicti
     
 }
 
-export default function Interpretation() {
-    const [isSubmitted, setIsSubmitted] = useState(false);
+interface props {
+    isSubmitted: boolean;
+    setIsSubmitted: (k:boolean)=>void;
+}
+
+export default function Interpretation({isSubmitted, setIsSubmitted}: props) {
+    
     const [userInput, setUserInput] = useState('');
 
     return <Paper style={{padding: '15px'}} >
@@ -38,7 +43,8 @@ export default function Interpretation() {
         </Typography>
         <TextField 
             id="outlined-basic" 
-            label="Input your interpretation here" 
+            label="Enter your interpretation"
+            defaultValue="a patien with a high bmi is more likely to large diabete progression" 
             multiline
             rows={4} 
             fullWidth

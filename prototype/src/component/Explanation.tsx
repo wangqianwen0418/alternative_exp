@@ -5,7 +5,11 @@ import shap_diabetes from '../assets/shap_diabetes.json'
 import Swarm from './Swarm';
 import Scatter from './Scatter';
 
-export default function Explanation() {
+interface props {
+    isSubmitted: boolean;
+}
+
+export default function Explanation({isSubmitted}:props) {
     const featureName = 'bmi', 
     featureIndex = shap_diabetes['feature_names'].indexOf(featureName),
     featureValues = shap_diabetes['feature_values'].map((row) => row[featureIndex]),
@@ -16,7 +20,9 @@ export default function Explanation() {
         </Typography>
         <svg className="swarm" width={800} height={500}>
             <Swarm xValues={shapValues} colorValues={featureValues} width={400} height={100} id='bmi'/>
+            {isSubmitted &&
             <Scatter yValues={shapValues} xValues={featureValues} width={400} height={300} id='bmi-scatter' offsets={[0, 150]}/>
+            }
         </svg>
     </Paper>
 }
