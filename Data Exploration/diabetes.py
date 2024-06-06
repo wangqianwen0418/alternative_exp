@@ -197,3 +197,26 @@ alt.Chart(df).mark_point().encode(
     tooltip=['index:Q']
     )
 # %%
+
+from scipy.stats import pearsonr
+
+bmi_shape_values = shap_values[:, 2].values
+BMI_values = X.iloc[:, 2].values
+# correlation, p_value = pearsonr(BMI_values, bmi_shape_values)
+# mask = (BMI_values < 0.06) & (BMI_values > 0.03)
+mask = (BMI_values < -0.04)
+filtered_bmi_shape_values = bmi_shape_values[mask]
+filtered_BMI_values = BMI_values[mask]
+pearsonr(filtered_BMI_values, filtered_bmi_shape_values)
+# %%
+
+sex_values = X.iloc[:, 1].values
+sex_shape_values = shap_values[:, 1].values
+BMI_values = X.iloc[:, 2].values
+mask = (sex_values<0)
+filtered_BMI_values = BMI_values[mask]
+filtered_sex_shape_values = sex_shape_values[mask]
+pearsonr(filtered_BMI_values, filtered_sex_shape_values)
+# %%
+pearsonr(BMI_values, sex_shape_values)
+# %%
