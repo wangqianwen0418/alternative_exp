@@ -12,7 +12,11 @@ import { Menu as MenuIcon, TroubleshootOutlined as TroubleShootIcon } from '@mui
 import { Toolbar, Drawer, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Box } from '@mui/material';
 import { styled, useTheme, } from '@mui/material/styles';
 
-
+export interface IHypo {
+    entities: string[],
+    relations: string[],
+    conditions: any,
+}
 
 
 interface AppProps {
@@ -25,6 +29,7 @@ const CASES = ['Case One', 'Case Two', 'Case Three']
 function App(appProps: AppProps) {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [open, setOpen] = useState(false);
+    const [hypo, setHypo] = useState<IHypo>()
 
 
     const DrawerList = (
@@ -69,12 +74,14 @@ function App(appProps: AppProps) {
             <Drawer open={open} onClose={() => setOpen(false)}>
                 {DrawerList}
             </Drawer>
+
             <Grid item xs={4} className='App-body'>
-                <Interpretation isSubmitted={isSubmitted} setIsSubmitted={setIsSubmitted} />
+                <Interpretation isSubmitted={isSubmitted} setIsSubmitted={setIsSubmitted} hypo={hypo} setHypo={setHypo} />
             </Grid>
             <Grid item xs={7} className='App-body'>
                 <Explanation isSubmitted={isSubmitted} initVis={appProps.initVis} />
             </Grid>
+
 
         </Grid>
     );
