@@ -1,8 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import CaseOne from './CaseOne';
-import CaseTwo from './CaseTwo';
+import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 import {
@@ -17,11 +16,11 @@ const root = ReactDOM.createRoot(
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <CaseOne />,
+    element: <App dataset='' initVis='' />,
   },
   {
     path: "CaseTwo",
-    element: <CaseTwo />,
+    element: <App dataset='' initVis='' />,
   },
 ]);
 

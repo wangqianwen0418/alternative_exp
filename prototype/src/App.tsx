@@ -11,7 +11,12 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Toolbar } from '@mui/material';
 
-function App() {
+interface AppProps {
+  dataset: string,
+  initVis: string
+}
+
+function App(appProps: AppProps) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   return (
     <Grid container>
