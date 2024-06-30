@@ -48,31 +48,32 @@ function App(appProps: AppProps) {
         </Box>
     );
 
+    const Header = <Grid item xs={12}>
+        <Toolbar sx={{ backgroundColor: 'black', fontSize: '28px', color: 'white' }}>
+            <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                onClick={() => setOpen(true)}
+                edge="start"
+            // sx={{ mr: 2, ...(open && { display: 'none' }) }}
+            >
+                <MenuIcon />
+            </IconButton>
+            Are you interpreting correctly?
+        </Toolbar>
+    </Grid>
+
     return (
         <Grid container justifyContent="center">
-            <Grid item xs={12}>
-                <Toolbar sx={{ backgroundColor: 'black', fontSize: '28px', color: 'white' }}>
-                    <IconButton
-                        color="inherit"
-                        aria-label="open drawer"
-                        onClick={() => setOpen(true)}
-                        edge="start"
-                    // sx={{ mr: 2, ...(open && { display: 'none' }) }}
-                    >
-                        <MenuIcon />
-                    </IconButton>
-                    Are you interpreting correctly?
-                </Toolbar>
-            </Grid>
+            {Header}
             <Drawer open={open} onClose={() => setOpen(false)}>
                 {DrawerList}
             </Drawer>
             <Grid item xs={4} className='App-body'>
-
                 <Interpretation isSubmitted={isSubmitted} setIsSubmitted={setIsSubmitted} />
             </Grid>
             <Grid item xs={7} className='App-body'>
-                <Explanation isSubmitted={isSubmitted} />
+                <Explanation isSubmitted={isSubmitted} initVis={appProps.initVis} />
             </Grid>
 
         </Grid>
