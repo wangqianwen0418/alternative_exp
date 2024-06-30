@@ -7,11 +7,22 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  CircularProgress
 } from "@mui/material";
 import "./Interpretation.css";
 import { useState } from "react";
-
+import nlp from "compromise";
+import openai from '../openai_config.js';
 import shapData from "../assets/shap_diabetes.json";
+var response = ""
+
+const feature_names = shapData.feature_names;
+
+let feature_name_str = feature_names.join(", ");
+
+const prediction_data = shapData.prediction_name;
+
+
 
 function getSelection(
   label: string,
@@ -27,7 +38,7 @@ function getSelection(
       {/* <InputLabel id="demo-simple-select-standard-label">{label}</InputLabel> */}
       <Select
         labelId="demo-simple-select-standard-label"
-        id="demo-simple-select-standard"
+        id="demo-simple-select-stelandard"
         value={value}
         onChange={(e) => handleChange(e.target.value)}
         label="Age"
@@ -44,7 +55,7 @@ function getSelection(
 
 function formatText(
   text: string,
-  entityType: "feature" | "relation" | "prediction"
+  entityType: "feature" | "relation" | "prediction" | "condition"
 ) {
   if (entityType === "feature") {
     return (
@@ -64,7 +75,13 @@ function formatText(
         {text}
       </span>
     );
-  }
+  } else if (entityType === "condition") {
+    return (
+      <span className="label" style={{ backgroundColor: "#ffc760" }}>
+        {text}
+      </span>
+    );
+  }  
 }
 
 interface props {
@@ -74,20 +91,130 @@ interface props {
 
 export default function Interpretation({ isSubmitted, setIsSubmitted }: props) {
   const [userInput, setUserInput] = useState("");
+  const [parsedData, setParsedData] = useState({
+    feature: "aa",
+    relation: "aa",
+    prediction: "aa",
+    condition: "aa",
+    PossibleRelationships: ["aa", "bb"],
+    PossibleConditions: ["cc", "dd"]
+  });
+  const [selectedRelation, setSelectedRelation] = useState(parsedData.relation);
+  const [selectedCondition, setSelectedCondition] = useState(parsedData.condition);
+  const [isLoading, setIsLoading] = useState(false);  // New loading state
 
-  const higlightInput = (k: string) => {
-    // return reacejs element with highlighted text
-    for (let i = 0; i < shapData.feature_names.length; i++) {
-      k = k.replace(
-        new RegExp(shapData.feature_names[i], "g"),
-        `<span class="highlight">${shapData.feature_names[i]}</span>`
-      );
-    }
-    k = k.replace(
-      new RegExp(shapData.prediction_name, "g"),
-      `<span class="highlight">${shapData.prediction_name}</span>`
-    );
-    return k;
+  const parseInput = async (input: string) => {
+    setIsLoading(true);  // Start loading
+
+
+    const prompt = `You are a bot that extracts the sentence structure from explanation sentences. You produce JSON that contains the following features from an inputted sentence: \:
+    Feature
+    Prediction
+    Relationship
+    Condition
+
+    The feature has to be present in this list: ${feature_name_str}, and the prediction should be ${prediction_data}. 
+    
+    It's fine if they use abbreviations/the full form of an abbreviation (ie Body Mass Index for BMI and vice versa), but if the user's interpretation describes a feature that is not present in the list, set the feature value to ERROR. This is very important, do not forget about this!
+
+    For example, if the sentence is: "BMI is the most important factor for predicting diabetes risk when it is above 25", the values you should return is as follows:
+
+    Feature: BMI
+    Prediction: diabetes risk
+    Relationship: most important factor
+    Condition: Above 25
+
+     
+
+
+    In addition, you should also include the following two fields (as arrays):
+    Possible Relationships: 
+    Possible Conditions:  
+    
+    In this example, some possible relationships would include: "has a positive correlation", "has a negative correlation", "2nd most important factor", "most important factor", etc.
+    Some possible conditions would include: "Below 25". Note that possible conditions should be included even if there are no conditions in the original statement.
+    
+    
+    If there is no actual condition in the sentence, make sure you still include a couple options for possible conditions, based on reasonable values for the given feature/variable.
+
+
+    This should be formatted in a JSON object, structured like this: 
+    Feature:
+    Prediction:
+    Relationship:
+    Condition:
+    PossibleRelationships:
+    PossibleConditions:
+    
+    If any of these values are missing in the sentence, the value for that field should be NONE. 
+    
+
+    `
+
+    const chatCompletion = await openai.chat.completions.create({
+      
+      
+      model: "gpt-4o",
+      response_format: { "type": "json_object" },
+      max_tokens: 1024,
+      messages: [
+        {"role": "system", "content": prompt},
+        {"role": "user", "content": input} 
+      ]
+
+    });
+    console.log(`RESPONSE: '${chatCompletion.choices[0].message.content}'`);
+    var json_string = chatCompletion.choices[0].message.content;
+    var finish_reason = chatCompletion.choices[0].finish_reason;
+    if (json_string !== null && finish_reason === "stop") {
+      try {
+          let jsonObject = JSON.parse(json_string);
+          
+          // Extract each element and store it in a variable
+          let feature = jsonObject.Feature;
+          let prediction = jsonObject.Prediction;
+          let relationship = jsonObject.Relationship;
+          let condition = jsonObject.Condition;
+          let PossibleRelationships = jsonObject.PossibleRelationships;
+          let PossibleConditions = jsonObject.PossibleConditions;
+          PossibleRelationships.push(relationship)
+
+          if (feature === "ERROR" || prediction === "ERROR") {
+            console.error("Improper feature/prediction detected");
+          }
+          else{
+            // Log the variables to check the values
+            console.log("Feature:", feature);
+            console.log("Prediction:", prediction);
+            console.log("Relationship:", relationship);
+            console.log("Condition:", condition);
+            console.log("Possible Relationships: ", PossibleRelationships);
+            console.log("Possible Conditions: ", PossibleConditions)
+
+            setParsedData({
+              feature,
+              prediction,
+              relation: relationship,
+              condition,
+              PossibleRelationships,
+              PossibleConditions
+            });
+          }
+
+      } catch (error) {
+          console.error("Error parsing JSON:", error);
+      }
+      finally{
+        setIsLoading(false);
+      }
+  } else {
+      console.error("JSON string is null");
+  }  
+  };
+
+  const handleSubmission = async () => {
+    parseInput(userInput);
+    setIsSubmitted(!isSubmitted);
   };
 
   return (
@@ -118,31 +245,27 @@ export default function Interpretation({ isSubmitted, setIsSubmitted }: props) {
           variant="contained"
           color="primary"
           style={{ margin: "10px 5px" }}
-          onClick={() => setIsSubmitted(!isSubmitted)}
+          onClick={handleSubmission}
         >
           Submit
         </Button>
       </div>
-      {isSubmitted && (
+      {isLoading ? (
+        <CircularProgress></CircularProgress>
+      ) : (
+      isSubmitted && (
         <Paper className="parse-input" elevation={1}>
-          {formatText("Diabete Progression", "prediction")}
+          {formatText(parsedData.feature, "feature")}
           {getSelection(
             "relation",
-            "increase with the increase of",
-            (k) => {},
-            [
-              "increase with the increase of",
-              "decrease with the increase of",
-              "increase with the decrease of",
-              "decrease with the decrease of",
-            ]
+            selectedRelation,
+            (k) => setSelectedRelation(k),
+            parsedData.PossibleRelationships
           )}
-          {formatText("bmi", "feature")}
-          {getSelection("condition", "when bmi >25", (k) => {}, [
-            "when bmi >25",
-            "when bmi <25",
-          ])}
+          {formatText(parsedData.prediction, "prediction")}
+          {getSelection("condition", selectedCondition, (k) => setSelectedCondition(k), parsedData.PossibleConditions)}
         </Paper>
+      )
       )}
     </Paper>
   );

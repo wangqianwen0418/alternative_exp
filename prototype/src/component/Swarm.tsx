@@ -9,7 +9,7 @@ interface SwarmProps {
   id: string; // make sure accurate d3 selection with multiple swarms on the same page
 }
 
-export default function Swarm(SwarmProps: SwarmProps) {
+export default function Swarm(SwarmProps: SwarmProps) { 
   let margin = [10, 10, 40, 10],
     radius = 3,
     leftTitleMargin = 40;
@@ -66,6 +66,7 @@ export default function Swarm(SwarmProps: SwarmProps) {
         {xValues.map((x, i) => {
           return (
             <circle
+              key={i}
               cx={xScale(x)}
               cy={height / 2}
               r={3}

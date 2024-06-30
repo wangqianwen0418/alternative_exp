@@ -220,3 +220,6 @@ pearsonr(filtered_BMI_values, filtered_sex_shape_values)
 # %%
 pearsonr(BMI_values, sex_shape_values)
 # %%
+
+
+print("WHOA LET ME SEE IF THIS WORKS")
