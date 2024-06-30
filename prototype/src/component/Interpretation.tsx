@@ -11,7 +11,6 @@ import {
 } from "@mui/material";
 import "./Interpretation.css";
 import { useState } from "react";
-import nlp from "compromise";
 import openai from '../openai_config.js';
 import shapData from "../assets/shap_diabetes.json";
 var response = ""
