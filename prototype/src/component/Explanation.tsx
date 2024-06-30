@@ -118,7 +118,7 @@ export default function Explanation({ isSubmitted, initVis, hypo }: props) {
             <svg className="swarm" width={900} height={500}>
                 {initialVisualization}
 
-
+                {additionalVisualizations}
             </svg>
         </Paper>
     );
