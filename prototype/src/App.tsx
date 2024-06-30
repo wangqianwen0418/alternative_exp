@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import Explanation from './component/Explanation';
 import Interpretation from './component/Interpretation';
+import { CASES } from './const';
 
 import './App.css';
 
@@ -24,7 +25,6 @@ interface AppProps {
     initVis: string
 }
 
-const CASES = ['Case One', 'Case Two', 'Case Three']
 
 function App(appProps: AppProps) {
     const [isSubmitted, setIsSubmitted] = useState(false);
@@ -39,13 +39,13 @@ function App(appProps: AppProps) {
                     <ListItemText primary={<span style={{ fontSize: '20px', textAlign: 'center', marginLeft: 15 }}>Cases</span>} />
                 </ListItem>
 
-                {CASES.map((name, index) => (
-                    <ListItem key={name} disablePadding>
-                        <ListItemButton href={`/case${index + 1}`}>
+                {CASES.map(c => (
+                    <ListItem key={c.name} disablePadding>
+                        <ListItemButton href={c.href}>
                             <ListItemIcon>
                                 <TroubleShootIcon />
                             </ListItemIcon>
-                            <ListItemText primary={name} />
+                            <ListItemText primary={c.name} />
                         </ListItemButton>
                     </ListItem>
                 ))}
