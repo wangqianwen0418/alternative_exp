@@ -5,4 +5,5 @@ TODO:
 - [X] Add loading icon while waiting for GPT API response
 - [ ] Support for multiple features
 - [ ] VEGA-Lite based graph encoding/generation
-- [ ] Interactive plots     
+- [ ] Interactive plots
+- [X] Adding height to swarm plot (needs refinement)  
