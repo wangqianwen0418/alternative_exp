@@ -9,7 +9,8 @@ interface SwarmProps {
   id: string; // make sure accurate d3 selection with multiple swarms on the same page
 }
 
-export default function Swarm(SwarmProps: SwarmProps) {
+
+export default function Swarm(SwarmProps: SwarmProps) { 
   let margin = [10, 10, 40, 10],
     radius = 3,
     leftTitleMargin = 40;
@@ -30,6 +31,8 @@ export default function Swarm(SwarmProps: SwarmProps) {
         d3.hcl((0.35470565 * 180) / Math.PI, 90, 54) // red
       )
     );
+  
+  const yScale = d3.scaleLinear().range([height / 2 - radius, height / 2 + radius]);
 
   useEffect(() => {
     d3.select("g.x-axis").remove();
@@ -50,6 +53,34 @@ export default function Swarm(SwarmProps: SwarmProps) {
       .text("contribution of bmi to the predicted diabetes progression");
   }, [xValues, height, width]);
 
+  let bucketWidth = 1;
+  let buckets: { [key: number]: { value: number, index: number }[] } = {};
+  
+  xValues.forEach((val, index) => {
+    let bucketKey = Math.floor(val/bucketWidth);
+    if (!buckets[bucketKey]) {
+      buckets[bucketKey] = [];
+    }
+    buckets[bucketKey].push({value: val, index: index});
+  });
+  let yVals = new Array(xValues.length);
+
+  for (let key in buckets){
+    let bucket = buckets[key];
+    bucket.sort((a, b) => a.value - b.value);
+    bucket.forEach((item, height) => {
+      yVals[item.index] = 0-height;
+    });
+  }
+
+  
+  
+
+
+  // Update the y-values by iterating through the x-values and incrementing the y-value for each point
+  console.log("YVALS!!");
+  console.log(yVals);
+
   return (
     <g className="swarm" id={id}>
       <rect
@@ -66,8 +97,9 @@ export default function Swarm(SwarmProps: SwarmProps) {
         {xValues.map((x, i) => {
           return (
             <circle
+              key={i}
               cx={xScale(x)}
-              cy={height / 2}
+              cy={yScale(yVals[i])}
               r={3}
               fill={colorScale(colorValues[i])}
             />
