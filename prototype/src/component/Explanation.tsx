@@ -4,13 +4,15 @@ import shap_diabetes from "../assets/shap_diabetes.json";
 import Swarm from "./Swarm";
 import Scatter from "./Scatter";
 import Bar from "./Bar";
+import { IHypo } from "../App";
 
 interface props {
     isSubmitted: boolean;
     initVis: string;
+    hypo: IHypo | undefined
 }
 
-export default function Explanation({ isSubmitted, initVis }: props) {
+export default function Explanation({ isSubmitted, initVis, hypo }: props) {
     const featureName = "bmi",
         featureIndex = shap_diabetes["feature_names"].indexOf(featureName),
         featureValues = shap_diabetes["feature_values"].map(
@@ -67,6 +69,47 @@ export default function Explanation({ isSubmitted, initVis }: props) {
                 />)
     }
 
+    // [TODO: additional visualizations should be updated based in hypothesis]
+    const additionalVisualizations = isSubmitted && (
+        <>
+            <Scatter
+                yValues={featureShapValues}
+                xValues={featureValues}
+                width={400}
+                height={300}
+                id="bmi-scatter"
+                offsets={[0, 150]}
+            />
+
+            <g>
+                <rect
+                    x={550}
+                    y={0}
+                    width={300}
+                    height={200}
+                    fill="white"
+                    stroke="black"
+                />
+                <text x={700} y={50} textAnchor="middle">
+                    Other Explanations
+                </text>
+            </g>
+            <g>
+                <rect
+                    x={450}
+                    y={250}
+                    width={400}
+                    height={200}
+                    fill="white"
+                    stroke="black"
+                />
+                <text x={600} y={300} textAnchor="middle">
+                    Other Explanations
+                </text>
+            </g>
+        </>
+    )
+
     return (
         <Paper style={{ padding: "15px" }}>
             <Typography variant="h5" gutterBottom>
@@ -75,45 +118,7 @@ export default function Explanation({ isSubmitted, initVis }: props) {
             <svg className="swarm" width={900} height={500}>
                 {initialVisualization}
 
-                {isSubmitted && (
-                    <>
-                        <Scatter
-                            yValues={featureShapValues}
-                            xValues={featureValues}
-                            width={400}
-                            height={300}
-                            id="bmi-scatter"
-                            offsets={[0, 150]}
-                        />
 
-                        <g>
-                            <rect
-                                x={550}
-                                y={0}
-                                width={300}
-                                height={200}
-                                fill="white"
-                                stroke="black"
-                            />
-                            <text x={700} y={50} textAnchor="middle">
-                                Other Explanations
-                            </text>
-                        </g>
-                        <g>
-                            <rect
-                                x={450}
-                                y={250}
-                                width={400}
-                                height={200}
-                                fill="white"
-                                stroke="black"
-                            />
-                            <text x={600} y={300} textAnchor="middle">
-                                Other Explanations
-                            </text>
-                        </g>
-                    </>
-                )}
             </svg>
         </Paper>
     );

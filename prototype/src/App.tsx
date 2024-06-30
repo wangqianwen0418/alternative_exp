@@ -10,7 +10,7 @@ import './App.css';
 import IconButton from '@mui/material/IconButton';
 import { Menu as MenuIcon, TroubleshootOutlined as TroubleShootIcon } from '@mui/icons-material';
 import { Toolbar, Drawer, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Box } from '@mui/material';
-import { styled, useTheme, } from '@mui/material/styles';
+
 
 export interface IHypo {
     entities: string[],
@@ -79,7 +79,7 @@ function App(appProps: AppProps) {
                 <Interpretation isSubmitted={isSubmitted} setIsSubmitted={setIsSubmitted} hypo={hypo} setHypo={setHypo} />
             </Grid>
             <Grid item xs={7} className='App-body'>
-                <Explanation isSubmitted={isSubmitted} initVis={appProps.initVis} />
+                <Explanation isSubmitted={isSubmitted} initVis={appProps.initVis} hypo={hypo} />
             </Grid>
 
 
