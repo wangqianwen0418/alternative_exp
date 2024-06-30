@@ -229,8 +229,7 @@ export default function Interpretation({ isSubmitted, setIsSubmitted, hypo, setH
             </Typography>
             <TextField
                 id="outlined-basic"
-                label="Enter your interpretation"
-                defaultValue="a patien with a high bmi is more likely to large diabete progression"
+                label="e.g., a high bmi leads to large diabete progression"
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
                 multiline
