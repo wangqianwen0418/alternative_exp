@@ -10,7 +10,7 @@ import './App.css';
 
 import IconButton from '@mui/material/IconButton';
 import { Menu as MenuIcon, TroubleshootOutlined as TroubleShootIcon } from '@mui/icons-material';
-import { Toolbar, Drawer, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Box } from '@mui/material';
+import { Toolbar, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Box, Paper, Typography } from '@mui/material';
 
 
 export interface IHypo {
@@ -75,6 +75,14 @@ function App(appProps: AppProps) {
                 {DrawerList}
             </Drawer>
 
+            <Grid item xs={10}>
+                <Paper style={{ padding: "15px" }}>
+                    <Typography variant="h5" gutterBottom> ML Model and Dataset </Typography>
+                    <p style={{ margin: '0px 5px' }}>
+                        The ML model use 10 features to predict the progression of diabetes.
+                    </p>
+                </Paper>
+            </Grid>
             <Grid item xs={4} className='App-body'>
                 <Interpretation isSubmitted={isSubmitted} setIsSubmitted={setIsSubmitted} hypo={hypo} setHypo={setHypo} />
             </Grid>

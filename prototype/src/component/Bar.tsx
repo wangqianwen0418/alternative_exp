@@ -21,8 +21,6 @@ export default function Bar(props: BarProps) {
 
     let sortedAvgShapeValues = Object.entries(avgShapeValues).sort((a, b) => a[1] - b[1]).reverse()
 
-    console.info(sortedAvgShapeValues)
-
     const yScale = d3.scaleBand().domain(sortedAvgShapeValues.map(d => d[0])).range([margin[1], height - margin[3] - margin[1]]).padding(0.1)
     const xScale = d3.scaleLinear().domain([0, d3.max(sortedAvgShapeValues, d => d[1]) as number]).range([margin[0], width - margin[2] - margin[0]])
 
@@ -36,7 +34,7 @@ export default function Bar(props: BarProps) {
 
         <g className='bars'>
             {sortedAvgShapeValues.map(([featureName, value], index) => {
-                return <g k={featureName}>
+                return <g key={featureName}>
                     <text x={margin[0] - 2} y={yScale(featureName) as number + yScale.bandwidth() * 0.8} textAnchor='end'>{featureName}</text>
                     <rect
                         key={featureName}
