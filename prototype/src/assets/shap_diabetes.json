@@ -5309,13 +5309,13 @@
         "age",
         "sex",
         "bmi",
-        "bp",
-        "s1",
-        "s2",
-        "s3",
-        "s4",
-        "s5",
-        "s6"
+        "blood pressure",
+        "serum cholesterol",
+        "low-density lipoproteins",
+        "high-density lipoproteins",
+        "total/HDL cholesterol ratio",
+        "serum triglycerides level",
+        "blood sugar level"
     ],
     "prediction_name": "diabetes progression",
     "feature_values": [

@@ -15,12 +15,6 @@ const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
 );
 
-const case1 = <App dataset='case 1' initVis='beeswarm' />
-const case2 = <App dataset='case 2' initVis='bar' />
-const case3 = <App dataset='case 3' initVis='scatter' />
-
-
-
 // const router = createBrowserRouter([
 //     {
 //         path: "/",
@@ -43,13 +37,13 @@ const case3 = <App dataset='case 3' initVis='scatter' />
 const cases = CASES.map((c, index) => {
     return {
         path: c.href,
-        element: <App dataset={c.name} initVis={c.initVis} />
+        element: <App {...c} />
     }
 })
 
 cases.unshift({
     path: '/',
-    element: <App dataset={CASES[0].name} initVis={CASES[0].initVis} />
+    element: <App {...CASES[0]} />
 })
 
 root.render(

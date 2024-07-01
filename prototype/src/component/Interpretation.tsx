@@ -14,6 +14,7 @@ import { useState } from "react";
 import openai from '../openai_config.js';
 import shapData from "../assets/shap_diabetes.json";
 import { IHypo } from "../App";
+import { CASES } from '../const';
 
 var response = ""
 
@@ -85,7 +86,7 @@ function formatText(
     }
 }
 
-interface props {
+type props = typeof CASES[0] & {
     isSubmitted: boolean;
     setIsSubmitted: (k: boolean) => void;
     hypo: IHypo | undefined;

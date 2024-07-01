@@ -11,7 +11,7 @@ interface BarProps {
 }
 
 export default function Bar(props: BarProps) {
-    let margin = [40, 10, 40, 10]
+    let margin = [200, 10, 40, 10]
 
     const { allShapValues, featureNames, height, width, id, offsets } = props;
     let avgShapeValues: { [featureName: string]: number } = {}

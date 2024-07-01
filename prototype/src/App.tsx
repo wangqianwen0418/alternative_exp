@@ -20,13 +20,8 @@ export interface IHypo {
 }
 
 
-interface AppProps {
-    dataset: string,
-    initVis: string
-}
 
-
-function App(appProps: AppProps) {
+function App(appProps: typeof CASES[0]) {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [open, setOpen] = useState(false);
     const [hypo, setHypo] = useState<IHypo>()
@@ -84,10 +79,10 @@ function App(appProps: AppProps) {
                 </Paper>
             </Grid>
             <Grid item xs={4} className='App-body'>
-                <Interpretation isSubmitted={isSubmitted} setIsSubmitted={setIsSubmitted} hypo={hypo} setHypo={setHypo} />
+                <Interpretation isSubmitted={isSubmitted} setIsSubmitted={setIsSubmitted} hypo={hypo} setHypo={setHypo} {...appProps} />
             </Grid>
             <Grid item xs={7} className='App-body'>
-                <Explanation isSubmitted={isSubmitted} initVis={appProps.initVis} hypo={hypo} />
+                <Explanation isSubmitted={isSubmitted} hypo={hypo} {...appProps} />
             </Grid>
 
 
