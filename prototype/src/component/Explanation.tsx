@@ -5,10 +5,10 @@ import Swarm from "./Swarm";
 import Scatter from "./Scatter";
 import Bar from "./Bar";
 import { IHypo } from "../App";
+import { CASES } from '../const';
 
-interface props {
+type props = typeof CASES[0] & {
     isSubmitted: boolean;
-    initVis: string;
     hypo: IHypo | undefined
 }
 
@@ -51,7 +51,7 @@ export default function Explanation({ isSubmitted, initVis, hypo }: props) {
                 <Bar
                     allShapValues={shap_diabetes["shap_values"]}
                     featureNames={shap_diabetes["feature_names"]}
-                    width={400}
+                    width={600}
                     height={200}
                     id="bmi-scatter"
                     offsets={[0, 0]}

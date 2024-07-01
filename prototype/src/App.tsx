@@ -4,12 +4,13 @@ import { useState } from 'react';
 
 import Explanation from './component/Explanation';
 import Interpretation from './component/Interpretation';
+import { CASES } from './const';
 
 import './App.css';
 
 import IconButton from '@mui/material/IconButton';
 import { Menu as MenuIcon, TroubleshootOutlined as TroubleShootIcon } from '@mui/icons-material';
-import { Toolbar, Drawer, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Box } from '@mui/material';
+import { Toolbar, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Box, Paper, Typography } from '@mui/material';
 
 
 export interface IHypo {
@@ -19,14 +20,8 @@ export interface IHypo {
 }
 
 
-interface AppProps {
-    dataset: string,
-    initVis: string
-}
 
-const CASES = ['Case One', 'Case Two', 'Case Three']
-
-function App(appProps: AppProps) {
+function App(appProps: typeof CASES[0]) {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [open, setOpen] = useState(false);
     const [hypo, setHypo] = useState<IHypo>()
@@ -39,13 +34,13 @@ function App(appProps: AppProps) {
                     <ListItemText primary={<span style={{ fontSize: '20px', textAlign: 'center', marginLeft: 15 }}>Cases</span>} />
                 </ListItem>
 
-                {CASES.map((name, index) => (
-                    <ListItem key={name} disablePadding>
-                        <ListItemButton href={`/case${index + 1}`}>
+                {CASES.map(c => (
+                    <ListItem key={c.name} disablePadding>
+                        <ListItemButton href={c.href}>
                             <ListItemIcon>
                                 <TroubleShootIcon />
                             </ListItemIcon>
-                            <ListItemText primary={name} />
+                            <ListItemText primary={c.name} />
                         </ListItemButton>
                     </ListItem>
                 ))}
@@ -75,11 +70,19 @@ function App(appProps: AppProps) {
                 {DrawerList}
             </Drawer>
 
+            <Grid item xs={10}>
+                <Paper style={{ padding: "15px" }}>
+                    <Typography variant="h5" gutterBottom> ML Model and Dataset </Typography>
+                    <p style={{ margin: '0px 5px' }}>
+                        The ML model use 10 features to predict the progression of diabetes.
+                    </p>
+                </Paper>
+            </Grid>
             <Grid item xs={4} className='App-body'>
-                <Interpretation isSubmitted={isSubmitted} setIsSubmitted={setIsSubmitted} hypo={hypo} setHypo={setHypo} />
+                <Interpretation isSubmitted={isSubmitted} setIsSubmitted={setIsSubmitted} hypo={hypo} setHypo={setHypo} {...appProps} />
             </Grid>
             <Grid item xs={7} className='App-body'>
-                <Explanation isSubmitted={isSubmitted} initVis={appProps.initVis} hypo={hypo} />
+                <Explanation isSubmitted={isSubmitted} hypo={hypo} {...appProps} />
             </Grid>
 
 
