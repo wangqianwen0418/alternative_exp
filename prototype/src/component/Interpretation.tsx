@@ -93,8 +93,9 @@ type props = typeof CASES[0] & {
     setHypo: (k: IHypo) => void;
 }
 
-export default function Interpretation({ isSubmitted, setIsSubmitted, hypo, setHypo }: props) {
-    const [userInput, setUserInput] = useState("");
+export default function Interpretation(props: props) {
+    const { isSubmitted, setIsSubmitted, hypo, setHypo, userText } = props;
+    const [userInput, setUserInput] = useState(userText || 'e.g., a high bmi leads to large diabete progression');
     const [parsedData, setParsedData] = useState({
         feature: "aa",
         relation: "aa",
@@ -230,15 +231,16 @@ export default function Interpretation({ isSubmitted, setIsSubmitted, hypo, setH
             </Typography>
             <TextField
                 id="outlined-basic"
-                label="e.g., a high bmi leads to large diabete progression"
+                label="freeform text"
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
                 multiline
                 rows={4}
                 fullWidth
+                disabled={!props.name.includes("Free")}
             />
             <div style={{ alignItems: "center" }}>
-                <Button
+                {props.name.includes("Free") && <Button
                     variant="contained"
                     color="primary"
                     style={{ margin: "10px 5px" }}
@@ -246,13 +248,14 @@ export default function Interpretation({ isSubmitted, setIsSubmitted, hypo, setH
                 >
                     Clear
                 </Button>
+                }
                 <Button
                     variant="contained"
                     color="primary"
                     style={{ margin: "10px 5px" }}
                     onClick={handleSubmission}
                 >
-                    Submit
+                    Check
                 </Button>
             </div>
             {isLoading ? (
