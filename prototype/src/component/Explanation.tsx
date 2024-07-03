@@ -1,5 +1,6 @@
 import { Paper, Typography } from "@mui/material";
 import shap_diabetes from "../assets/shap_diabetes.json";
+import { useState } from "react";
 
 import Swarm from "./Swarm";
 import Scatter from "./Scatter";
@@ -15,14 +16,15 @@ type props = (typeof CASES)[0] & {
 
 export default function Explanation(props: props) {
   const { isSubmitted, initVis } = props;
+  const [selectedIndexs, setSelectedIndexs] = useState<number[]>([]);
   const featureName = "bmi",
     featureIndex = shap_diabetes["feature_names"].indexOf(featureName),
-    featureValues = shap_diabetes["feature_values"]
-      .slice(0, 100)
-      .map((row) => row[featureIndex]),
-    featureShapValues = shap_diabetes["shap_values"]
-      .slice(0, 100)
-      .map((row) => row[featureIndex]);
+    featureValues = shap_diabetes["feature_values"].map(
+      (row) => row[featureIndex]
+    ),
+    featureShapValues = shap_diabetes["shap_values"].map(
+      (row) => row[featureIndex]
+    );
 
   let initialVisualization;
   switch (initVis) {
@@ -34,6 +36,8 @@ export default function Explanation(props: props) {
           width={500}
           height={100}
           id="bmi"
+          selectedIndexs={selectedIndexs}
+          setSelectedIndexs={setSelectedIndexs}
         />
       );
       break;
@@ -46,6 +50,8 @@ export default function Explanation(props: props) {
           height={300}
           id="bmi-scatter"
           offsets={[0, 0]}
+          selectedIndexs={selectedIndexs}
+          setSelectedIndexs={setSelectedIndexs}
         />
       );
       break;
@@ -69,6 +75,8 @@ export default function Explanation(props: props) {
           width={500}
           height={100}
           id="bmi"
+          selectedIndexs={selectedIndexs}
+          setSelectedIndexs={setSelectedIndexs}
         />
       );
   }
@@ -83,34 +91,9 @@ export default function Explanation(props: props) {
         height={300}
         id="bmi-scatter"
         offsets={[0, 150]}
+        selectedIndexs={selectedIndexs}
+        setSelectedIndexs={setSelectedIndexs}
       />
-
-      <g>
-        <rect
-          x={550}
-          y={0}
-          width={300}
-          height={200}
-          fill="white"
-          stroke="black"
-        />
-        <text x={700} y={50} textAnchor="middle">
-          Other Explanations
-        </text>
-      </g>
-      <g>
-        <rect
-          x={450}
-          y={250}
-          width={400}
-          height={200}
-          fill="white"
-          stroke="black"
-        />
-        <text x={600} y={300} textAnchor="middle">
-          Other Explanations
-        </text>
-      </g>
     </>
   );
 
