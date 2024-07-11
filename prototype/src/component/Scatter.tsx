@@ -60,6 +60,40 @@ export default function Scatter(props: ScatterProps) {
             .attr("transform", `rotate(-90) translate(${(-height * 2) / 3}, 40)`)
             .attr("fill", "black")
             .text("Contributions of BMI to the prediction");
+        
+        // Brush functionality for selection
+        const brush = d3.brush()
+            .extent([[0, 0], [width, height]])
+            .on("end", brushended);
+    
+        // Append the brush to the SVG group
+        d3.select(`g.scatter#${id}`)
+            .append("g")
+            .attr("class", "brush")
+            .call(brush);
+        
+        // Function to handle the brush selection
+        function brushended(event: any) {
+            const selection = event.selection;
+            if (!selection) return; // Exit if no selection
+
+            const [[x0, y0], [x1, y1]] = selection;
+
+            d3.selectAll(`g.scatter#${id} .points circle`)
+                .attr("stroke-width", (d: any, i: number) => {
+                    const x = xScale(xValues[i]);
+                    const y = yScale(yValues[i]);
+                    return x0 <= x && x <= x1 && y0 <= y && y <= y1 ? 3 : 1;
+                })
+                .each(function(d: any, i: number) {
+                    const x = xScale(xValues[i]);
+                    const y = yScale(yValues[i]);
+                    if (x0 <= x && x <= x1 && y0 <= y && y <= y1) {
+                        console.log(`Selected: (${xValues[i]}, ${yValues[i]})`);
+                    }
+                });
+        }
+
     }, [xValues, height, width]);
 
     return (

@@ -16,7 +16,7 @@ export default function Swarm(SwarmProps: SwarmProps) {
     leftTitleMargin = 40;
   const [selectedPoints, setSelectedPoints] = useState<number[]>([]);
   const [brushSelection, setBrushSelection] = useState<[number, number] | null>(null);
-
+  
   const { xValues, colorValues, height, width, id } = SwarmProps;
   const xScale = d3
     .scaleLinear()
@@ -36,7 +36,7 @@ export default function Swarm(SwarmProps: SwarmProps) {
     );
   
   const yScale = d3.scaleLinear().range([(height / 2 - radius)*0.7+14, (height / 2 + radius)*0.7+14]);
-      
+
   useEffect(() => {
     d3.select("g.x-axis").remove();
     d3.select("text.axis-title").remove();
@@ -108,55 +108,7 @@ export default function Swarm(SwarmProps: SwarmProps) {
     .attr("y", legendY)
     .text(colorScale.domain()[1].toFixed(2));
    
-    const points = d3.select(`g.points#${id}`);
-    points.selectAll("circle").on("click", (i: number) => {
-      const index = i;
-      const isSelected = selectedPoints.includes(index);
-      if (isSelected) {
-        setSelectedPoints(selectedPoints.filter((j) => j !== index));
-      }
-      else{
-        setSelectedPoints([...selectedPoints, index]);
-      }
-    });
-
-    const brush = d3.brushX().extent([
-      [margin[3] + leftTitleMargin, 0],
-      [width - margin[1], height],
-    ]);
-
-    points.append("g").attr("class", "brush").call(brush);
-
-    brush.on("brush", (event) => {
-      const selection = event.selection;
-      if (selection) {
-        const [x0, x1] = selection;
-        const selectedIndices = xValues.reduce((acc: number[], x, i) => {
-          if (x0 <= xScale(x) && xScale(x) <= x1){
-            acc.push(i);
-          }
-          return acc;
-        },[]);
-        setSelectedPoints(selectedIndices);
-        setBrushSelection([x0, x1]);
-      } else{
-        setSelectedPoints([]);
-        setBrushSelection(null);
-      }
-    });
-
-    return () => {
-      points.selectAll("circle").on("click", null);
-      brush.on("brush", null);
-    };
   }, [xValues, height, width]);
-
-  useEffect(() => {
-    if (selectedPoints.length > 0){
-      console.log("Selected Points: ");
-      console.log(selectedPoints.map((i) => ({id: i, value: xValues[i], color: colorValues[i]})));
-    }
-  }, [selectedPoints, xValues, colorValues]);
 
   let bucketWidth = 1;
   let buckets: { [key: number]: { value: number, index: number }[] } = {};
@@ -202,7 +154,6 @@ export default function Swarm(SwarmProps: SwarmProps) {
           {id}
         </text>
         {xValues.map((x, i) => {
-          const isSelected = selectedPoints.includes(i);
           return (
             <circle
               key={i}
@@ -210,7 +161,6 @@ export default function Swarm(SwarmProps: SwarmProps) {
               cy={yScale(yVals[i])}
               r={3}
               fill={colorScale(colorValues[i])}
-              style={{ fontWeight: isSelected ? "bold" : "normal" }}
             />
           );
         })}

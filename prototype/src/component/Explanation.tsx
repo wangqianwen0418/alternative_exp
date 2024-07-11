@@ -9,16 +9,19 @@ import { CASES } from '../const';
 
 type props = typeof CASES[0] & {
     isSubmitted: boolean;
-    hypo: IHypo | undefined
+    hypo: IHypo;
 }
 
-export default function Explanation({ isSubmitted, initVis, hypo }: props) {
+export default function Explanation({ isSubmitted, hypo, initVis}: props) {
     const featureName = "bmi",
         featureIndex = shap_diabetes["feature_names"].indexOf(featureName),
         featureValues = shap_diabetes["feature_values"].map(
             (row) => row[featureIndex]
         ),
         featureShapValues = shap_diabetes["shap_values"].map((row) => row[featureIndex]);
+    
+    console.log("EXPLANATION HYPO: ");
+    console.log(hypo.freetext);
 
 
     let initialVisualization;

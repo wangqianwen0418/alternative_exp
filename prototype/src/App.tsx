@@ -14,9 +14,13 @@ import { Toolbar, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItem
 
 
 export interface IHypo {
-    entities: string[],
-    relations: string[],
-    conditions: any,
+    freetext: string;
+    features: string[],
+    relation: string,
+    prediction: string;
+    condition: string,
+    possibleRelations: string[];
+    possibleConditions: string[];
 }
 
 
@@ -24,8 +28,19 @@ export interface IHypo {
 function App(appProps: typeof CASES[0]) {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [open, setOpen] = useState(false);
-    const [hypo, setHypo] = useState<IHypo>()
+    const [hypo, setHypo] = useState<IHypo>({
+        freetext: '',
+        features: [],
+        relation: '',
+        prediction: '',
+        condition: '',
+        possibleRelations: [],
+        possibleConditions: []
+    });
 
+    const handleHypoChange = (newHypo: IHypo) => {
+        setHypo(newHypo);
+    };
 
     const DrawerList = (
         <Box sx={{ width: 250 }} role="presentation" onClick={() => setOpen(false)}>
@@ -79,10 +94,10 @@ function App(appProps: typeof CASES[0]) {
                 </Paper>
             </Grid>
             <Grid item xs={4} className='App-body'>
-                <Interpretation isSubmitted={isSubmitted} setIsSubmitted={setIsSubmitted} hypo={hypo} setHypo={setHypo} {...appProps} />
+                <Interpretation isSubmitted={isSubmitted} setIsSubmitted={setIsSubmitted} hypo={hypo} onHypoChange={handleHypoChange}{...appProps} />
             </Grid>
             <Grid item xs={7} className='App-body'>
-                <Explanation isSubmitted={isSubmitted} hypo={hypo} {...appProps} />
+                <Explanation isSubmitted={isSubmitted} hypo={hypo}{...appProps} />
             </Grid>
 
 

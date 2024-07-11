@@ -16,6 +16,8 @@ import shapData from "../assets/shap_diabetes.json";
 import { IHypo } from "../App";
 import { CASES } from '../const';
 
+
+
 var response = ""
 
 const feature_names = shapData.feature_names;
@@ -89,11 +91,11 @@ function formatText(
 type props = typeof CASES[0] & {
     isSubmitted: boolean;
     setIsSubmitted: (k: boolean) => void;
-    hypo: IHypo | undefined;
-    setHypo: (k: IHypo) => void;
+    hypo: IHypo;
+    onHypoChange: (newHypo: IHypo) => void;
 }
 
-export default function Interpretation({ isSubmitted, setIsSubmitted, hypo, setHypo }: props) {
+export default function Interpretation({ isSubmitted, setIsSubmitted, hypo, onHypoChange }: props) {
     const [userInput, setUserInput] = useState("");
     const [parsedData, setParsedData] = useState({
         feature: "aa",
@@ -103,32 +105,44 @@ export default function Interpretation({ isSubmitted, setIsSubmitted, hypo, setH
         PossibleRelationships: ["aa", "bb"],
         PossibleConditions: ["cc", "dd"]
     });
+
     const [selectedRelation, setSelectedRelation] = useState(parsedData.relation);
     const [selectedCondition, setSelectedCondition] = useState(parsedData.condition);
     const [isLoading, setIsLoading] = useState(false);  // New loading state
+    let newHypo: IHypo = {
+        freetext: "null",
+        features: ["none"],
+        relation: "none",
+        prediction: 'none',
+        condition: 'none',
+        possibleRelations: ['none'],
+        possibleConditions: ['none']
+    };
 
     const parseInput = async (input: string) => {
+
+
         setIsLoading(true);  // Start loading
 
 
-        const prompt = `You are a bot that extracts the sentence structure from explanation sentences. You produce JSON that contains the following features from an inputted sentence: \:
-    Feature
+        const prompt = `You are a bot that extracts the sentence structure from explanation sentences. You produce JSON that contains the following data from an inputted sentence: \:
+    Features
     Prediction
     Relationship
     Condition
 
-    The feature has to be present in this list: ${feature_name_str}, and the prediction should be ${prediction_data}. 
+    The features have to be present in this list: ${feature_name_str}, and the prediction should be ${prediction_data}. 
     
-    It's fine if they use abbreviations/the full form of an abbreviation (ie Body Mass Index for BMI and vice versa), but if the user's interpretation describes a feature that is not present in the list, set the feature value to ERROR. This is very important, do not forget about this!
+    It's fine if they use abbreviations/the full form of an abbreviation (ie Body Mass Index for BMI and vice versa), but if the user's interpretation describes a feature that is not present in the list, set the feature value to ["ERROR"]. This is very important, do not forget about this!
 
     For example, if the sentence is: "BMI is the most important factor for predicting diabetes risk when it is above 25", the values you should return is as follows:
 
-    Feature: BMI
+    Feature(s): ["BMI"]
     Prediction: diabetes risk
     Relationship: most important factor
     Condition: Above 25
 
-     
+    There may be multiple features, so the value for the "features" key should always be an array. 
 
 
     In addition, you should also include the following two fields (as arrays):
@@ -143,7 +157,7 @@ export default function Interpretation({ isSubmitted, setIsSubmitted, hypo, setH
 
 
     This should be formatted in a JSON object, structured like this: 
-    Feature:
+    Features:
     Prediction:
     Relationship:
     Condition:
@@ -151,8 +165,6 @@ export default function Interpretation({ isSubmitted, setIsSubmitted, hypo, setH
     PossibleConditions:
     
     If any of these values are missing in the sentence, the value for that field should be NONE. 
-    
-
     `
 
         const chatCompletion = await openai.chat.completions.create({
@@ -170,6 +182,7 @@ export default function Interpretation({ isSubmitted, setIsSubmitted, hypo, setH
         console.log(`RESPONSE: '${chatCompletion.choices[0].message.content}'`);
 
         // [TODO: @aninuth call setHypo here to update the hypo based the gpt response]
+         
         var json_string = chatCompletion.choices[0].message.content;
         var finish_reason = chatCompletion.choices[0].finish_reason;
         if (json_string !== null && finish_reason === "stop") {
@@ -177,7 +190,7 @@ export default function Interpretation({ isSubmitted, setIsSubmitted, hypo, setH
                 let jsonObject = JSON.parse(json_string);
 
                 // Extract each element and store it in a variable
-                let feature = jsonObject.Feature;
+                let features = jsonObject.Features;
                 let prediction = jsonObject.Prediction;
                 let relationship = jsonObject.Relationship;
                 let condition = jsonObject.Condition;
@@ -185,33 +198,50 @@ export default function Interpretation({ isSubmitted, setIsSubmitted, hypo, setH
                 let PossibleConditions = jsonObject.PossibleConditions;
                 PossibleRelationships.push(relationship)
 
-                if (feature === "ERROR" || prediction === "ERROR") {
+                if (features === "ERROR" || prediction === "ERROR") {
                     console.error("Improper feature/prediction detected");
                 }
                 else {
                     // Log the variables to check the values
-                    console.log("Feature:", feature);
-                    console.log("Prediction:", prediction);
-                    console.log("Relationship:", relationship);
-                    console.log("Condition:", condition);
-                    console.log("Possible Relationships: ", PossibleRelationships);
-                    console.log("Possible Conditions: ", PossibleConditions)
-
-                    setParsedData({
-                        feature,
-                        prediction,
+                    newHypo = {
+                        freetext: input,
+                        features: features,
                         relation: relationship,
-                        condition,
-                        PossibleRelationships,
-                        PossibleConditions
-                    });
+                        prediction: prediction,
+                        condition: condition,
+                        possibleRelations: PossibleRelationships,
+                        possibleConditions: PossibleConditions                        
+                    }
+                    
+                    console.log("NEW HYPO VALS");
+                    console.log("Features:", newHypo.features);
+                    console.log("Prediction:", newHypo.prediction);
+                    console.log("Relationship:", newHypo.relation);
+                    console.log("Condition:", newHypo.condition);
+                    console.log("Possible Relationships: ", newHypo.possibleRelations);
+                    console.log("Possible Conditions: ", newHypo.possibleConditions);
+                    
+                    onHypoChange(newHypo);
+                    setIsLoading(false);
+                    
+                    // setParsedData({
+                    //     features,
+                    //     prediction,
+                    //     relation: relationship,
+                    //     condition,
+                    //     PossibleRelationships,
+                    //     PossibleConditions
+                    // });
                 }
 
             } catch (error) {
                 console.error("Error parsing JSON:", error);
+
             }
             finally {
                 setIsLoading(false);
+                console.log('finally!!');
+                console.log(newHypo.freetext);
             }
         } else {
             console.error("JSON string is null");
@@ -219,7 +249,9 @@ export default function Interpretation({ isSubmitted, setIsSubmitted, hypo, setH
     };
 
     const handleSubmission = async () => {
-        parseInput(userInput);
+        await parseInput(userInput);
+        console.log("submission done, newHypo: ");
+        console.log(newHypo.freetext);
         setIsSubmitted(!isSubmitted);
     };
 
@@ -261,15 +293,15 @@ export default function Interpretation({ isSubmitted, setIsSubmitted, hypo, setH
                 // [TODO: @aninuth update based on the hypo state]
                 isSubmitted && (
                     <Paper className="parse-input" elevation={1}>
-                        {formatText(parsedData.feature, "feature")}
+                        {formatText(newHypo.features[0], "feature")}
                         {getSelection(
                             "relation",
-                            selectedRelation,
+                            newHypo.relation,
                             (k) => setSelectedRelation(k),
-                            parsedData.PossibleRelationships
+                            newHypo.possibleRelations
                         )}
-                        {formatText(parsedData.prediction, "prediction")}
-                        {getSelection("condition", selectedCondition, (k) => setSelectedCondition(k), parsedData.PossibleConditions)}
+                        {formatText(newHypo.prediction, "prediction")}
+                        {getSelection("condition", newHypo.condition, (k) => setSelectedCondition(k), newHypo.possibleConditions)}
                     </Paper>
                 )
             )}
