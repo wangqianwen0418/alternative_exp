@@ -37,6 +37,21 @@ export default function Bar(props: BarProps) {
     .domain([0, Math.max(...allShapValues.flat().map((d) => Math.abs(d)))])
     .range([margin[0], width - margin[2]]);
 
+  // calculate the 95% confidence interval for each feature
+  const confidenceIntervals: { [k: string]: [number, number] } = {};
+  featureNames.forEach((featureName, index) => {
+    const values = allShapValues.map((val) => Math.abs(val[index]));
+    const mean = d3.mean(values) as number;
+    const stdDev = d3.deviation(values) as number;
+    const n = values.length;
+    const t = 1.96; // 95% confidence interval
+    const confidenceInterval = t * (stdDev / Math.sqrt(n));
+    confidenceIntervals[featureName] = [
+      mean - confidenceInterval,
+      mean + confidenceInterval,
+    ];
+  });
+
   useEffect(() => {
     d3.select(`g.bar#${id}`).selectAll("g.x-axis").remove();
     const xAxisGroup = d3
@@ -80,6 +95,14 @@ export default function Bar(props: BarProps) {
                 width={xScale(value) - xScale(0)}
                 height={yScale.bandwidth()}
                 fill="steelblue"
+              />
+              <line
+                x1={xScale(confidenceIntervals[featureName][0])}
+                x2={xScale(confidenceIntervals[featureName][1])}
+                y1={(yScale(featureName) as number) + yScale.bandwidth() / 2}
+                y2={(yScale(featureName) as number) + yScale.bandwidth() / 2}
+                stroke="black"
+                strokeWidth={2}
               />
             </g>
           );

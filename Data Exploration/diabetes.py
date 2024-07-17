@@ -222,4 +222,16 @@ pearsonr(BMI_values, sex_shape_values)
 # %%
 
 
-print("WHOA LET ME SEE IF THIS WORKS")
+bmi_shape_values = shap_values.values[:, 2]
+s5_shape_values = shap_values.values[:, 8]
+
+from scipy.stats import ttest_rel
+
+# Perform paired t-test
+t_statistic, p_value = ttest_rel(bmi_shape_values, s5_shape_values)
+
+# Print the results
+print(f"T-statistic: {t_statistic}")
+print(f"P-value: {p_value}")
+
+# %%
