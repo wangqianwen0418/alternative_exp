@@ -2,7 +2,7 @@ export const CASES = [
     {
         name: "Case 1",
         href: "/case1",
-        userText: '',
+        userText: 'BMI is the most important feature for predicting diabetes risk.',
         initVis: "beeswarm"
     },
     {

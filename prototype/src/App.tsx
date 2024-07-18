@@ -37,6 +37,7 @@ function App(appProps: typeof CASES[0]) {
         possibleRelations: [],
         possibleConditions: []
     });
+    const [curCase, setCase] = useState(CASES[0]);
 
     const handleHypoChange = (newHypo: IHypo) => {
         setHypo(newHypo);
@@ -50,7 +51,7 @@ function App(appProps: typeof CASES[0]) {
                 </ListItem>
 
                 {CASES.map(c => (
-                    <ListItem key={c.name} disablePadding>
+                    <ListItem key={c.name} disablePadding onClick={() => setCase(c)}>
                         <ListItemButton href={c.href}>
                             <ListItemIcon>
                                 <TroubleShootIcon />
@@ -94,7 +95,7 @@ function App(appProps: typeof CASES[0]) {
                 </Paper>
             </Grid>
             <Grid item xs={4} className='App-body'>
-                <Interpretation isSubmitted={isSubmitted} setIsSubmitted={setIsSubmitted} hypo={hypo} onHypoChange={handleHypoChange}{...appProps} />
+                <Interpretation isSubmitted={isSubmitted} setIsSubmitted={setIsSubmitted} hypo={hypo} onHypoChange={handleHypoChange} selectedCase={curCase.name} {...appProps} />
             </Grid>
             <Grid item xs={7} className='App-body'>
                 <Explanation isSubmitted={isSubmitted} hypo={hypo}{...appProps} />

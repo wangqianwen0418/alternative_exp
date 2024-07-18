@@ -1,24 +1,23 @@
 import {
-    Button,
-    Paper,
-    TextField,
-    Typography,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
-    CircularProgress
+  Button,
+  Paper,
+  TextField,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  CircularProgress,
 } from "@mui/material";
 import "./Interpretation.css";
 import { useState } from "react";
-import openai from '../openai_config.js';
+
+import OpenAI from "openai";
 import shapData from "../assets/shap_diabetes.json";
 import { IHypo } from "../App";
-import { CASES } from '../const';
+import { CASES } from "../const";
 
-
-
-var response = ""
+var response = "";
 
 const feature_names = shapData.feature_names;
 
@@ -26,106 +25,111 @@ let feature_name_str = feature_names.join(", ");
 
 const prediction_data = shapData.prediction_name;
 
-
-
 function getSelection(
-    label: string,
-    value: string,
-    handleChange: (k: string) => void,
-    options: string[]
+  label: string,
+  value: string,
+  handleChange: (k: string) => void,
+  options: string[]
 ) {
-    return (
-        <FormControl
-            variant="standard"
-            sx={{ m: 1, minWidth: 120, display: "block" }}
-        >
-            {/* <InputLabel id="demo-simple-select-standard-label">{label}</InputLabel> */}
-            <Select
-                labelId="demo-simple-select-standard-label"
-                id="demo-simple-select-stelandard"
-                value={value}
-                onChange={(e) => handleChange(e.target.value)}
-                label="Age"
-            >
-                {options.map((option) => (
-                    <MenuItem key={option} value={option}>
-                        {option}
-                    </MenuItem>
-                ))}
-            </Select>
-        </FormControl>
-    );
+  return (
+    <FormControl
+      variant="standard"
+      sx={{ m: 1, minWidth: 120, display: "block" }}
+    >
+      {/* <InputLabel id="demo-simple-select-standard-label">{label}</InputLabel> */}
+      <Select
+        labelId="demo-simple-select-standard-label"
+        id="demo-simple-select-stelandard"
+        value={value}
+        onChange={(e) => handleChange(e.target.value)}
+        label="Age"
+      >
+        {options.map((option) => (
+          <MenuItem key={option} value={option}>
+            {option}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
+  );
 }
 
 function formatText(
-    text: string,
-    entityType: "feature" | "relation" | "prediction" | "condition"
+  text: string,
+  entityType: "feature" | "relation" | "prediction" | "condition"
 ) {
-    if (entityType === "feature") {
-        return (
-            <span className="label" style={{ backgroundColor: "#6bbcff" }}>
-                {text}
-            </span>
-        );
-    } else if (entityType === "relation") {
-        return (
-            <span className="label" style={{ backgroundColor: "green" }}>
-                {text}
-            </span>
-        );
-    } else if (entityType === "prediction") {
-        return (
-            <span className="label" style={{ backgroundColor: "#ffc760" }}>
-                {text}
-            </span>
-        );
-    } else if (entityType === "condition") {
-        return (
-            <span className="label" style={{ backgroundColor: "#ffc760" }}>
-                {text}
-            </span>
-        );
-    }
+  if (entityType === "feature") {
+    return (
+      <span className="label" style={{ backgroundColor: "#6bbcff" }}>
+        {text}
+      </span>
+    );
+  } else if (entityType === "relation") {
+    return (
+      <span className="label" style={{ backgroundColor: "green" }}>
+        {text}
+      </span>
+    );
+  } else if (entityType === "prediction") {
+    return (
+      <span className="label" style={{ backgroundColor: "#ffc760" }}>
+        {text}
+      </span>
+    );
+  } else if (entityType === "condition") {
+    return (
+      <span className="label" style={{ backgroundColor: "#ffc760" }}>
+        {text}
+      </span>
+    );
+  }
 }
 
-type props = typeof CASES[0] & {
-    isSubmitted: boolean;
-    setIsSubmitted: (k: boolean) => void;
-    hypo: IHypo;
-    onHypoChange: (newHypo: IHypo) => void;
-}
+type props = (typeof CASES)[0] & {
+  isSubmitted: boolean;
+  selectedCase: string;
+  setIsSubmitted: (k: boolean) => void;
+  hypo: IHypo;
+  onHypoChange: (newHypo: IHypo) => void;
+};
 
-export default function Interpretation({ isSubmitted, setIsSubmitted, hypo, onHypoChange }: props) {
-    const [userInput, setUserInput] = useState("");
-    const [parsedData, setParsedData] = useState({
-        feature: "aa",
-        relation: "aa",
-        prediction: "aa",
-        condition: "aa",
-        PossibleRelationships: ["aa", "bb"],
-        PossibleConditions: ["cc", "dd"]
-    });
+export default function Interpretation({
+  isSubmitted,
+  selectedCase,
+  setIsSubmitted,
+  hypo,
+  onHypoChange,
+}: props) {
+  const [userInput, setUserInput] = useState("");
+  const [parsedData, setParsedData] = useState({
+    feature: "aa",
+    relation: "aa",
+    prediction: "aa",
+    condition: "aa",
+    PossibleRelationships: ["aa", "bb"],
+    PossibleConditions: ["cc", "dd"],
+  });
 
-    const [selectedRelation, setSelectedRelation] = useState(parsedData.relation);
-    const [selectedCondition, setSelectedCondition] = useState(parsedData.condition);
-    const [isLoading, setIsLoading] = useState(false);  // New loading state
-    let newHypo: IHypo = {
-        freetext: "null",
-        features: ["none"],
-        relation: "none",
-        prediction: 'none',
-        condition: 'none',
-        possibleRelations: ['none'],
-        possibleConditions: ['none']
-    };
+  const [selectedRelation, setSelectedRelation] = useState(parsedData.relation);
+  const [selectedCondition, setSelectedCondition] = useState(
+    parsedData.condition
+  );
+  const [isLoading, setIsLoading] = useState(false); // New loading state
+  const [apiKey, setApiKey] = useState("");
+  let newHypo: IHypo = {
+    freetext: "null",
+    features: ["none"],
+    relation: "none",
+    prediction: "none",
+    condition: "none",
+    possibleRelations: ["none"],
+    possibleConditions: ["none"],
+  };
 
-    const parseInput = async (input: string) => {
-
-
-        setIsLoading(true);  // Start loading
-
-
-        const prompt = `You are a bot that extracts the sentence structure from explanation sentences. You produce JSON that contains the following data from an inputted sentence: \:
+  const parseInput = async (input: string) => {
+    setIsLoading(true); // Start loading
+    console.log("PARSING USER INPUT, SUMMONING THE GPT");
+    const prompt = `You are a bot that extracts the sentence structure from explanation sentences. You produce JSON that contains the following data from an inputted sentence: \:
     Features
     Prediction
     Relationship
@@ -165,146 +169,219 @@ export default function Interpretation({ isSubmitted, setIsSubmitted, hypo, onHy
     PossibleConditions:
     
     If any of these values are missing in the sentence, the value for that field should be NONE. 
-    `
+    `;
+    const openai = new OpenAI({
+      apiKey: apiKey,
 
-        const chatCompletion = await openai.chat.completions.create({
+      dangerouslyAllowBrowser: true,
+    });
+    console.log("API KEY: ", apiKey);
+    const chatCompletion = await openai.chat.completions.create({
+      model: "gpt-4o",
+      response_format: { type: "json_object" },
+      max_tokens: 1024,
+      messages: [
+        { role: "system", content: prompt },
+        { role: "user", content: input },
+      ],
+    });
+    console.log(`RESPONSE: '${chatCompletion.choices[0].message.content}'`);
 
+    // [TODO: @aninuth call setHypo here to update the hypo based the gpt response]
 
-            model: "gpt-4o",
-            response_format: { "type": "json_object" },
-            max_tokens: 1024,
-            messages: [
-                { "role": "system", "content": prompt },
-                { "role": "user", "content": input }
-            ]
+    var json_string = chatCompletion.choices[0].message.content;
+    var finish_reason = chatCompletion.choices[0].finish_reason;
+    if (json_string !== null && finish_reason === "stop") {
+      try {
+        let jsonObject = JSON.parse(json_string);
 
-        });
-        console.log(`RESPONSE: '${chatCompletion.choices[0].message.content}'`);
+        // Extract each element and store it in a variable
+        let features = jsonObject.Features;
+        let prediction = jsonObject.Prediction;
+        let relationship = jsonObject.Relationship;
+        let condition = jsonObject.Condition;
+        let PossibleRelationships = jsonObject.PossibleRelationships;
+        let PossibleConditions = jsonObject.PossibleConditions;
+        PossibleRelationships.push(relationship);
 
-        // [TODO: @aninuth call setHypo here to update the hypo based the gpt response]
-         
-        var json_string = chatCompletion.choices[0].message.content;
-        var finish_reason = chatCompletion.choices[0].finish_reason;
-        if (json_string !== null && finish_reason === "stop") {
-            try {
-                let jsonObject = JSON.parse(json_string);
-
-                // Extract each element and store it in a variable
-                let features = jsonObject.Features;
-                let prediction = jsonObject.Prediction;
-                let relationship = jsonObject.Relationship;
-                let condition = jsonObject.Condition;
-                let PossibleRelationships = jsonObject.PossibleRelationships;
-                let PossibleConditions = jsonObject.PossibleConditions;
-                PossibleRelationships.push(relationship)
-
-                if (features === "ERROR" || prediction === "ERROR") {
-                    console.error("Improper feature/prediction detected");
-                }
-                else {
-                    // Log the variables to check the values
-                    newHypo = {
-                        freetext: input,
-                        features: features,
-                        relation: relationship,
-                        prediction: prediction,
-                        condition: condition,
-                        possibleRelations: PossibleRelationships,
-                        possibleConditions: PossibleConditions                        
-                    }
-                    
-                    console.log("NEW HYPO VALS");
-                    console.log("Features:", newHypo.features);
-                    console.log("Prediction:", newHypo.prediction);
-                    console.log("Relationship:", newHypo.relation);
-                    console.log("Condition:", newHypo.condition);
-                    console.log("Possible Relationships: ", newHypo.possibleRelations);
-                    console.log("Possible Conditions: ", newHypo.possibleConditions);
-                    
-                    onHypoChange(newHypo);
-                    setIsLoading(false);
-                    
-                    // setParsedData({
-                    //     features,
-                    //     prediction,
-                    //     relation: relationship,
-                    //     condition,
-                    //     PossibleRelationships,
-                    //     PossibleConditions
-                    // });
-                }
-
-            } catch (error) {
-                console.error("Error parsing JSON:", error);
-
-            }
-            finally {
-                setIsLoading(false);
-                console.log('finally!!');
-                console.log(newHypo.freetext);
-            }
+        if (features === "ERROR" || prediction === "ERROR") {
+          console.error("Improper feature/prediction detected");
         } else {
-            console.error("JSON string is null");
+          // Log the variables to check the values
+          newHypo = {
+            freetext: input,
+            features: features,
+            relation: relationship,
+            prediction: prediction,
+            condition: condition,
+            possibleRelations: PossibleRelationships,
+            possibleConditions: PossibleConditions,
+          };
+
+          console.log("NEW HYPO VALS");
+          console.log("Features:", newHypo.features);
+          console.log("Prediction:", newHypo.prediction);
+          console.log("Relationship:", newHypo.relation);
+          console.log("Condition:", newHypo.condition);
+          console.log("Possible Relationships: ", newHypo.possibleRelations);
+          console.log("Possible Conditions: ", newHypo.possibleConditions);
+
+          onHypoChange(newHypo);
+          setIsLoading(false);
+
+          // setParsedData({
+          //     features,
+          //     prediction,
+          //     relation: relationship,
+          //     condition,
+          //     PossibleRelationships,
+          //     PossibleConditions
+          // });
         }
-    };
-
-    const handleSubmission = async () => {
-        await parseInput(userInput);
-        console.log("submission done, newHypo: ");
+      } catch (error) {
+        console.error("Error parsing JSON:", error);
+      } finally {
+        setIsLoading(false);
+        console.log("finally!!");
         console.log(newHypo.freetext);
-        setIsSubmitted(!isSubmitted);
-    };
+        return newHypo;
+      }
+    } else {
+      console.error("JSON string is null");
+    }
+  };
 
-    return (
-        <Paper style={{ padding: "15px" }}>
-            <Typography variant="h5" gutterBottom>
-                User Interpretation
-            </Typography>
-            <TextField
-                id="outlined-basic"
-                label="e.g., a high bmi leads to large diabete progression"
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-                multiline
-                rows={4}
-                fullWidth
-            />
-            <div style={{ alignItems: "center" }}>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    style={{ margin: "10px 5px" }}
-                    onClick={() => setIsSubmitted(!isSubmitted)}
-                >
-                    Clear
-                </Button>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    style={{ margin: "10px 5px" }}
-                    onClick={handleSubmission}
-                >
-                    Submit
-                </Button>
-            </div>
-            {isLoading ? (
-                <CircularProgress></CircularProgress>
-            ) : (
-                // [TODO: @aninuth update based on the hypo state]
-                isSubmitted && (
-                    <Paper className="parse-input" elevation={1}>
-                        {formatText(newHypo.features[0], "feature")}
-                        {getSelection(
-                            "relation",
-                            newHypo.relation,
-                            (k) => setSelectedRelation(k),
-                            newHypo.possibleRelations
-                        )}
-                        {formatText(newHypo.prediction, "prediction")}
-                        {getSelection("condition", newHypo.condition, (k) => setSelectedCondition(k), newHypo.possibleConditions)}
-                    </Paper>
-                )
+  const handleSubmission = async () => {
+    console.log(selectedCase);
+    if (selectedCase === "Case 1") {
+      console.log("In case 1");
+      newHypo = {
+        freetext:
+          "BMI is the most important feature for predicting diabetes risk.",
+        features: ["BMI"],
+        prediction: "diabetes risk",
+        relation: "most important feature",
+        condition: "none",
+        possibleRelations: [
+          "most important feature",
+          "2nd most important feature",
+          "least important feature",
+          "has a positive correlation with",
+        ],
+        possibleConditions: ["when above 25", "when below 25"],
+      };
+      onHypoChange(newHypo);
+      setIsSubmitted(!isSubmitted);
+    } else if (selectedCase === "Case 2") {
+      console.log("in case 2");
+      newHypo = {
+        freetext:
+          "serum triglycerides level is the most important feature for predicting the progression of diabetes.",
+        features: ["serum triglycerides level"],
+        prediction: "diabetes progression",
+        relation: "most important feature",
+        condition: "none",
+        possibleRelations: [
+          "most important feature",
+          "2nd most important feature",
+          "least important feature",
+          "has a positive correlation with",
+        ],
+        possibleConditions: ["when above 25", "when below 25"],
+      };
+      onHypoChange(newHypo);
+      setIsSubmitted(!isSubmitted);
+    } else if (selectedCase === "Case 3") {
+      console.log("in case 3");
+      newHypo = {
+        freetext: "BMI has a positive correlation with diabetes progression",
+        features: ["BMI"],
+        prediction: "diabetes progression",
+        relation: "positive correlation",
+        condition: "none",
+        possibleRelations: [
+          "most important feature",
+          "2nd most important feature",
+          "least important feature",
+          "has a positive correlation with",
+        ],
+        possibleConditions: ["when above 25", "when below 25"],
+      };
+      onHypoChange(newHypo);
+      setIsSubmitted(!isSubmitted);
+    } else {
+      const result = await parseInput(userInput);
+      newHypo = result ?? newHypo;
+      console.log(newHypo.freetext);
+      onHypoChange(newHypo);
+      setIsSubmitted(!isSubmitted);
+    }
+  };
+
+  return (
+    <Paper style={{ padding: "15px" }}>
+      <Typography variant="h5" gutterBottom>
+        User Interpretation
+      </Typography>
+      <TextField
+        id="outlined-basic"
+        label="e.g., a high bmi leads to large diabete progression"
+        value={userInput}
+        onChange={(e) => setUserInput(e.target.value)}
+        multiline
+        rows={4}
+        fullWidth
+      />
+      <TextField
+        id="api-key"
+        label="Enter your OpenAI API key here"
+        value = {apiKey}
+        onChange={(e) => setApiKey(e.target.value)}
+        rows={1}
+        fullWidth
+        style={{ marginTop: "15px" }}
+      />
+      <div style={{ alignItems: "center" }}>
+        <Button
+          variant="contained"
+          color="primary"
+          style={{ margin: "10px 5px" }}
+          onClick={() => setIsSubmitted(!isSubmitted)}
+        >
+          Clear
+        </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          style={{ margin: "10px 5px" }}
+          onClick={handleSubmission}
+        >
+          Submit
+        </Button>
+      </div>
+      {isLoading ? (
+        <CircularProgress></CircularProgress>
+      ) : (
+        // [TODO: @aninuth update based on the hypo state]
+        isSubmitted && (
+          <Paper className="parse-input" elevation={1}>
+            {formatText(newHypo.features[0], "feature")}
+            {getSelection(
+              "relation",
+              newHypo.relation,
+              (k) => setSelectedRelation(k),
+              newHypo.possibleRelations
             )}
-        </Paper>
-    );
+            {formatText(newHypo.prediction, "prediction")}
+            {getSelection(
+              "condition",
+              newHypo.condition,
+              (k) => setSelectedCondition(k),
+              newHypo.possibleConditions
+            )}
+          </Paper>
+        )
+      )}
+    </Paper>
+  );
 }

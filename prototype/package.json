@@ -1,6 +1,7 @@
 {
   "name": "prototype",
   "version": "0.1.0",
+  "homepage": "https://aninuth.guthub.io/react-gh-pages",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.11.4",
@@ -27,6 +28,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -55,6 +58,7 @@
     "@types/d3": "^7.4.3",
     "eslint": "^8.57.0",
     "eslint-plugin-react": "^7.34.3",
+    "gh-pages": "^6.1.1",
     "globals": "^15.7.0",
     "typescript-eslint": "^7.14.1"
   }
