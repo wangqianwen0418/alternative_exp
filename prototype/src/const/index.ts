@@ -19,10 +19,16 @@ export const CASES = [
     initVis: "scatter",
   },
   {
-    name: "Case 4",
-    href: "/case4",
+    name: "Case 4a",
+    href: "/case4a",
     userText: "",
-    initVis: "beeswarm_income",
+    initVis: "heatmap_income",
+  },
+  {
+    name: "Case 4b",
+    href: "/case4b",
+    userText: "",
+    initVis: "swarm_income",
   },
   {
     name: "Free Exploration",

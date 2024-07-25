@@ -3,6 +3,7 @@ import shap_diabetes from "../assets/shap_diabetes.json";
 import shap_income from "../assets/shap_income_subset.json";
 
 import Swarm from "./Swarm";
+import Heatmap from "./Heatmap";
 import Scatter from "./Scatter";
 import Bar from "./Bar";
 import { IHypo } from "../App";
@@ -23,7 +24,7 @@ export default function Explanation({ isSubmitted, initVis, hypo }: props) {
       (row) => row[featureIndex]
     );
 
-  const incomeFeatureName = "Age",
+  const incomeFeatureName = "Capital Gain",
     incomeFeatureIndex =
       shap_income["feature_names"].indexOf(incomeFeatureName),
     incomeFeatureValues = shap_income["feature_values"].map(
@@ -40,9 +41,10 @@ export default function Explanation({ isSubmitted, initVis, hypo }: props) {
         <Swarm
           xValues={featureShapValues}
           colorValues={featureValues}
-          width={1000}
-          height={500}
+          width={700}
+          height={400}
           id="bmi"
+          bucketWidth={1}
         />
       );
       break;
@@ -70,14 +72,26 @@ export default function Explanation({ isSubmitted, initVis, hypo }: props) {
         />
       );
       break;
-    case "beeswarm_income":
+    case "heatmap_income":
+      initialVisualization = (
+        <Heatmap
+          shapValues={incomeFeatureShapValues}
+          featureValues={incomeFeatureValues}
+          height={50}
+          width={1000}
+          title="Capital Gain Heatmap"
+        />
+      );
+      break;
+    case "swarm_income":
       initialVisualization = (
         <Swarm
           xValues={incomeFeatureShapValues}
           colorValues={incomeFeatureValues}
-          width={1000}
-          height={500}
-          id="Age"
+          width={800}
+          height={350}
+          id="Capital Gain"
+          bucketWidth={0.002}
         />
       );
       break;
@@ -89,6 +103,7 @@ export default function Explanation({ isSubmitted, initVis, hypo }: props) {
           width={500}
           height={100}
           id="bmi"
+          bucketWidth={1}
         />
       );
   }
@@ -139,7 +154,7 @@ export default function Explanation({ isSubmitted, initVis, hypo }: props) {
       <Typography variant="h5" gutterBottom>
         Visual Explanation
       </Typography>
-      <svg className="swarm" width={900} height={500}>
+      <svg className="swarm" width={1000} height={500}>
         {initialVisualization}
 
         {additionalVisualizations}
