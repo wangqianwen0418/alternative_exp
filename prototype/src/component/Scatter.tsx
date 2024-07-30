@@ -8,13 +8,16 @@ interface ScatterProps {
     width: number;
     height: number;
     id: string; // make sure accurate d3 selection with multiple swarms on the same page
+    selectedIndices: number[];
+    setSelectedIndices: (indices: number[]) => void;
+
 }
 
 export default function Scatter(props: ScatterProps) {
     let margin = [10, 10, 40, 10],
         radius = 3,
         leftTitleMargin = 40;
-    const { xValues, yValues, height, width, id, offsets } = props;
+    const { xValues, yValues, height, width, id, offsets, selectedIndices, setSelectedIndices } = props;
     const xScale = d3
         .scaleLinear()
         .domain(d3.extent(xValues) as [number, number])
@@ -64,21 +67,28 @@ export default function Scatter(props: ScatterProps) {
         // Brush functionality for selection
         const brush = d3.brush()
             .extent([[0, 0], [width, height]])
+            .on("start", brushstart)
             .on("end", brushended);
     
         // Append the brush to the SVG group
-        d3.select(`g.scatter#${id}`)
+        const brushGroup = d3.select(`g.scatter#${id}`)
             .append("g")
             .attr("class", "brush")
             .call(brush);
         
+
+        function brushstart(event: any) {
+            //TODO: CLEAR THE BRUSH RECTANGLE
+            brushGroup.call(brush.move, null);
+        }
+
         // Function to handle the brush selection
         function brushended(event: any) {
             const selection = event.selection;
             if (!selection) return; // Exit if no selection
-
+            const brushedIndices: number[] = [];
             const [[x0, y0], [x1, y1]] = selection;
-
+            
             d3.selectAll(`g.scatter#${id} .points circle`)
                 .attr("stroke-width", (d: any, i: number) => {
                     const x = xScale(xValues[i]);
@@ -89,9 +99,12 @@ export default function Scatter(props: ScatterProps) {
                     const x = xScale(xValues[i]);
                     const y = yScale(yValues[i]);
                     if (x0 <= x && x <= x1 && y0 <= y && y <= y1) {
+                        brushedIndices.push(i);
                         console.log(`Selected: (${xValues[i]}, ${yValues[i]})`);
                     }
                 });
+
+                setSelectedIndices(brushedIndices);
         }
 
     }, [xValues, height, width]);
@@ -118,8 +131,15 @@ export default function Scatter(props: ScatterProps) {
                             cy={yScale(yValues[i])}
                             r={3}
                             stroke="steelblue"
-                            fill="none"
-                            opacity={0.8}
+                            fill={
+                                props.selectedIndices.includes(i) ? "steelblue" : "transparent"
+                              }
+                              opacity={
+                                props.selectedIndices.length == 0 ||
+                                props.selectedIndices.includes(i)
+                                  ? 0.8
+                                  : 0.3
+                              }
                         />
                     );
                 })}

@@ -1,7 +1,7 @@
 {
   "name": "prototype",
   "version": "0.1.0",
-  "homepage": "https://aninuth.guthub.io/react-gh-pages",
+  "homepage": "/case1",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.11.4",

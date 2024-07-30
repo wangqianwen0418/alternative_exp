@@ -8,14 +8,17 @@ import {
   Select,
   MenuItem,
   CircularProgress,
+  Modal,
+  Box,
 } from "@mui/material";
 import "./Interpretation.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import OpenAI from "openai";
 import shapData from "../assets/shap_diabetes.json";
 import { IHypo } from "../App";
 import { CASES } from "../const";
+import { updateElementAccess } from "typescript";
 
 var response = "";
 
@@ -101,6 +104,8 @@ export default function Interpretation({
   onHypoChange,
 }: props) {
   const [userInput, setUserInput] = useState("");
+
+
   const [parsedData, setParsedData] = useState({
     feature: "aa",
     relation: "aa",
@@ -111,20 +116,38 @@ export default function Interpretation({
   });
 
   const [selectedRelation, setSelectedRelation] = useState(parsedData.relation);
-  const [selectedCondition, setSelectedCondition] = useState(
-    parsedData.condition
-  );
+  const [selectedCondition, setSelectedCondition] = useState(parsedData.condition);
   const [isLoading, setIsLoading] = useState(false); // New loading state
   const [apiKey, setApiKey] = useState("");
-  let newHypo: IHypo = {
+  const [isFree, setIsFree] = useState(false);
+  const [newHypo, setNewHypo] = useState<IHypo>({
     freetext: "null",
-    features: ["none"],
-    relation: "none",
-    prediction: "none",
+    features: ["Feature 1", "Feature 2"],
+    relation: "relationship 1",
+    prediction: "BMI",
     condition: "none",
-    possibleRelations: ["none"],
-    possibleConditions: ["none"],
-  };
+    possibleRelations: ["relationship 1", "relationship 2"],
+    possibleConditions: ["none", "condition 1", "condition 2"],
+  });
+  const [curCase, setCurCase] = useState("Case 1");
+
+
+
+  useEffect(() => {
+    if (window.location.pathname === "/free") {
+      setIsFree(true);
+      setCurCase("Free Exploration");
+    }
+    else if (window.location.pathname === "/case2") {
+      setCurCase("Case 2");
+    }
+    else if (window.location.pathname === "/case3") {
+      setCurCase("Case 3");
+    }
+    else{
+      setCurCase("Case 1");
+    }
+  }, []);
 
   const parseInput = async (input: string) => {
     setIsLoading(true); // Start loading
@@ -159,6 +182,12 @@ export default function Interpretation({
     
     If there is no actual condition in the sentence, make sure you still include a couple options for possible conditions, based on reasonable values for the given feature/variable.
 
+    Finally, there is one last thing you need to return: An explanation level. This can best be explained in the following way: 
+    The first level (Level 1) is exclusively describing SHAP/output values at a summary level. For example, an explanation such as "Serum triglycerides level is the most important feature for predicting diabetes risk" would be a level 1 explanation, as it does not account for any information gained from the feature values.
+    Level 2 is still exclusively describing SHAP/output values, although it includes distribution information or details about the SHAP scores. For example, "Serum triglycerides level is the most important feature for diabetes risk when the values are above average" would be a level 2 explanation.
+    Level 3 explanations also incoporate the values of the features themselves. For example, "BMI has a positive correlation with diabetes risk" would be a level 3 explanation. 
+    Level 4 explanations involve the relationship between multiple features. For example, "Age influences the impact of BMI on diabetes progression" would be considered a level 4 explanation. 
+    Please return the integer value of the level in the JSON as well.
 
     This should be formatted in a JSON object, structured like this: 
     Features:
@@ -167,8 +196,11 @@ export default function Interpretation({
     Condition:
     PossibleRelationships:
     PossibleConditions:
+    Level: 
     
-    If any of these values are missing in the sentence, the value for that field should be NONE. 
+    If any of the original values (feature, prediction, relationship, condition) are missing in the sentence, the value for that field should be NONE. 
+
+
     `;
     const openai = new OpenAI({
       apiKey: apiKey,
@@ -187,8 +219,6 @@ export default function Interpretation({
     });
     console.log(`RESPONSE: '${chatCompletion.choices[0].message.content}'`);
 
-    // [TODO: @aninuth call setHypo here to update the hypo based the gpt response]
-
     var json_string = chatCompletion.choices[0].message.content;
     var finish_reason = chatCompletion.choices[0].finish_reason;
     if (json_string !== null && finish_reason === "stop") {
@@ -203,12 +233,12 @@ export default function Interpretation({
         let PossibleRelationships = jsonObject.PossibleRelationships;
         let PossibleConditions = jsonObject.PossibleConditions;
         PossibleRelationships.push(relationship);
-
+        let level = jsonObject.Level;
         if (features === "ERROR" || prediction === "ERROR") {
           console.error("Improper feature/prediction detected");
         } else {
           // Log the variables to check the values
-          newHypo = {
+          const updatedHypo = {
             freetext: input,
             features: features,
             relation: relationship,
@@ -225,8 +255,8 @@ export default function Interpretation({
           console.log("Condition:", newHypo.condition);
           console.log("Possible Relationships: ", newHypo.possibleRelations);
           console.log("Possible Conditions: ", newHypo.possibleConditions);
-
-          onHypoChange(newHypo);
+          setNewHypo(updatedHypo);
+          onHypoChange(updatedHypo);
           setIsLoading(false);
 
           // setParsedData({
@@ -253,9 +283,10 @@ export default function Interpretation({
 
   const handleSubmission = async () => {
     console.log(selectedCase);
+    selectedCase = curCase;
     if (selectedCase === "Case 1") {
       console.log("In case 1");
-      newHypo = {
+      const updatedHypo = {
         freetext:
           "BMI is the most important feature for predicting diabetes risk.",
         features: ["BMI"],
@@ -270,11 +301,12 @@ export default function Interpretation({
         ],
         possibleConditions: ["when above 25", "when below 25"],
       };
-      onHypoChange(newHypo);
+      setNewHypo(updatedHypo);
+      onHypoChange(updatedHypo);
       setIsSubmitted(!isSubmitted);
     } else if (selectedCase === "Case 2") {
       console.log("in case 2");
-      newHypo = {
+      const updatedHypo = {
         freetext:
           "serum triglycerides level is the most important feature for predicting the progression of diabetes.",
         features: ["serum triglycerides level"],
@@ -289,11 +321,12 @@ export default function Interpretation({
         ],
         possibleConditions: ["when above 25", "when below 25"],
       };
-      onHypoChange(newHypo);
+      setNewHypo(updatedHypo)
+      onHypoChange(updatedHypo);
       setIsSubmitted(!isSubmitted);
     } else if (selectedCase === "Case 3") {
       console.log("in case 3");
-      newHypo = {
+      const updatedHypo = {
         freetext: "BMI has a positive correlation with diabetes progression",
         features: ["BMI"],
         prediction: "diabetes progression",
@@ -307,13 +340,36 @@ export default function Interpretation({
         ],
         possibleConditions: ["when above 25", "when below 25"],
       };
-      onHypoChange(newHypo);
+      setNewHypo(updatedHypo);
+      onHypoChange(updatedHypo);
       setIsSubmitted(!isSubmitted);
-    } else {
+    } else if (selectedCase === "Free Exploration") {
       const result = await parseInput(userInput);
-      newHypo = result ?? newHypo;
+      if (result){
+        setNewHypo(result);
+        onHypoChange(result);
+      }
       console.log(newHypo.freetext);
-      onHypoChange(newHypo);
+      setIsSubmitted(!isSubmitted);      
+    } else {
+      console.log("In case 10");
+      const updatedHypo = {
+        freetext:
+          "BMI is the most important feature for predicting diabetes risk.",
+        features: ["BMI"],
+        prediction: "diabetes risk",
+        relation: "most important feature",
+        condition: "none",
+        possibleRelations: [
+          "most important feature",
+          "2nd most important feature",
+          "least important feature",
+          "has a positive correlation with",
+        ],
+        possibleConditions: ["when above 25", "when below 25"],
+      };
+      setNewHypo(updatedHypo);
+      onHypoChange(updatedHypo);
       setIsSubmitted(!isSubmitted);
     }
   };
@@ -332,15 +388,18 @@ export default function Interpretation({
         rows={4}
         fullWidth
       />
-      <TextField
-        id="api-key"
-        label="Enter your OpenAI API key here"
-        value = {apiKey}
-        onChange={(e) => setApiKey(e.target.value)}
-        rows={1}
-        fullWidth
-        style={{ marginTop: "15px" }}
-      />
+      {isFree && (
+        <TextField
+          id="api-key"
+          label="Enter your OpenAI API key here"
+          value={apiKey}
+          onChange={(e) => setApiKey(e.target.value)}
+          rows={1}
+          fullWidth
+          style={{ marginTop: "15px" }}
+        />
+      )}
+
       <div style={{ alignItems: "center" }}>
         <Button
           variant="contained"
@@ -362,10 +421,14 @@ export default function Interpretation({
       {isLoading ? (
         <CircularProgress></CircularProgress>
       ) : (
-        // [TODO: @aninuth update based on the hypo state]
         isSubmitted && (
           <Paper className="parse-input" elevation={1}>
-            {formatText(newHypo.features[0], "feature")}
+            <div className="features-container">
+              {newHypo.features.map((feature, index) => (
+                <span key={index}>{formatText(feature, "feature")}</span>
+              ))}
+            </div>
+
             {getSelection(
               "relation",
               newHypo.relation,

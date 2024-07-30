@@ -6,6 +6,7 @@ import Scatter from "./Scatter";
 import Bar from "./Bar";
 import { IHypo } from "../App";
 import { CASES } from '../const';
+import {useState} from "react";
 
 type props = typeof CASES[0] & {
     isSubmitted: boolean;
@@ -13,6 +14,9 @@ type props = typeof CASES[0] & {
 }
 
 export default function Explanation({ isSubmitted, hypo, initVis}: props) {
+    const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
+    console.log("SELECTED INDICES: ");
+    console.log(selectedIndices);
     const featureName = "bmi",
         featureIndex = shap_diabetes["feature_names"].indexOf(featureName),
         featureValues = shap_diabetes["feature_values"].map(
@@ -34,6 +38,8 @@ export default function Explanation({ isSubmitted, hypo, initVis}: props) {
                     width={500}
                     height={100}
                     id="bmi"
+                    selectedIndices={selectedIndices}
+                    setSelectedIndices={setSelectedIndices}
                 />
             );
             break;
@@ -46,6 +52,8 @@ export default function Explanation({ isSubmitted, hypo, initVis}: props) {
                     height={300}
                     id="bmi-scatter"
                     offsets={[0, 0]}
+                    selectedIndices={selectedIndices}
+                    setSelectedIndices={setSelectedIndices}
                 />
             );
             break;
@@ -69,6 +77,8 @@ export default function Explanation({ isSubmitted, hypo, initVis}: props) {
                     width={500}
                     height={100}
                     id="bmi"
+                    selectedIndices={selectedIndices}
+                    setSelectedIndices={setSelectedIndices}
                 />)
     }
 
@@ -82,6 +92,8 @@ export default function Explanation({ isSubmitted, hypo, initVis}: props) {
                 height={300}
                 id="bmi-scatter"
                 offsets={[0, 150]}
+                selectedIndices={selectedIndices}
+                setSelectedIndices={setSelectedIndices}
             />
 
             <g>

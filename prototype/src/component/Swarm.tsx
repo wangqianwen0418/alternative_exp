@@ -7,6 +7,8 @@ interface SwarmProps {
   width: number;
   height: number;
   id: string; // make sure accurate d3 selection with multiple swarms on the same page
+  selectedIndices: number[];
+  setSelectedIndices: (index: number[]) => void;
 }
 
 
@@ -202,7 +204,6 @@ export default function Swarm(SwarmProps: SwarmProps) {
           {id}
         </text>
         {xValues.map((x, i) => {
-          const isSelected = selectedPoints.includes(i);
           return (
             <circle
               key={i}
@@ -210,7 +211,18 @@ export default function Swarm(SwarmProps: SwarmProps) {
               cy={yScale(yVals[i])}
               r={3}
               fill={colorScale(colorValues[i])}
-              style={{ fontWeight: isSelected ? "bold" : "normal" }}
+              opacity={
+                SwarmProps.selectedIndices.length == 0 ||
+                SwarmProps.selectedIndices.includes(i)
+                  ? 1
+                  : 0.3
+              }
+              onMouseEnter={() => {
+                SwarmProps.setSelectedIndices([i]);
+              }}
+              onMouseLeave={() => {
+                SwarmProps.setSelectedIndices([]);
+              }}
             />
           );
         })}
