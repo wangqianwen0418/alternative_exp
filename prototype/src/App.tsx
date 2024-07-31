@@ -59,7 +59,7 @@ function App(appProps: typeof CASES[0]) {
             >
                 <MenuIcon />
             </IconButton>
-            Are you interpreting correctly?
+            Is the interpretation correct?
         </Toolbar>
     </Grid>
 
