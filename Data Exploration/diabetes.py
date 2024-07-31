@@ -182,6 +182,7 @@ shap.plots.scatter(shap_values[:, 'sex'],color=shap_values[:, 'bmi'], x_jitter=0
 #%%
 gender_shap_values = shap_values[:, 1].values
 BMI_values = X_train.iloc[:, 2].values
+
 gender_values = ['female' if i>0 else 'male' for i in X_train.iloc[:, 1].values]
 
 df = pd.DataFrame({
@@ -197,6 +198,36 @@ alt.Chart(df).mark_point().encode(
     color=alt.Color('color:N'),
     tooltip=['index:Q']
     )
+#%%
+gender_shap_values = shap_values[:, 1].values
+BMI_values = X_train.iloc[:, 2].values
+f_mask = (X_train.iloc[:, 1].values > 0)
+m_mask = (X_train.iloc[:, 1].values < 0)
+
+df = pd.DataFrame({
+    'X': BMI_values[f_mask],
+    'Y': gender_shap_values[f_mask],
+})
+df['index'] = df.index
+
+chart1 = alt.Chart(df).mark_point().encode(
+    x=alt.X('X:Q', title='BMI'),
+    y=alt.Y('Y:Q', title='SHAP value of Gender'),
+   
+    tooltip=['index:Q']
+    )
+
+df = pd.DataFrame({
+    'X': BMI_values[m_mask],
+    'Y': gender_shap_values[m_mask],
+})
+df['index'] = df.index
+chart2 = alt.Chart(df).mark_point().encode(
+    x=alt.X('X:Q', title='BMI'),
+    y=alt.Y('Y:Q', title='SHAP value of Gender'),
+)
+
+chart1 | chart2
 # %%
 
 from scipy.stats import pearsonr
@@ -222,5 +253,36 @@ pearsonr(filtered_BMI_values, filtered_sex_shape_values)
 pearsonr(BMI_values, sex_shape_values)
 # %%
 
+shap.plots.scatter(shap_values[:, 'bmi'],color=shap_values)
+#%%
+BMI_values = X_train.iloc[:, 2].values
+bmi_shape_values = shap_values[:, 2].values
+mask = (BMI_values < -0.05) 
+filtered_bmi_shape_values = bmi_shape_values[mask]
+filtered_bp_values = X_train.iloc[:, 3].values[mask]
+df = pd.DataFrame({
+    'X': filtered_bp_values,
+    'Y': filtered_bmi_shape_values
+})
+df['index'] = df.index
+chart_a = alt.Chart(df).mark_point().encode(
+    x=alt.X('X:Q', title='bp'),
+    y=alt.Y('Y:Q', title='SHAP value of BMI'),
+    tooltip=['index:Q']
+)
 
-print("WHOA LET ME SEE IF THIS WORKS")
+mask2 = (BMI_values > 0.05)
+filtered_bmi_shape_values = bmi_shape_values[mask2]
+filtered_bp_values = X_train.iloc[:, 3].values[mask2]
+df = pd.DataFrame({
+    'X': filtered_bp_values,
+    'Y': filtered_bmi_shape_values
+})
+df['index'] = df.index
+chart_b = alt.Chart(df).mark_point().encode(
+    x=alt.X('X:Q', title='bp'),
+    y=alt.Y('Y:Q', title='SHAP value of BMI'),
+    tooltip=['index:Q']
+)
+chart_a | chart_b
+# %%
