@@ -240,7 +240,7 @@ export default function Explanation({ isSubmitted, hypo, initVis }: props) {
       <Typography variant="h5" gutterBottom>
         Visual Explanation
       </Typography>
-      <svg className="swarm" width={900} height="70vh">
+      <svg className="swarm" width={1300} height="70vh">
         {initialVisualization}
 
         {isSubmitted && additionalVisualizations}
