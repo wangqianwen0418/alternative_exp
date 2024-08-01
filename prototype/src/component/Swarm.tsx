@@ -11,15 +11,14 @@ interface SwarmProps {
   setSelectedIndices: (index: number[]) => void;
 }
 
-
-export default function Swarm(SwarmProps: SwarmProps) { 
+export default function Swarm(props: SwarmProps) {
   let margin = [10, 10, 40, 10],
     radius = 3,
     leftTitleMargin = 40;
   const [selectedPoints, setSelectedPoints] = useState<number[]>([]);
   const [brushSelection, setBrushSelection] = useState<[number, number] | null>(null);
 
-  const { xValues, colorValues, height, width, id } = SwarmProps;
+  const { xValues, colorValues, height, width, id } = props;
   const xScale = d3
     .scaleLinear()
     .domain(d3.extent(xValues) as [number, number])
@@ -161,18 +160,18 @@ export default function Swarm(SwarmProps: SwarmProps) {
   }, [selectedPoints, xValues, colorValues]);
 
   let bucketWidth = 1;
-  let buckets: { [key: number]: { value: number, index: number }[] } = {};
-  
+  let buckets: { [key: number]: { value: number; index: number }[] } = {};
+
   xValues.forEach((val, index) => {
-    let bucketKey = Math.floor(val/bucketWidth);
+    let bucketKey = Math.floor(val / bucketWidth);
     if (!buckets[bucketKey]) {
       buckets[bucketKey] = [];
     }
-    buckets[bucketKey].push({value: val, index: index});
+    buckets[bucketKey].push({ value: val, index: index });
   });
   let yVals = new Array(xValues.length);
 
-  for (let key in buckets){
+  for (let key in buckets) {
     let bucket = buckets[key];
     bucket.sort((a, b) => a.value - b.value);
     bucket.forEach((item, height) => {
@@ -181,10 +180,6 @@ export default function Swarm(SwarmProps: SwarmProps) {
       yVals[item.index] = position;
     });
   }
-
-  
-  
-
 
   // Update the y-values by iterating through the x-values and incrementing the y-value for each point
   return (
@@ -209,16 +204,16 @@ export default function Swarm(SwarmProps: SwarmProps) {
               r={3}
               fill={colorScale(colorValues[i])}
               opacity={
-                SwarmProps.selectedIndices.length == 0 ||
-                SwarmProps.selectedIndices.includes(i)
+                props.selectedIndices.length == 0 ||
+                props.selectedIndices.includes(i)
                   ? 1
                   : 0.3
               }
               onMouseEnter={() => {
-                SwarmProps.setSelectedIndices([i]);
+                props.setSelectedIndices([i]);
               }}
               onMouseLeave={() => {
-                SwarmProps.setSelectedIndices([]);
+                props.setSelectedIndices([]);
               }}
             />
           );

@@ -1,12 +1,13 @@
 import { Paper, Typography } from "@mui/material";
 import shap_diabetes from "../assets/shap_diabetes.json";
+import { useState } from "react";
 
 import Swarm from "./Swarm";
 import Scatter from "./Scatter";
 import Bar from "./Bar";
+import PCP from "./PCP";
 import { IHypo } from "../App";
 import { CASES } from '../const';
-import {useState} from "react";
 
 type props = typeof CASES[0] & {
     isSubmitted: boolean;
@@ -60,8 +61,8 @@ export default function Explanation({ isSubmitted, hypo, initVis}: props) {
         case "bar":
             initialVisualization = (
                 <Bar
-                    allShapValues={shap_diabetes["shap_values"]}
-                    featureNames={shap_diabetes["feature_names"]}
+                    allShapValues={shap_diabetes["shap_values"].slice(0,100)}
+                    featureNames={shap_diabetes["feature_names"].slice(0,100)}
                     width={600}
                     height={200}
                     id="bmi-scatter"
@@ -125,16 +126,16 @@ export default function Explanation({ isSubmitted, hypo, initVis}: props) {
         </>
     )
 
-    return (
-        <Paper style={{ padding: "15px" }}>
-            <Typography variant="h5" gutterBottom>
-                Visual Explanation
-            </Typography>
-            <svg className="swarm" width={900} height={500}>
-                {initialVisualization}
+  return (
+    <Paper style={{ padding: "15px" }}>
+      <Typography variant="h5" gutterBottom>
+        Visual Explanation
+      </Typography>
+      <svg className="swarm" width={900} height="70vh">
+        {initialVisualization}
 
-                {additionalVisualizations}
-            </svg>
-        </Paper>
-    );
+        {isSubmitted && additionalVisualizations}
+      </svg>
+    </Paper>
+  );
 }

@@ -18,6 +18,7 @@ import { IHypo } from "../App";
 import { CASES } from "../const";
 
 var response = "";
+var response = "";
 
 const feature_names = shapData.feature_names;
 
@@ -26,6 +27,10 @@ let feature_name_str = feature_names.join(", ");
 const prediction_data = shapData.prediction_name;
 
 function getSelection(
+  label: string,
+  value: string,
+  handleChange: (k: string) => void,
+  options: string[]
   label: string,
   value: string,
   handleChange: (k: string) => void,
@@ -52,12 +57,60 @@ function getSelection(
       </Select>
     </FormControl>
   );
+  return (
+    <FormControl
+      variant="standard"
+      sx={{ m: 1, minWidth: 120, display: "block" }}
+    >
+      {/* <InputLabel id="demo-simple-select-standard-label">{label}</InputLabel> */}
+      <Select
+        labelId="demo-simple-select-standard-label"
+        id="demo-simple-select-stelandard"
+        value={value}
+        onChange={(e) => handleChange(e.target.value)}
+        label="Age"
+      >
+        {options.map((option) => (
+          <MenuItem key={option} value={option}>
+            {option}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
+  );
 }
 
 function formatText(
   text: string,
   entityType: "feature" | "relation" | "prediction" | "condition"
+  text: string,
+  entityType: "feature" | "relation" | "prediction" | "condition"
 ) {
+  if (entityType === "feature") {
+    return (
+      <span className="label" style={{ backgroundColor: "#6bbcff" }}>
+        {text}
+      </span>
+    );
+  } else if (entityType === "relation") {
+    return (
+      <span className="label" style={{ backgroundColor: "green" }}>
+        {text}
+      </span>
+    );
+  } else if (entityType === "prediction") {
+    return (
+      <span className="label" style={{ backgroundColor: "#ffc760" }}>
+        {text}
+      </span>
+    );
+  } else if (entityType === "condition") {
+    return (
+      <span className="label" style={{ backgroundColor: "#ffc760" }}>
+        {text}
+      </span>
+    );
+  }
   if (entityType === "feature") {
     return (
       <span className="label" style={{ backgroundColor: "#6bbcff" }}>

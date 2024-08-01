@@ -23,38 +23,38 @@ export default function Scatter(props: ScatterProps) {
         .domain(d3.extent(xValues) as [number, number])
         .range([margin[3], width - margin[1]]);
 
-    const yScale = d3
-        .scaleLinear()
-        .domain(d3.extent(yValues) as [number, number])
-        .range([height - margin[2], margin[0]]);
+  const yScale = d3
+    .scaleLinear()
+    .domain(d3.extent(yValues) as [number, number])
+    .range([height - margin[2], margin[0]]);
 
-    useEffect(() => {
-        d3.select(`g.scatter#${id}`).selectAll("g.x-axis").remove();
-        d3.select(`g.scatter#${id}`).selectAll("g.y-axis").remove();
+  useEffect(() => {
+    d3.select(`g.scatter#${id}`).selectAll("g.x-axis").remove();
+    d3.select(`g.scatter#${id}`).selectAll("g.y-axis").remove();
 
-        const xAxisGroup = d3
-            .select(`g.scatter#${id}`)
-            .append("g")
-            .attr("class", "x-axis")
-            .attr("transform", `translate(0,${height})`);
+    const xAxisGroup = d3
+      .select(`g.scatter#${id}`)
+      .append("g")
+      .attr("class", "x-axis")
+      .attr("transform", `translate(0,${height})`);
 
-        xAxisGroup.call(d3.axisBottom(xScale));
-        xAxisGroup
-            .append("text")
-            .attr("text-anchor", "middle")
-            .attr("class", "axis-title")
-            .attr("y", -5)
-            .attr("x", width / 2)
-            .attr("fill", "black")
-            .text("BMI values");
+    xAxisGroup.call(d3.axisBottom(xScale));
+    xAxisGroup
+      .append("text")
+      .attr("text-anchor", "middle")
+      .attr("class", "axis-title")
+      .attr("y", -5)
+      .attr("x", width / 2)
+      .attr("fill", "black")
+      .text("BMI values");
 
-        const yAxisGroup = d3
-            .select(`g.scatter#${id}`)
-            .append("g")
-            .attr("class", "y-axis")
-            .attr("transform", `translate(0,0)`);
+    const yAxisGroup = d3
+      .select(`g.scatter#${id}`)
+      .append("g")
+      .attr("class", "y-axis")
+      .attr("transform", `translate(0,0)`);
 
-        yAxisGroup.call(d3.axisRight(yScale));
+    yAxisGroup.call(d3.axisRight(yScale));
 
         yAxisGroup
             .append("text")
