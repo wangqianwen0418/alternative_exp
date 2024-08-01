@@ -13,7 +13,7 @@ interface SwarmProps {
 
 export default function Swarm(props: SwarmProps) {
   let margin = [10, 10, 40, 10],
-    radius = 3,
+    radius = 2,
     leftTitleMargin = 40;
   const [selectedPoints, setSelectedPoints] = useState<number[]>([]);
   const [brushSelection, setBrushSelection] = useState<[number, number] | null>(null);

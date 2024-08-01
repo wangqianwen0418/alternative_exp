@@ -191,10 +191,19 @@ export default function Interpretation(props: props) {
     If there is no actual condition in the sentence, make sure you still include a couple options for possible conditions, based on reasonable values for the given feature/variable.
 
     Finally, there is one last thing you need to return: An explanation level. This can best be explained in the following way: 
-    The first level (Level 1) is exclusively describing SHAP/output values at a summary level. For example, an explanation such as "Serum triglycerides level is the most important feature for predicting diabetes risk" would be a level 1 explanation, as it does not account for any information gained from the feature values.
-    Level 2 is still exclusively describing SHAP/output values, although it includes distribution information or details about the SHAP scores. For example, "Serum triglycerides level is the most important feature for diabetes risk when the values are above average" would be a level 2 explanation.
-    Level 3 explanations also incoporate the values of the features themselves. For example, "BMI has a positive correlation with diabetes risk" would be a level 3 explanation. 
-    Level 4 explanations involve the relationship between multiple features. For example, "Age influences the impact of BMI on diabetes progression" would be considered a level 4 explanation. 
+
+    Level 1. Univariate Analysis:
+    Definition: Read values, ranges, and distribution of a single variable.
+    Example: Examining the distribution of SHAP values for BMI.
+    Level 2. Bivariate Analysis-Comparison:
+    Definition: Compare two variables.
+    Example: Comparing the SHAP values of BMI with those of age.
+    Level 3. Bivariate Analysis-Correlation:
+    Definition: Interpret the correlations between two variables.
+    Example: Analyzing the correlation between BMI values and the SHAP values of BMI.
+    Level 4. Multivariate Analysis:
+    Definition: Investigate the influence of a third variable on the correlation between two other variables.
+    Example: Exploring how the correlation between BMI values and BMI SHAP values changes based on gender values. 
     Please return the integer value of the level in the JSON as well.
 
     This should be formatted in a JSON object, structured like this: 
