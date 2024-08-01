@@ -140,6 +140,12 @@ export default function Scatter(props: ScatterProps) {
                                   ? 0.8
                                   : 0.3
                               }
+                              onMouseEnter={() => {
+                                props.setSelectedIndices([i]);
+                              }}
+                              onMouseLeave={() => {
+                                props.setSelectedIndices([]);
+                              }}
                         />
                     );
                 })}

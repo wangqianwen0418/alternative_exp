@@ -14,7 +14,7 @@ interface SwarmProps {
 
 export default function Swarm(SwarmProps: SwarmProps) { 
   let margin = [10, 10, 40, 10],
-    radius = 1,
+    radius = 3,
     leftTitleMargin = 40;
   const [selectedPoints, setSelectedPoints] = useState<number[]>([]);
   const [brushSelection, setBrushSelection] = useState<[number, number] | null>(null);
@@ -187,9 +187,6 @@ export default function Swarm(SwarmProps: SwarmProps) {
 
 
   // Update the y-values by iterating through the x-values and incrementing the y-value for each point
-  console.log("YVALS!!");
-  console.log(yVals);
-
   return (
     <g className="swarm" id={id}>
       <rect

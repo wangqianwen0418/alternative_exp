@@ -4,13 +4,11 @@ import {
   TextField,
   Typography,
   FormControl,
-  InputLabel,
   Select,
   MenuItem,
   CircularProgress,
-  Modal,
-  Box,
 } from "@mui/material";
+
 import "./Interpretation.css";
 import { useState, useEffect } from "react";
 
@@ -18,7 +16,6 @@ import OpenAI from "openai";
 import shapData from "../assets/shap_diabetes.json";
 import { IHypo } from "../App";
 import { CASES } from "../const";
-import { updateElementAccess } from "typescript";
 
 var response = "";
 
@@ -96,27 +93,16 @@ type props = (typeof CASES)[0] & {
   onHypoChange: (newHypo: IHypo) => void;
 };
 
-export default function Interpretation({
-  isSubmitted,
-  selectedCase,
-  setIsSubmitted,
-  hypo,
-  onHypoChange,
-}: props) {
-  const [userInput, setUserInput] = useState("");
+export default function Interpretation(props: props) {
+  
+  const {isSubmitted, selectedCase, setIsSubmitted, hypo, onHypoChange} = props;
+  const [userInput, setUserInput] = useState("e.g., a high bmi leads to large diabete progression");
 
 
-  const [parsedData, setParsedData] = useState({
-    feature: "aa",
-    relation: "aa",
-    prediction: "aa",
-    condition: "aa",
-    PossibleRelationships: ["aa", "bb"],
-    PossibleConditions: ["cc", "dd"],
-  });
 
-  const [selectedRelation, setSelectedRelation] = useState(parsedData.relation);
-  const [selectedCondition, setSelectedCondition] = useState(parsedData.condition);
+
+  const [selectedRelation, setSelectedRelation] = useState("");
+  const [selectedCondition, setSelectedCondition] = useState("");
   const [isLoading, setIsLoading] = useState(false); // New loading state
   const [apiKey, setApiKey] = useState("");
   const [isFree, setIsFree] = useState(false);
@@ -151,7 +137,7 @@ export default function Interpretation({
 
   const parseInput = async (input: string) => {
     setIsLoading(true); // Start loading
-    console.log("PARSING USER INPUT, SUMMONING THE GPT");
+
     const prompt = `You are a bot that extracts the sentence structure from explanation sentences. You produce JSON that contains the following data from an inputted sentence: \:
     Features
     Prediction
@@ -207,7 +193,7 @@ export default function Interpretation({
 
       dangerouslyAllowBrowser: true,
     });
-    console.log("API KEY: ", apiKey);
+
     const chatCompletion = await openai.chat.completions.create({
       model: "gpt-4o",
       response_format: { type: "json_object" },
@@ -217,7 +203,7 @@ export default function Interpretation({
         { role: "user", content: input },
       ],
     });
-    console.log(`RESPONSE: '${chatCompletion.choices[0].message.content}'`);
+    
 
     var json_string = chatCompletion.choices[0].message.content;
     var finish_reason = chatCompletion.choices[0].finish_reason;
@@ -237,7 +223,6 @@ export default function Interpretation({
         if (features === "ERROR" || prediction === "ERROR") {
           console.error("Improper feature/prediction detected");
         } else {
-          // Log the variables to check the values
           const updatedHypo = {
             freetext: input,
             features: features,
@@ -248,32 +233,16 @@ export default function Interpretation({
             possibleConditions: PossibleConditions,
           };
 
-          console.log("NEW HYPO VALS");
-          console.log("Features:", newHypo.features);
-          console.log("Prediction:", newHypo.prediction);
-          console.log("Relationship:", newHypo.relation);
-          console.log("Condition:", newHypo.condition);
-          console.log("Possible Relationships: ", newHypo.possibleRelations);
-          console.log("Possible Conditions: ", newHypo.possibleConditions);
           setNewHypo(updatedHypo);
           onHypoChange(updatedHypo);
           setIsLoading(false);
 
-          // setParsedData({
-          //     features,
-          //     prediction,
-          //     relation: relationship,
-          //     condition,
-          //     PossibleRelationships,
-          //     PossibleConditions
-          // });
+
         }
       } catch (error) {
         console.error("Error parsing JSON:", error);
       } finally {
         setIsLoading(false);
-        console.log("finally!!");
-        console.log(newHypo.freetext);
         return newHypo;
       }
     } else {
@@ -282,11 +251,11 @@ export default function Interpretation({
   };
 
   const handleSubmission = async () => {
-    console.log(selectedCase);
-    selectedCase = curCase;
-    if (selectedCase === "Case 1") {
-      console.log("In case 1");
-      const updatedHypo = {
+    let updatedHypo: IHypo = newHypo;
+
+    if (curCase === "Case 1") {
+
+      updatedHypo = {
         freetext:
           "BMI is the most important feature for predicting diabetes risk.",
         features: ["BMI"],
@@ -301,12 +270,12 @@ export default function Interpretation({
         ],
         possibleConditions: ["when above 25", "when below 25"],
       };
-      setNewHypo(updatedHypo);
-      onHypoChange(updatedHypo);
-      setIsSubmitted(!isSubmitted);
-    } else if (selectedCase === "Case 2") {
+
+
+
+    } else if (curCase === "Case 2") {
       console.log("in case 2");
-      const updatedHypo = {
+      updatedHypo = {
         freetext:
           "serum triglycerides level is the most important feature for predicting the progression of diabetes.",
         features: ["serum triglycerides level"],
@@ -321,12 +290,12 @@ export default function Interpretation({
         ],
         possibleConditions: ["when above 25", "when below 25"],
       };
-      setNewHypo(updatedHypo)
-      onHypoChange(updatedHypo);
-      setIsSubmitted(!isSubmitted);
-    } else if (selectedCase === "Case 3") {
+
+
+
+    } else if (curCase === "Case 3") {
       console.log("in case 3");
-      const updatedHypo = {
+      updatedHypo = {
         freetext: "BMI has a positive correlation with diabetes progression",
         features: ["BMI"],
         prediction: "diabetes progression",
@@ -340,20 +309,15 @@ export default function Interpretation({
         ],
         possibleConditions: ["when above 25", "when below 25"],
       };
-      setNewHypo(updatedHypo);
-      onHypoChange(updatedHypo);
-      setIsSubmitted(!isSubmitted);
-    } else if (selectedCase === "Free Exploration") {
+
+
+    } else if (curCase === "Free Exploration") {
       const result = await parseInput(userInput);
       if (result){
-        setNewHypo(result);
-        onHypoChange(result);
+        updatedHypo = result;
       }
-      console.log(newHypo.freetext);
-      setIsSubmitted(!isSubmitted);      
     } else {
-      console.log("In case 10");
-      const updatedHypo = {
+      updatedHypo = {
         freetext:
           "BMI is the most important feature for predicting diabetes risk.",
         features: ["BMI"],
@@ -368,10 +332,13 @@ export default function Interpretation({
         ],
         possibleConditions: ["when above 25", "when below 25"],
       };
-      setNewHypo(updatedHypo);
-      onHypoChange(updatedHypo);
-      setIsSubmitted(!isSubmitted);
+      
     }
+
+    setNewHypo(updatedHypo);
+    onHypoChange(updatedHypo);
+    setIsSubmitted(!isSubmitted);
+
   };
 
   return (
@@ -383,7 +350,7 @@ export default function Interpretation({
         id="outlined-basic"
         label="e.g., a high bmi leads to large diabete progression"
         value={userInput}
-        onChange={(e) => setUserInput(e.target.value)}
+        onChange={(e) => isFree && setUserInput(e.target.value)}
         multiline
         rows={4}
         fullWidth
@@ -418,7 +385,8 @@ export default function Interpretation({
           Submit
         </Button>
       </div>
-      {isLoading ? (
+      {isFree && 
+      (isLoading ? (
         <CircularProgress></CircularProgress>
       ) : (
         isSubmitted && (
@@ -444,7 +412,7 @@ export default function Interpretation({
             )}
           </Paper>
         )
-      )}
+      ))}
     </Paper>
   );
 }
