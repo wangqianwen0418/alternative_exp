@@ -24,14 +24,73 @@ export default function Explanation({ isSubmitted, initVis, hypo }: props) {
       (row) => row[featureIndex]
     );
 
-  const incomeFeatureName = "Capital Gain",
-    incomeFeatureIndex =
-      shap_income["feature_names"].indexOf(incomeFeatureName),
-    incomeFeatureValues = shap_income["feature_values"].map(
-      (row) => row[incomeFeatureIndex]
+  const income_capitalGain = "Capital Gain",
+    income_capitalGain_featureIndex =
+      shap_income["feature_names"].indexOf(income_capitalGain),
+    income_capitalGain_featureValues = shap_income["feature_values"].map(
+      (row) => row[income_capitalGain_featureIndex]
     ),
-    incomeFeatureShapValues = shap_income["shap_values"].map(
-      (row) => row[incomeFeatureIndex]
+    income_capitalGain_shapValues = shap_income["shap_values"].map(
+      (row) => row[income_capitalGain_featureIndex]
+    );
+
+  const income_educationNum = "Education-Num",
+    income_educationNum_featureIndex =
+      shap_income["feature_names"].indexOf(income_educationNum),
+    income_educationNum_featureValues = shap_income["feature_values"].map(
+      (row) => row[income_educationNum_featureIndex]
+    ),
+    income_educationNum_shapValues = shap_income["shap_values"].map(
+      (row) => row[income_educationNum_featureIndex]
+    );
+
+  const income_age = "Age",
+    income_age_featureIndex = shap_income["feature_names"].indexOf(income_age),
+    income_age_featureValues = shap_income["feature_values"].map(
+      (row) => row[income_age_featureIndex]
+    ),
+    income_age_shapValues = shap_income["shap_values"].map(
+      (row) => row[income_age_featureIndex]
+    );
+
+  const income_occupation = "Occupation",
+    income_occupation_featureIndex =
+      shap_income["feature_names"].indexOf(income_occupation),
+    income_occupation_featureValues = shap_income["feature_values"].map(
+      (row) => row[income_occupation_featureIndex]
+    ),
+    income_occupation_shapValues = shap_income["shap_values"].map(
+      (row) => row[income_occupation_featureIndex]
+    );
+
+  const income_relationship = "Relationship",
+    income_relationship_featureIndex =
+      shap_income["feature_names"].indexOf(income_relationship),
+    income_relationship_featureValues = shap_income["feature_values"].map(
+      (row) => row[income_relationship_featureIndex]
+    ),
+    income_relationship_shapValues = shap_income["shap_values"].map(
+      (row) => row[income_relationship_featureIndex]
+    );
+
+  const income_capitalLoss = "Capital Loss",
+    income_capitalLoss_featureIndex =
+      shap_income["feature_names"].indexOf(income_capitalLoss),
+    income_capitalLoss_featureValues = shap_income["feature_values"].map(
+      (row) => row[income_capitalLoss_featureIndex]
+    ),
+    income_capitalLoss_shapValues = shap_income["shap_values"].map(
+      (row) => row[income_capitalLoss_featureIndex]
+    );
+
+  const income_hoursPerWeek = "Hours per week",
+    income_hoursPerWeek_featureIndex =
+      shap_income["feature_names"].indexOf(income_hoursPerWeek),
+    income_hoursPerWeek_featureValues = shap_income["feature_values"].map(
+      (row) => row[income_hoursPerWeek_featureIndex]
+    ),
+    income_hoursPerWeek_shapValues = shap_income["shap_values"].map(
+      (row) => row[income_hoursPerWeek_featureIndex]
     );
 
   let initialVisualization;
@@ -75,10 +134,35 @@ export default function Explanation({ isSubmitted, initVis, hypo }: props) {
     case "heatmap_income":
       initialVisualization = (
         <Heatmap
-          shapValues={incomeFeatureShapValues}
-          featureValues={incomeFeatureValues}
+          shapValuesArray={[
+            income_capitalGain_shapValues,
+            income_educationNum_shapValues,
+            income_age_shapValues,
+            income_occupation_shapValues,
+            income_relationship_shapValues,
+            income_capitalLoss_shapValues,
+            income_hoursPerWeek_shapValues,
+          ]}
+          featureValuesArray={[
+            income_capitalGain_featureValues,
+            income_educationNum_featureValues,
+            income_age_featureValues,
+            income_occupation_featureValues,
+            income_relationship_featureValues,
+            income_capitalLoss_featureValues,
+            income_hoursPerWeek_featureValues,
+          ]}
+          labels={[
+            income_capitalGain,
+            income_educationNum,
+            income_age,
+            income_occupation,
+            income_relationship,
+            income_capitalLoss,
+            income_hoursPerWeek,
+          ]}
           height={50}
-          width={1000}
+          width={800}
           title="Capital Gain Heatmap"
         />
       );
@@ -86,8 +170,8 @@ export default function Explanation({ isSubmitted, initVis, hypo }: props) {
     case "swarm_income":
       initialVisualization = (
         <Swarm
-          xValues={incomeFeatureShapValues}
-          colorValues={incomeFeatureValues}
+          xValues={income_capitalGain_shapValues}
+          colorValues={income_capitalGain_featureValues}
           width={800}
           height={350}
           id="Capital Gain"
@@ -154,7 +238,7 @@ export default function Explanation({ isSubmitted, initVis, hypo }: props) {
       <Typography variant="h5" gutterBottom>
         Visual Explanation
       </Typography>
-      <svg className="swarm" width={1000} height={500}>
+      <svg className="swarm" width={1300} height={500}>
         {initialVisualization}
 
         {additionalVisualizations}
