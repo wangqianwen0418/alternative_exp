@@ -31,10 +31,6 @@ function getSelection(
   value: string,
   handleChange: (k: string) => void,
   options: string[]
-  label: string,
-  value: string,
-  handleChange: (k: string) => void,
-  options: string[]
 ) {
   return (
     <FormControl
@@ -83,34 +79,7 @@ function getSelection(
 function formatText(
   text: string,
   entityType: "feature" | "relation" | "prediction" | "condition"
-  text: string,
-  entityType: "feature" | "relation" | "prediction" | "condition"
 ) {
-  if (entityType === "feature") {
-    return (
-      <span className="label" style={{ backgroundColor: "#6bbcff" }}>
-        {text}
-      </span>
-    );
-  } else if (entityType === "relation") {
-    return (
-      <span className="label" style={{ backgroundColor: "green" }}>
-        {text}
-      </span>
-    );
-  } else if (entityType === "prediction") {
-    return (
-      <span className="label" style={{ backgroundColor: "#ffc760" }}>
-        {text}
-      </span>
-    );
-  } else if (entityType === "condition") {
-    return (
-      <span className="label" style={{ backgroundColor: "#ffc760" }}>
-        {text}
-      </span>
-    );
-  }
   if (entityType === "feature") {
     return (
       <span className="label" style={{ backgroundColor: "#6bbcff" }}>
