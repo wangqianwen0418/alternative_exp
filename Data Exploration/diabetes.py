@@ -35,15 +35,15 @@ rforest = RandomForestRegressor(
 rforest.fit(X_train, y_train)
 print_accuracy(rforest.predict)
 
-explainer = shap.TreeExplainer(rforest)
+explainer = shap.Explainer(rforest, X_train)
 
 # # rather than use the whole training set to estimate expected values, we summarize with
 # # a set of weighted kmeans, each weighted by the number of points they represent.
 # X_train_summary = shap.kmeans(X_train, 10)
 # explainer = shap.PermutationExplainer(model.predict, X_train_summary)
 # explainer = shap.KernelExplainer(model.predict, X_train_summary)
-
-shap_values = explainer(X)
+#%%
+shap_values = explainer(X_train)
 
 #%%
 import json
@@ -62,9 +62,10 @@ shap.plots.waterfall(shap_values[0])
 
 #%%
     # shap_values = explainer.shap_values(X_test[0:1])
-shap.summary_plot(shap_values, X)
+shap.plots.beeswarm(shap_values, color="shap_blue")
     # shap.force_plot(explainer.expected_value, shap_values, X_test[0:1])
-
+#%%
+shap.plots.beeswarm(shap_values)
 
 # %%
 feature_index = 2 # 2 is the index of the feature "bmi"
@@ -106,7 +107,7 @@ feature_index = 2 # 2 is the index of the feature "bmi"
 # 3 is the index of the feature "bp"
 # feature_index = 8 # 8 is the index of the feature "s5"
 feature_shap_values = shap_values[:, feature_index].values
-feature_values = X.iloc[:, feature_index].values
+feature_values = X_train.iloc[:, feature_index].values
 df = pd.DataFrame({
     'X': feature_values,
     'Y': feature_shap_values
@@ -132,7 +133,7 @@ indices = [index for index in range(len(a)) if abs(b[index]) > abs(20 * a[index]
 # %%
 
 feature_index = 8
-feature_values = X.iloc[:, feature_index].values
+feature_values = X_train.iloc[:, feature_index].values
 shap_index = np.argsort(np.argsort(np.abs(shap_values.values), axis=1), axis=1)[:, feature_index] #use np.argsort twice to get the ranking index
 
 df = pd.DataFrame({
@@ -172,7 +173,7 @@ from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.inspection import PartialDependenceDisplay
 
 est = GradientBoostingRegressor()
-est.fit(X, y)
+est.fit(X_train, y_train)
 PartialDependenceDisplay.from_estimator(est, X, [feature_index])
 # %%
 # the larger the BMI, the smaller the absolute SHAP value of gender 
@@ -180,8 +181,9 @@ shap.plots.scatter(shap_values[:, 'sex'],color=shap_values[:, 'bmi'], x_jitter=0
 
 #%%
 gender_shap_values = shap_values[:, 1].values
-BMI_values = X.iloc[:, 2].values
-gender_values = ['female' if i>0 else 'male' for i in X.iloc[:, 1].values]
+BMI_values = X_train.iloc[:, 2].values
+
+gender_values = ['female' if i>0 else 'male' for i in X_train.iloc[:, 1].values]
 
 df = pd.DataFrame({
     'X': BMI_values,
@@ -196,12 +198,42 @@ alt.Chart(df).mark_point().encode(
     color=alt.Color('color:N'),
     tooltip=['index:Q']
     )
+#%%
+gender_shap_values = shap_values[:, 1].values
+BMI_values = X_train.iloc[:, 2].values
+f_mask = (X_train.iloc[:, 1].values > 0)
+m_mask = (X_train.iloc[:, 1].values < 0)
+
+df = pd.DataFrame({
+    'X': BMI_values[f_mask],
+    'Y': gender_shap_values[f_mask],
+})
+df['index'] = df.index
+
+chart1 = alt.Chart(df).mark_point().encode(
+    x=alt.X('X:Q', title='BMI'),
+    y=alt.Y('Y:Q', title='SHAP value of Gender'),
+   
+    tooltip=['index:Q']
+    )
+
+df = pd.DataFrame({
+    'X': BMI_values[m_mask],
+    'Y': gender_shap_values[m_mask],
+})
+df['index'] = df.index
+chart2 = alt.Chart(df).mark_point().encode(
+    x=alt.X('X:Q', title='BMI'),
+    y=alt.Y('Y:Q', title='SHAP value of Gender'),
+)
+
+chart1 | chart2
 # %%
 
 from scipy.stats import pearsonr
 
 bmi_shape_values = shap_values[:, 2].values
-BMI_values = X.iloc[:, 2].values
+BMI_values = X_train.iloc[:, 2].values
 # correlation, p_value = pearsonr(BMI_values, bmi_shape_values)
 # mask = (BMI_values < 0.06) & (BMI_values > 0.03)
 mask = (BMI_values < -0.04)
@@ -210,9 +242,9 @@ filtered_BMI_values = BMI_values[mask]
 pearsonr(filtered_BMI_values, filtered_bmi_shape_values)
 # %%
 
-sex_values = X.iloc[:, 1].values
+sex_values = X_train.iloc[:, 1].values
 sex_shape_values = shap_values[:, 1].values
-BMI_values = X.iloc[:, 2].values
+BMI_values = X_train.iloc[:, 2].values
 mask = (sex_values<0)
 filtered_BMI_values = BMI_values[mask]
 filtered_sex_shape_values = sex_shape_values[mask]
@@ -221,17 +253,36 @@ pearsonr(filtered_BMI_values, filtered_sex_shape_values)
 pearsonr(BMI_values, sex_shape_values)
 # %%
 
+shap.plots.scatter(shap_values[:, 'bmi'],color=shap_values)
+#%%
+BMI_values = X_train.iloc[:, 2].values
+bmi_shape_values = shap_values[:, 2].values
+mask = (BMI_values < -0.05) 
+filtered_bmi_shape_values = bmi_shape_values[mask]
+filtered_bp_values = X_train.iloc[:, 3].values[mask]
+df = pd.DataFrame({
+    'X': filtered_bp_values,
+    'Y': filtered_bmi_shape_values
+})
+df['index'] = df.index
+chart_a = alt.Chart(df).mark_point().encode(
+    x=alt.X('X:Q', title='bp'),
+    y=alt.Y('Y:Q', title='SHAP value of BMI'),
+    tooltip=['index:Q']
+)
 
-bmi_shape_values = shap_values.values[:, 2]
-s5_shape_values = shap_values.values[:, 8]
-
-from scipy.stats import ttest_rel
-
-# Perform paired t-test
-t_statistic, p_value = ttest_rel(bmi_shape_values, s5_shape_values)
-
-# Print the results
-print(f"T-statistic: {t_statistic}")
-print(f"P-value: {p_value}")
-
+mask2 = (BMI_values > 0.05)
+filtered_bmi_shape_values = bmi_shape_values[mask2]
+filtered_bp_values = X_train.iloc[:, 3].values[mask2]
+df = pd.DataFrame({
+    'X': filtered_bp_values,
+    'Y': filtered_bmi_shape_values
+})
+df['index'] = df.index
+chart_b = alt.Chart(df).mark_point().encode(
+    x=alt.X('X:Q', title='bp'),
+    y=alt.Y('Y:Q', title='SHAP value of BMI'),
+    tooltip=['index:Q']
+)
+chart_a | chart_b
 # %%
