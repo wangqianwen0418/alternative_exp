@@ -18,7 +18,6 @@ import { IHypo } from "../App";
 import { CASES } from "../const";
 
 var response = "";
-var response = "";
 
 const feature_names = shapData.feature_names;
 
@@ -116,12 +115,11 @@ type props = (typeof CASES)[0] & {
 };
 
 export default function Interpretation(props: props) {
-  
-  const {isSubmitted, selectedCase, setIsSubmitted, hypo, onHypoChange} = props;
-  const [userInput, setUserInput] = useState("e.g., a high bmi leads to large diabete progression");
-
-
-
+  const { isSubmitted, selectedCase, setIsSubmitted, hypo, onHypoChange } =
+    props;
+  const [userInput, setUserInput] = useState(
+    "e.g., a high bmi leads to large diabete progression"
+  );
 
   const [selectedRelation, setSelectedRelation] = useState("");
   const [selectedCondition, setSelectedCondition] = useState("");
@@ -139,20 +137,15 @@ export default function Interpretation(props: props) {
   });
   const [curCase, setCurCase] = useState("Case 1");
 
-
-
   useEffect(() => {
     if (window.location.pathname === "/free") {
       setIsFree(true);
       setCurCase("Free Exploration");
-    }
-    else if (window.location.pathname === "/case2") {
+    } else if (window.location.pathname === "/case2") {
       setCurCase("Case 2");
-    }
-    else if (window.location.pathname === "/case3") {
+    } else if (window.location.pathname === "/case3") {
       setCurCase("Case 3");
-    }
-    else{
+    } else {
       setCurCase("Case 1");
     }
   }, []);
@@ -225,7 +218,6 @@ export default function Interpretation(props: props) {
         { role: "user", content: input },
       ],
     });
-    
 
     var json_string = chatCompletion.choices[0].message.content;
     var finish_reason = chatCompletion.choices[0].finish_reason;
@@ -258,8 +250,6 @@ export default function Interpretation(props: props) {
           setNewHypo(updatedHypo);
           onHypoChange(updatedHypo);
           setIsLoading(false);
-
-
         }
       } catch (error) {
         console.error("Error parsing JSON:", error);
@@ -276,7 +266,6 @@ export default function Interpretation(props: props) {
     let updatedHypo: IHypo = newHypo;
 
     if (curCase === "Case 1") {
-
       updatedHypo = {
         freetext:
           "BMI is the most important feature for predicting diabetes risk.",
@@ -292,9 +281,6 @@ export default function Interpretation(props: props) {
         ],
         possibleConditions: ["when above 25", "when below 25"],
       };
-
-
-
     } else if (curCase === "Case 2") {
       console.log("in case 2");
       updatedHypo = {
@@ -312,9 +298,6 @@ export default function Interpretation(props: props) {
         ],
         possibleConditions: ["when above 25", "when below 25"],
       };
-
-
-
     } else if (curCase === "Case 3") {
       console.log("in case 3");
       updatedHypo = {
@@ -331,11 +314,9 @@ export default function Interpretation(props: props) {
         ],
         possibleConditions: ["when above 25", "when below 25"],
       };
-
-
     } else if (curCase === "Free Exploration") {
       const result = await parseInput(userInput);
-      if (result){
+      if (result) {
         updatedHypo = result;
       }
     } else {
@@ -354,13 +335,11 @@ export default function Interpretation(props: props) {
         ],
         possibleConditions: ["when above 25", "when below 25"],
       };
-      
     }
 
     setNewHypo(updatedHypo);
     onHypoChange(updatedHypo);
     setIsSubmitted(!isSubmitted);
-
   };
 
   return (
@@ -407,34 +386,34 @@ export default function Interpretation(props: props) {
           Submit
         </Button>
       </div>
-      {isFree && 
-      (isLoading ? (
-        <CircularProgress></CircularProgress>
-      ) : (
-        isSubmitted && (
-          <Paper className="parse-input" elevation={1}>
-            <div className="features-container">
-              {newHypo.features.map((feature, index) => (
-                <span key={index}>{formatText(feature, "feature")}</span>
-              ))}
-            </div>
+      {isFree &&
+        (isLoading ? (
+          <CircularProgress></CircularProgress>
+        ) : (
+          isSubmitted && (
+            <Paper className="parse-input" elevation={1}>
+              <div className="features-container">
+                {newHypo.features.map((feature, index) => (
+                  <span key={index}>{formatText(feature, "feature")}</span>
+                ))}
+              </div>
 
-            {getSelection(
-              "relation",
-              newHypo.relation,
-              (k) => setSelectedRelation(k),
-              newHypo.possibleRelations
-            )}
-            {formatText(newHypo.prediction, "prediction")}
-            {getSelection(
-              "condition",
-              newHypo.condition,
-              (k) => setSelectedCondition(k),
-              newHypo.possibleConditions
-            )}
-          </Paper>
-        )
-      ))}
+              {getSelection(
+                "relation",
+                newHypo.relation,
+                (k) => setSelectedRelation(k),
+                newHypo.possibleRelations
+              )}
+              {formatText(newHypo.prediction, "prediction")}
+              {getSelection(
+                "condition",
+                newHypo.condition,
+                (k) => setSelectedCondition(k),
+                newHypo.possibleConditions
+              )}
+            </Paper>
+          )
+        ))}
     </Paper>
   );
 }
