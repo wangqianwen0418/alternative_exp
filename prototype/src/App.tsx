@@ -52,7 +52,7 @@ function App(appProps: typeof CASES[0]) {
 
                 {CASES.map(c => (
                     <ListItem key={c.name} disablePadding onClick={() => setCase(c)}>
-                        <ListItemButton href={c.href}>
+                        <ListItemButton href={`#${c.href}`}>
                             <ListItemIcon>
                                 <TroubleShootIcon />
                             </ListItemIcon>
