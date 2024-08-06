@@ -160,62 +160,78 @@ export default function Interpretation(props: props) {
   const parseInput = async (input: string) => {
     setIsLoading(true); // Start loading
 
-    const prompt = `You are a bot that extracts the sentence structure from explanation sentences. You produce JSON that contains the following data from an inputted sentence: \:
-    Features
-    Prediction
-    Relationship
+    const prompt = `You are a bot that extracts the content from 'insight' statements. You produce JSON that contains the following data from an inputted sentence: \:
+    Features (Independent Variable(s))
+    Feature State (any context about how the feature is used)
+    Attribution (Dependent Variable)
+    Relationship 
+    Constant
     Condition
 
-    The features have to be present in this list: ${feature_name_str}, and the prediction should be ${prediction_data}. 
+    The features have to be present in this list: ${feature_name_str}, and the Attribution should be ${prediction_data}. 
     
     It's fine if they use abbreviations/the full form of an abbreviation (ie Body Mass Index for BMI and vice versa), but if the user's interpretation describes a feature that is not present in the list, set the feature value to ["ERROR"]. This is very important, do not forget about this!
 
-    For example, if the sentence is: "BMI is the most important factor for predicting diabetes risk when it is above 25", the values you should return is as follows:
+    For example, if the sentence is: "The average contribution of BMI to diabetes risk is larger than 0.5", the values you should return is as follows:
 
-    Feature(s): ["BMI"]
-    Prediction: diabetes risk
-    Relationship: most important factor
-    Condition: Above 25
+    Features: ["BMI"]
+    FeatureState: ["Average Contribution"]
+    Attribution: diabetes risk
+    Relationship: Greater than
+    Constant: 0.5
+    Condition: NONE
 
-    There may be multiple features, so the value for the "features" key should always be an array. 
+    There may be multiple features, so the value for the "features" key and Feature State should always be an array (of same length). 
 
 
-    In addition, you should also include the following two fields (as arrays):
+    In addition, you should also include the following three fields (as arrays):
     Possible Relationships: 
     Possible Conditions:  
+    Possible Constants: 
     
-    In this example, some possible relationships would include: "has a positive correlation", "has a negative correlation", "2nd most important factor", "most important factor", etc.
-    Some possible conditions would include: "Below 25". Note that possible conditions should be included even if there are no conditions in the original statement.
+    In this example, some possible relationships would include: "has a positive correlation", "has a negative correlation", "Less than", etc.
+    Some possible conditions would include: "when the BMI is above 25". Note that possible conditions should be included even if there are no conditions in the original statement.
     
     
     If there is no actual condition in the sentence, make sure you still include a couple options for possible conditions, based on reasonable values for the given feature/variable.
 
-    Finally, there is one last thing you need to return: An explanation level. This can best be explained in the following way: 
+    Finally, there is one last thing you need to return: One of four categories that an insight can fall into. This can best be explained in the following way: 
 
-    Level 1. Univariate Analysis:
-    Definition: Read values, ranges, and distribution of a single variable.
-    Example: Examining the distribution of SHAP values for BMI.
-    Level 2. Bivariate Analysis-Comparison:
-    Definition: Compare two variables.
-    Example: Comparing the SHAP values of BMI with those of age.
-    Level 3. Bivariate Analysis-Correlation:
-    Definition: Interpret the correlations between two variables.
-    Example: Analyzing the correlation between BMI values and the SHAP values of BMI.
-    Level 4. Multivariate Analysis:
-    Definition: Investigate the influence of a third variable on the correlation between two other variables.
-    Example: Exploring how the correlation between BMI values and BMI SHAP values changes based on gender values. 
-    Please return the integer value of the level in the JSON as well.
+    Category 1:
+    Attribution (DV) by Feature (IV), univariate. 
+    Possible Examples: The <feature> values contribute at least <constant> to the <attribution>, The average contribution of F_i to the prediction is larger than [constant]
+
+    Category 2:
+    Bivariate comparison (Feature1, Feature2):
+    Possible Examples: 
+    Feature1 contributes [more] to the prediction than Feature2
+    Feature1 influences a [greater] number of instances than Feature2
+
+    Category 3:
+    Attribution [DV1] by Feature Value [IV1] 
+    Possible Examples:
+    There is a [positive] correlation between the contribution of Feature1 to predictions and the Feature1 values [when values are above 15]
+
+    Category 4:
+    Multivariate Attribution by Feature Values
+    Possible Examples:
+    The correlation between the Feature1Values and Feature1 is [stronger/weaker] when Feature2 is in [range A] compared to [range B].
+
+
+
+    Please return the integer value of the Category in the JSON as well.
 
     This should be formatted in a JSON object, structured like this: 
     Features:
-    Prediction:
+    FeatureState: 
+    Attribution:
     Relationship:
+    Constant: 
     Condition:
     PossibleRelationships:
     PossibleConditions:
-    Level: 
-    
-    If any of the original values (feature, prediction, relationship, condition) are missing in the sentence, the value for that field should be NONE. 
+    Category: 
+   
 
 
     `;
@@ -244,16 +260,20 @@ export default function Interpretation(props: props) {
 
         // Extract each element and store it in a variable
         let features = jsonObject.Features;
-        let prediction = jsonObject.Prediction;
+        let featureState = jsonObject.FeatureState
+        let prediction = jsonObject.Attribution;
         let relationship = jsonObject.Relationship;
+        let constant = jsonObject.Constant;
         let condition = jsonObject.Condition;
         let PossibleRelationships = jsonObject.PossibleRelationships;
         let PossibleConditions = jsonObject.PossibleConditions;
+        let category = jsonObject.Category;
         PossibleRelationships.push(relationship);
-        let level = jsonObject.Level;
         if (features === "ERROR" || prediction === "ERROR") {
           console.error("Improper feature/prediction detected");
         } else {
+          console.log("FULL JSON FOR INSIGHTS: ");
+          console.log(jsonObject);
           const updatedHypo = {
             freetext: input,
             features: features,
