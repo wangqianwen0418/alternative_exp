@@ -1,5 +1,6 @@
+import { Diversity2 } from "@mui/icons-material";
 import * as d3 from "d3";
-import { useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 
 interface SwarmProps {
   xValues: number[];
@@ -16,9 +17,19 @@ export default function Swarm(props: SwarmProps) {
     radius = 2,
     leftTitleMargin = 40;
   const [selectedPoints, setSelectedPoints] = useState<number[]>([]);
-  const [brushSelection, setBrushSelection] = useState<[number, number] | null>(null);
+  const [brushSelection, setBrushSelection] = useState<[number, number] | null>(
+    null
+  );
 
-  const { xValues, colorValues, height, width, id } = props;
+  const {
+    xValues,
+    colorValues,
+    height,
+    width,
+    id,
+    selectedIndices,
+    setSelectedIndices,
+  } = props;
   const xScale = d3
     .scaleLinear()
     .domain(d3.extent(xValues) as [number, number])
@@ -35,9 +46,14 @@ export default function Swarm(props: SwarmProps) {
         d3.hcl((0.35470565 * 180) / Math.PI, 90, 54) // red
       )
     );
-  
-  const yScale = d3.scaleLinear().range([(height / 2 - radius)*0.7+14, (height / 2 + radius)*0.7+14]);
-      
+
+  const yScale = d3
+    .scaleLinear()
+    .range([
+      (height / 2 - radius) * 0.7 + 14,
+      (height / 2 + radius) * 0.7 + 14,
+    ]);
+
   useEffect(() => {
     d3.select("g.x-axis").remove();
     d3.select("text.axis-title").remove();
@@ -60,7 +76,8 @@ export default function Swarm(props: SwarmProps) {
     const legendX = width - margin[1] - legendWidth;
     const legendY = margin[0];
 
-    const gradient = d3.select(`g.swarm#${id}`)
+    const gradient = d3
+      .select(`g.swarm#${id}`)
       .append("linearGradient")
       .attr("id", "color-legend-gradient")
       .attr("x1", "0%")
@@ -71,13 +88,13 @@ export default function Swarm(props: SwarmProps) {
     gradient
       .selectAll("stop")
       .data([
-          { offset: "0%", color: colorScale.domain()[0] },
-          { offset: "100%", color: colorScale.domain()[1] },
-        ])
+        { offset: "0%", color: colorScale.domain()[0] },
+        { offset: "100%", color: colorScale.domain()[1] },
+      ])
       .enter()
       .append("stop")
-      .attr("offset", d => d.offset)
-      .attr("stop-color", d => colorScale(d.color));
+      .attr("offset", (d) => d.offset)
+      .attr("stop-color", (d) => colorScale(d.color));
 
     d3.select(`g.swarm#${id}`)
       .append("rect")
@@ -94,29 +111,28 @@ export default function Swarm(props: SwarmProps) {
       .attr("x", legendX + legendWidth / 2)
       .attr("y", legendY - 10)
       .text("Feature Value");
-    
+
     d3.select(`g.swarm#${id}`)
       .append("text")
       .attr("class", "legend-label")
       .attr("x", legendX + legendWidth / 2)
       .attr("y", legendY + legendHeight)
       .text(colorScale.domain()[0].toFixed(2));
-    
+
     d3.select(`g.swarm#${id}`)
-    .append("text")
-    .attr("class", "legend-label")
-    .attr("x", legendX + legendWidth / 2)
-    .attr("y", legendY)
-    .text(colorScale.domain()[1].toFixed(2));
-   
+      .append("text")
+      .attr("class", "legend-label")
+      .attr("x", legendX + legendWidth / 2)
+      .attr("y", legendY)
+      .text(colorScale.domain()[1].toFixed(2));
+
     const points = d3.select(`g.points#${id}`);
     points.selectAll("circle").on("click", (i: number) => {
       const index = i;
       const isSelected = selectedPoints.includes(index);
       if (isSelected) {
         setSelectedPoints(selectedPoints.filter((j) => j !== index));
-      }
-      else{
+      } else {
         setSelectedPoints([...selectedPoints, index]);
       }
     });
@@ -124,23 +140,59 @@ export default function Swarm(props: SwarmProps) {
     const brush = d3.brushX().extent([
       [margin[3] + leftTitleMargin, 0],
       [width - margin[1], height],
-    ]);
+    ])
+    .on("start", brushstart)
+    .on("end", brushended);
 
-    points.append("g").attr("class", "brush").call(brush);
+    const brushGroup = d3
+      .select(`g.swarm#${id}`)
+      .append("g")
+      .attr("class", "brush")
+      .call(brush);
+    
+    function brushstart(event: any) {
+      brushGroup.call(brush.move, null);
+    }
+
+    function brushended(event: any) {
+      console.log("Point 1");
+      const selection = event.selection;
+      console.log(selection);
+      if (!selection) return;
+      console.log("Point 2");
+      const brushedIndices: number[] = [];
+      const [x0, x1] = selection;
+
+      console.log("Point 3");
+      d3.selectAll(`g.swarm#${id} .points circle`)
+        .attr("stroke-width", (d: any, i: number) => {
+          const x = xScale(xValues[i]);
+          return x0 <= x && x <= x1 ? 2 : 1;
+        })
+        .each(function (d: any, i: number) {
+          const x = xScale(xValues[i]);
+          if (x0 <= x && x <= x1){
+            brushedIndices.push(i);
+          }
+        });
+        console.log("174");
+        setSelectedIndices(brushedIndices);
+
+    }
 
     brush.on("brush", (event) => {
       const selection = event.selection;
       if (selection) {
         const [x0, x1] = selection;
         const selectedIndices = xValues.reduce((acc: number[], x, i) => {
-          if (x0 <= xScale(x) && xScale(x) <= x1){
+          if (x0 <= xScale(x) && xScale(x) <= x1) {
             acc.push(i);
           }
           return acc;
-        },[]);
+        }, []);
         setSelectedPoints(selectedIndices);
         setBrushSelection([x0, x1]);
-      } else{
+      } else {
         setSelectedPoints([]);
         setBrushSelection(null);
       }
@@ -153,9 +205,15 @@ export default function Swarm(props: SwarmProps) {
   }, [xValues, height, width]);
 
   useEffect(() => {
-    if (selectedPoints.length > 0){
+    if (selectedPoints.length > 0) {
       console.log("Selected Points: ");
-      console.log(selectedPoints.map((i) => ({id: i, value: xValues[i], color: colorValues[i]})));
+      console.log(
+        selectedPoints.map((i) => ({
+          id: i,
+          value: xValues[i],
+          color: colorValues[i],
+        }))
+      );
     }
   }, [selectedPoints, xValues, colorValues]);
 
@@ -176,7 +234,7 @@ export default function Swarm(props: SwarmProps) {
     bucket.sort((a, b) => a.value - b.value);
     bucket.forEach((item, height) => {
       let half = Math.floor(bucket.length / 2);
-      let position = height < half ? height : height - bucket.length
+      let position = height < half ? height : height - bucket.length;
       yVals[item.index] = position;
     });
   }

@@ -199,7 +199,7 @@ export default function Interpretation(props: props) {
 
     Category 1:
     Attribution (DV) by Feature (IV), univariate. 
-    Possible Examples: The <feature> values contribute at least <constant> to the <attribution>, The average contribution of F_i to the prediction is larger than [constant]
+    Possible Examples: The <feature> values contribute at least <constant> to the <attribution>, The average contribution of F_i to the prediction is larger than <constant>
 
     Category 2:
     Bivariate comparison (Feature1, Feature2):
