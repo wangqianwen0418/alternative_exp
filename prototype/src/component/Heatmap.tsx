@@ -18,10 +18,13 @@ export default function Heatmap({
   height,
   title,
 }: HeatmapProps) {
-  const [, setHoveredBar] = useState<{
+  const [hoveredBar, setHoveredBar] = useState<{
     label: string;
     shapValue: number;
   } | null>(null);
+  const [hoveredIndexes, setHoveredIndexes] = useState<Map<number, number>>(
+    new Map()
+  );
 
   const averageShapValues = shapValuesArray.map(
     (shapValues) => d3.mean(shapValues) ?? 0
@@ -41,14 +44,6 @@ export default function Heatmap({
   const sortedLabels = datasets.map((d) => d.label);
   const sortedAverageShapValues = datasets.map((d) => d.averageShap);
 
-  // const combinedData = shapValuesArray.map((shapValues, idx) => ({
-  //   shapValues,
-  //   featureValues: featureValuesArray[idx],
-  //   label: labels[idx],
-  //   averageShap: averageShapValues[idx],
-  // }));
-  // const allShapValues = combinedData.flatMap((d) => d.shapValues);
-  // const [minShap, maxShap] = d3.extent(allShapValues) as [number, number];
   const [minShap, maxShap] = [-2, 2];
 
   const colorScale = d3
@@ -78,19 +73,29 @@ export default function Heatmap({
 
   const leftMargin = 100;
 
-  const handleMouseOver = (datasetLabel: string, shapValue: number) => {
-    setHoveredBar({ label: datasetLabel, shapValue });
-    console.log(`Dataset: ${datasetLabel}, SHAP Value: ${shapValue}`);
+  const handleMouseOver = (
+    datasetIdx: number,
+    shapValue: number,
+    index: number
+  ) => {
+    setHoveredBar({ label: sortedLabels[datasetIdx], shapValue });
+    setHoveredIndexes(new Map(hoveredIndexes).set(datasetIdx, index));
+    console.log(
+      `Dataset: ${sortedLabels[datasetIdx]}, SHAP Value: ${shapValue}`
+    );
   };
 
-  const handleMouseOut = () => {
+  const handleMouseOut = (datasetIdx: number) => {
     setHoveredBar(null);
+    const updatedIndexes = new Map(hoveredIndexes);
+    updatedIndexes.delete(datasetIdx);
+    setHoveredIndexes(updatedIndexes);
   };
 
   return (
     <svg
       width={width + leftMargin + maxBarWidth + 100}
-      height={totalHeight + 60}
+      height={totalHeight + 70}
     >
       <text
         className="title"
@@ -129,11 +134,15 @@ export default function Heatmap({
                 y={0}
                 width={rectWidth}
                 height={rectHeight}
-                fill={colorScale(d.shapValue)}
-                onMouseOver={() =>
-                  handleMouseOver(sortedLabels[idx], d.shapValue)
+                fill={
+                  hoveredIndexes.get(idx) === d.originalIndex
+                    ? "black"
+                    : colorScale(d.shapValue)
                 }
-                onMouseOut={handleMouseOut}
+                onMouseOver={() =>
+                  handleMouseOver(idx, d.shapValue, d.originalIndex)
+                }
+                onMouseOut={() => handleMouseOut(idx)}
               />
             ))}
 
@@ -150,7 +159,6 @@ export default function Heatmap({
               y={rectHeight / 2 - 15}
               textAnchor="middle"
               fontSize="12"
-              fill="#000"
             >
               {averageShap.toFixed(2)}
             </text>
@@ -189,6 +197,27 @@ export default function Heatmap({
         fontSize="12"
       >
         {minShap.toFixed(2)}+
+      </text>
+
+      <text
+        x={width + leftMargin + 15}
+        y={totalHeight + height + 10}
+        textAnchor="middle"
+        fontSize="12"
+      >
+        Avg.
+      </text>
+
+      <text
+        x={width + leftMargin + maxBarWidth + 50 + 10}
+        y={totalHeight / 2 + 40}
+        textAnchor="middle"
+        fontSize="13"
+        transform={`rotate(-90, ${width + leftMargin + maxBarWidth + 70}, ${
+          totalHeight / 2 + 40
+        })`}
+      >
+        SHAP Values
       </text>
 
       {sortedLabels.map((label, idx) => (

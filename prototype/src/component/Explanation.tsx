@@ -7,7 +7,6 @@ import Swarm from "./Swarm";
 import Heatmap from "./Heatmap";
 import Scatter from "./Scatter";
 import Bar from "./Bar";
-import PCP from "./PCP";
 import { IHypo } from "../App";
 import { CASES } from "../const";
 
