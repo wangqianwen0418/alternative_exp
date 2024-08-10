@@ -16,6 +16,7 @@ import OpenAI from "openai";
 import shapData from "../assets/shap_diabetes.json";
 import { IHypo } from "../App";
 import { CASES } from "../const";
+import { features } from "process";
 
 var response = "";
 var response = "";
@@ -116,12 +117,11 @@ type props = (typeof CASES)[0] & {
 };
 
 export default function Interpretation(props: props) {
-  
-  const {isSubmitted, selectedCase, setIsSubmitted, hypo, onHypoChange} = props;
-  const [userInput, setUserInput] = useState("e.g., a high bmi leads to large diabete progression");
-
-
-
+  const { isSubmitted, selectedCase, setIsSubmitted, hypo, onHypoChange } =
+    props;
+  const [userInput, setUserInput] = useState(
+    "e.g., a high bmi leads to large diabete progression"
+  );
 
   const [selectedRelation, setSelectedRelation] = useState("");
   const [selectedCondition, setSelectedCondition] = useState("");
@@ -131,28 +131,27 @@ export default function Interpretation(props: props) {
   const [newHypo, setNewHypo] = useState<IHypo>({
     freetext: "null",
     features: ["Feature 1", "Feature 2"],
+    featureState: ["none", "none"],
+    attribution: "diabetes",
     relation: "relationship 1",
-    prediction: "BMI",
+    prediction: "Diabetes",
     condition: "none",
+    constant: "0.0",
     possibleRelations: ["relationship 1", "relationship 2"],
     possibleConditions: ["none", "condition 1", "condition 2"],
+    category: 1,
   });
   const [curCase, setCurCase] = useState("Case 1");
-
-
 
   useEffect(() => {
     if (window.location.pathname === "/free") {
       setIsFree(true);
       setCurCase("Free Exploration");
-    }
-    else if (window.location.pathname === "/case2") {
+    } else if (window.location.pathname === "/case2") {
       setCurCase("Case 2");
-    }
-    else if (window.location.pathname === "/case3") {
+    } else if (window.location.pathname === "/case3") {
       setCurCase("Case 3");
-    }
-    else{
+    } else {
       setCurCase("Case 1");
     }
   }, []);
@@ -189,7 +188,7 @@ export default function Interpretation(props: props) {
     Possible Conditions:  
     Possible Constants: 
     
-    In this example, some possible relationships would include: "has a positive correlation", "has a negative correlation", "Less than", etc.
+    In this example, some possible relationships would include: "greater than", "Less than", etc. Note that these conditions should apply to the feature state (since we're looking at average contribution in this case, we should not be considering things like overall correlation, but that might be the case in different situations).
     Some possible conditions would include: "when the BMI is above 25". Note that possible conditions should be included even if there are no conditions in the original statement.
     
     
@@ -250,7 +249,6 @@ export default function Interpretation(props: props) {
         { role: "user", content: input },
       ],
     });
-    
 
     var json_string = chatCompletion.choices[0].message.content;
     var finish_reason = chatCompletion.choices[0].finish_reason;
@@ -260,7 +258,8 @@ export default function Interpretation(props: props) {
 
         // Extract each element and store it in a variable
         let features = jsonObject.Features;
-        let featureState = jsonObject.FeatureState
+        let featureState = jsonObject.FeatureState;
+        let attribution = jsonObject.attribution;
         let prediction = jsonObject.Attribution;
         let relationship = jsonObject.Relationship;
         let constant = jsonObject.Constant;
@@ -277,18 +276,20 @@ export default function Interpretation(props: props) {
           const updatedHypo = {
             freetext: input,
             features: features,
+            featureState: featureState,
+            attribution: attribution,
             relation: relationship,
             prediction: prediction,
             condition: condition,
+            constant: constant,
             possibleRelations: PossibleRelationships,
             possibleConditions: PossibleConditions,
+            category: category,
           };
 
           setNewHypo(updatedHypo);
           onHypoChange(updatedHypo);
           setIsLoading(false);
-
-
         }
       } catch (error) {
         console.error("Error parsing JSON:", error);
@@ -305,14 +306,16 @@ export default function Interpretation(props: props) {
     let updatedHypo: IHypo = newHypo;
 
     if (curCase === "Case 1") {
-
       updatedHypo = {
         freetext:
-          "BMI is the most important feature for predicting diabetes risk.",
+          "The average contribution of BMI to diabetes risk is larger than 0.5",
         features: ["BMI"],
+        featureState: ["average contribution"],
+        attribution: "diabetes risk",
         prediction: "diabetes risk",
-        relation: "most important feature",
+        relation: "larger than",
         condition: "none",
+        constant: "0.5",
         possibleRelations: [
           "most important feature",
           "2nd most important feature",
@@ -320,61 +323,60 @@ export default function Interpretation(props: props) {
           "has a positive correlation with",
         ],
         possibleConditions: ["when above 25", "when below 25"],
+        category: 1,
       };
-
-
-
     } else if (curCase === "Case 2") {
       console.log("in case 2");
       updatedHypo = {
         freetext:
-          "serum triglycerides level is the most important feature for predicting the progression of diabetes.",
-        features: ["serum triglycerides level"],
+          "serum triglycerides level is more important than BMI for predicting the progression of diabetes.",
+        features: ["serum triglycerides level", "BMI"],
+        featureState: ["none", "none"],
         prediction: "diabetes progression",
+        attribution: "diabetes progression",
         relation: "most important feature",
         condition: "none",
-        possibleRelations: [
-          "most important feature",
-          "2nd most important feature",
-          "least important feature",
-          "has a positive correlation with",
-        ],
-        possibleConditions: ["when above 25", "when below 25"],
+        constant: "none",
+        possibleRelations: ["more important than", "less important than"],
+        possibleConditions: ["when BMI is n 25", "when below 25"],
+        category: 2,
       };
-
-
-
     } else if (curCase === "Case 3") {
       console.log("in case 3");
       updatedHypo = {
         freetext: "BMI has a positive correlation with diabetes progression",
         features: ["BMI"],
+        featureState: ["none"],
         prediction: "diabetes progression",
+        attribution: "diabetes progression",
         relation: "positive correlation",
         condition: "none",
+        constant: "none",
         possibleRelations: [
-          "most important feature",
-          "2nd most important feature",
-          "least important feature",
-          "has a positive correlation with",
+          "positive correlation",
+          "negative correlation",
+          "no correlation",
         ],
         possibleConditions: ["when above 25", "when below 25"],
+        category: 3,
       };
-
-
     } else if (curCase === "Free Exploration") {
       const result = await parseInput(userInput);
-      if (result){
+      if (result) {
         updatedHypo = result;
+        console.log("FREE HYPO SET!");
       }
     } else {
       updatedHypo = {
         freetext:
-          "BMI is the most important feature for predicting diabetes risk.",
+          "The average contribution of BMI to diabetes risk is larger than 0.5",
         features: ["BMI"],
+        featureState: ["average contribution"],
+        attribution: "diabetes risk",
         prediction: "diabetes risk",
-        relation: "most important feature",
+        relation: "larger than",
         condition: "none",
+        constant: "0.5",
         possibleRelations: [
           "most important feature",
           "2nd most important feature",
@@ -382,15 +384,55 @@ export default function Interpretation(props: props) {
           "has a positive correlation with",
         ],
         possibleConditions: ["when above 25", "when below 25"],
+        category: 1,
       };
-      
     }
 
     setNewHypo(updatedHypo);
     onHypoChange(updatedHypo);
     setIsSubmitted(!isSubmitted);
-
   };
+
+  type ColorKeys = 'feature' | 'prediction' | 'relation';
+
+  const colors: Record<ColorKeys, string> = {
+    "feature": "#6bbcff", // Blue
+    "prediction": "#ffff6b", // Yellow
+    "relation": "#6bffaf" // Green
+  };
+
+  // Function to wrap a text segment with a span and style it
+  const wrapText = (text: string, color: string) => (
+    <span className="label" style={{ backgroundColor: color }}>
+      {text}
+    </span>
+  );
+
+  const parts: (string | React.ReactNode)[] = []
+
+  const pushNonHighlightedText = (text: string) => {
+    if (text) parts.push(text);
+  };
+
+  let remainingText = newHypo.freetext;
+
+  const processString = (subString: string, key: ColorKeys) => {
+    const index = remainingText.indexOf(subString);
+    if (index != -1){
+      pushNonHighlightedText(remainingText.slice(0, index));
+      parts.push(wrapText(subString, colors[key]));
+      remainingText = remainingText.slice(index + subString.length);
+    } 
+  };
+
+  newHypo.features.forEach((feature) => processString(feature, 'feature'));
+  processString(newHypo.prediction, 'prediction');
+  processString(newHypo.relation, 'relation');
+  pushNonHighlightedText(remainingText);
+
+
+
+
 
   return (
     <Paper style={{ padding: "15px" }}>
@@ -436,34 +478,37 @@ export default function Interpretation(props: props) {
           Submit
         </Button>
       </div>
-      {isFree && 
-      (isLoading ? (
-        <CircularProgress></CircularProgress>
-      ) : (
-        isSubmitted && (
-          <Paper className="parse-input" elevation={1}>
-            <div className="features-container">
-              {newHypo.features.map((feature, index) => (
-                <span key={index}>{formatText(feature, "feature")}</span>
-              ))}
-            </div>
+      {isFree &&
+        (isLoading ? (
+          <CircularProgress></CircularProgress>
+        ) : (
+          isSubmitted && (
+            <Paper className="parse-input" elevation={1}>
+              <div className="features-container">
+                {newHypo.features.map((feature, index) => (
+                  <span key={index}>{formatText(feature, "feature")}</span>
+                ))}
+              </div>
 
-            {getSelection(
-              "relation",
-              newHypo.relation,
-              (k) => setSelectedRelation(k),
-              newHypo.possibleRelations
-            )}
-            {formatText(newHypo.prediction, "prediction")}
-            {getSelection(
-              "condition",
-              newHypo.condition,
-              (k) => setSelectedCondition(k),
-              newHypo.possibleConditions
-            )}
-          </Paper>
-        )
-      ))}
+              {getSelection(
+                "relation",
+                newHypo.relation,
+                (k) => setSelectedRelation(k),
+                newHypo.possibleRelations
+              )}
+              {formatText(newHypo.prediction, "prediction")}
+              {getSelection(
+                "condition",
+                newHypo.condition,
+                (k) => setSelectedCondition(k),
+                newHypo.possibleConditions
+              )}
+            </Paper>
+          )
+        ))}
+        <div>
+          {parts}
+        </div>
     </Paper>
   );
 }

@@ -16,11 +16,15 @@ import { Toolbar, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItem
 export interface IHypo {
     freetext: string;
     features: string[],
+    featureState: string[],
+    attribution: string;
     relation: string,
     prediction: string;
     condition: string,
+    constant: string,
     possibleRelations: string[];
     possibleConditions: string[];
+    category: number;
 }
 
 
@@ -31,11 +35,15 @@ function App(appProps: typeof CASES[0]) {
     const [hypo, setHypo] = useState<IHypo>({
         freetext: '',
         features: [],
+        featureState: [],
+        attribution: '', 
         relation: '',
         prediction: '',
         condition: '',
+        constant: '',
         possibleRelations: [],
-        possibleConditions: []
+        possibleConditions: [],
+        category: -1
     });
     const [curCase, setCase] = useState(CASES[0]);
 
