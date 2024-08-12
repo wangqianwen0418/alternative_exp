@@ -96,7 +96,7 @@ export default function Interpretation(props: props) {
 
     const [selectedRelation, setSelectedRelation] = useState("");
     const [selectedCondition, setSelectedCondition] = useState("");
-    const [modalVisible, setModalVisible] = useState(true);
+    const [modalVisible, setModalVisible] = useState(caseName.includes('Free'));
     const [isLoading, setIsLoading] = useState(false); // New loading state
     const [apiKey, setApiKey] = useState("");
     const [newHypo, setNewHypo] = useState<IHypo>({
