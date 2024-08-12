@@ -97,7 +97,9 @@ function App(appProps: typeof CASES[0]) {
                 <Paper style={{ padding: "15px" }}>
                     <Typography variant="h5" gutterBottom> ML Model and Dataset {appProps.name.includes('Free') && <SyncIcon />}</Typography>
                     <p style={{ margin: '0px 5px' }}>
-                        The ML model use 10 features to predict the progression of diabetes.
+                        Each instance in the dataset corresponds to a patient, characterized by values for 10 distinct features.
+                        <br />
+                        This machine learning model predicts the progression of diabetes in patients using these 10 features.
                     </p>
                 </Paper>
             </Grid>
