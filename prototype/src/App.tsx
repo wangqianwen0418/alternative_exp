@@ -4,14 +4,13 @@ import { useState } from 'react';
 
 import Explanation from './component/Explanation';
 import Interpretation from './component/Interpretation';
-import { CASES } from './const';
+import { CASES, TInsight } from './const';
 
 import './App.css';
 
 import IconButton from '@mui/material/IconButton';
 import { Menu as MenuIcon, TroubleshootOutlined as TroubleShootIcon, Sync as SyncIcon } from '@mui/icons-material';
 import { Toolbar, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Box, Paper, Typography } from '@mui/material';
-
 
 export interface IHypo {
     freetext: string;
@@ -26,7 +25,6 @@ export interface IHypo {
     possibleConditions: string[];
     category: number;
 }
-
 
 
 function App(appProps: typeof CASES[0]) {
@@ -45,6 +43,8 @@ function App(appProps: typeof CASES[0]) {
         possibleConditions: [],
         category: -1
     });
+
+    const [insight, setInsight] = useState<TInsight>(appProps.insight);
 
     const handleHypoChange = (newHypo: IHypo) => {
         setHypo(newHypo);

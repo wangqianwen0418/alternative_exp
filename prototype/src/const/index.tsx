@@ -1,6 +1,9 @@
 import React from "react";
 
-export const CASES = [
+
+
+
+export const CASES: TCase[] = [
     {
         name: "Case 1",
         href: "/case1",
@@ -8,8 +11,8 @@ export const CASES = [
         initVis: "beeswarm",
         insight: {
             variables: [
-                { name: "bmi", transform: "average", type: "feature attribution" },
-                { name: "age", transform: "average", type: "feature attribution" }
+                { featureName: "bmi", transform: "average", type: "feature attribution" },
+                { featureName: "age", transform: "average", type: "feature attribution" }
             ],
             type: "comparison",
             relation: "greater",
@@ -23,11 +26,11 @@ export const CASES = [
         initVis: "bar",
         insight: {
             variables: [
-                { name: "bmi", type: "feature attribution" },
+                { featureName: "bmi", type: "feature attribution", transform: undefined },
                 0
             ],
-            type: "read value",
-            relation: "greater",
+            type: "read",
+            relation: "greater than",
             condition: undefined
         }
     },
@@ -36,13 +39,13 @@ export const CASES = [
         href: "/case3",
         userText: 'the larger the age, the more likely to have greater diabetes progression.',
         initVis: "bee swarm",
-        Insights: {
+        insight: {
             variables: [
-                { name: "age", type: "feature value" },
-                { name: "age", type: "feature atrribution" }
+                { featureName: "age", type: "feature value", transform: undefined },
+                { featureName: "age", type: "feature attribution", transform: undefined }
             ],
             type: "correlation",
-            relation: "positive",
+            relation: "positively",
             condition: undefined
         }
     },
@@ -78,13 +81,13 @@ export type TCase = {
     href: string,
     userText: string,
     initVis: "beeswarm" | "bar" | "scatter" | string,
-    insight: TInsight
+    insight?: TInsight
 }
 
 export type TInsight = TInsight1 | TInsight2 | TInsight3 | TInsight4 | undefined
 
 export type TInsight1 = {
-    variables: [TVariable, TConstant],
+    variables: [TVariable, number],
     type: "read",
     relation: "greater than" | "less than" | "equal to",
     condition: { featureName: string, range: [number, number] } | undefined,
@@ -117,6 +120,5 @@ export type TVariable = {
     type: "feature value" | "feature attribution",
 }
 
-export type TConstant = number
 
 
