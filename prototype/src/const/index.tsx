@@ -12,12 +12,12 @@ export const CASES: TCase[] = [
         {
           featureName: "bmi",
           transform: "average",
-          type: "feature attribution",
+          type: "contribution",
         },
         {
           featureName: "age",
           transform: "average",
-          type: "feature attribution",
+          type: "contribution",
         },
       ],
       type: "comparison",
@@ -35,7 +35,7 @@ export const CASES: TCase[] = [
       variables: [
         {
           featureName: "bmi",
-          type: "feature attribution",
+          type: "contribution",
           transform: undefined,
         },
         0,
@@ -53,10 +53,10 @@ export const CASES: TCase[] = [
     initVis: "bee swarm",
     insight: {
       variables: [
-        { featureName: "age", type: "feature value", transform: undefined },
+        { featureName: "age", type: "value", transform: undefined },
         {
           featureName: "age",
-          type: "feature attribution",
+          type: "contribution",
           transform: undefined,
         },
       ],
@@ -79,10 +79,13 @@ export const GenerateTextTemplates = (insight: TInsight) => {
   if (insight?.type === "read") {
     const [var1, var2] = insight.variables;
     return (
-      <span>
+      <span className="formatted">
         {" "}
-        The <span className="label transform">{var1.transform}</span> value of{" "}
-        <span className="label featureName">{var1.featureName}</span> is{" "}
+        The{" "}
+        <span className="label transform">
+          {var1.transform} {var1.type}{" "}
+        </span>{" "}
+        of <span className="label featureName">{var1.featureName}</span> is{" "}
         <span className="label relation">{insight.relation}</span> than{" "}
         <span className="label constant">{var2}</span>.{" "}
       </span>
@@ -90,12 +93,19 @@ export const GenerateTextTemplates = (insight: TInsight) => {
   } else if (insight?.type === "comparison") {
     const [var1, var2] = insight.variables;
     return (
-      <span>
+      <span className="formatted">
         {" "}
-        The <span className="label transform">{var1.transform}</span> value of{" "}
-        <span className="label featureName">{var1.featureName}</span> is{" "}
+        The{" "}
+        <span className="label transform">
+          {" "}
+          {var1.transform} {var1.type}{" "}
+        </span>{" "}
+        of <span className="label featureName">{var1.featureName}</span> is{" "}
         <span className="label relation">{insight.relation}</span> the{" "}
-        <span className="label transform">{var2.transform}</span> value of{" "}
+        <span className="label transform">
+          {var2.transform} {var1.type}{" "}
+        </span>{" "}
+        of
         <span className="label featureName">{var2.featureName}</span>.{" "}
       </span>
     );
@@ -156,5 +166,5 @@ export type TInsight4 = {
 export type TVariable = {
   featureName: string;
   transform: "average" | undefined;
-  type: "feature value" | "feature attribution";
+  type: "value" | "contribution";
 };

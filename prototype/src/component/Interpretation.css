@@ -1,6 +1,11 @@
 span.label {
   padding: 1px 5px;
   border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+span.formatted {
+  line-height: 180%;
 }
 
 .MuiPaper-root.parse-input {
@@ -15,5 +20,8 @@ span.featureName {
   background-color: deepskyblue;
 }
 span.constant {
-  background-color: lightseagreen;
+  background-color: deepskyblue;
+}
+span.relation {
+  background-color: rgb(167, 233, 157);
 }
