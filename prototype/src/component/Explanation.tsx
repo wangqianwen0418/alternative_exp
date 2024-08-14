@@ -6,125 +6,125 @@ import Swarm from "./Swarm";
 import Scatter from "./Scatter";
 import Bar from "./Bar";
 import PCP from "./PCP";
-import { IHypo } from "../App";
-import { CASES } from '../const';
+import { CASES, TInsight } from "../const";
 
-type props = typeof CASES[0] & {
-    isSubmitted: boolean;
-    hypo: IHypo;
-}
+type props = (typeof CASES)[0] & {
+  isSubmitted: boolean;
+  insight: TInsight;
+};
 
-export default function Explanation({ isSubmitted, hypo, initVis}: props) {
-    const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
-    console.log("SELECTED INDICES: ");
-    console.log(selectedIndices);
-    const featureName = "bmi",
-        featureIndex = shap_diabetes["feature_names"].indexOf(featureName),
-        featureValues = shap_diabetes["feature_values"].map(
-            (row) => row[featureIndex]
-        ),
-        featureShapValues = shap_diabetes["shap_values"].map((row) => row[featureIndex]);
-    
-    console.log("EXPLANATION HYPO: ");
-    console.log(hypo.freetext);
+export default function Explanation({ isSubmitted, insight, initVis }: props) {
+  const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
+  console.log("SELECTED INDICES: ");
+  console.log(selectedIndices);
+  const featureName = "bmi",
+    featureIndex = shap_diabetes["feature_names"].indexOf(featureName),
+    featureValues = shap_diabetes["feature_values"].map(
+      (row) => row[featureIndex]
+    ),
+    featureShapValues = shap_diabetes["shap_values"].map(
+      (row) => row[featureIndex]
+    );
 
+  console.log("EXPLANATION HYPO: ");
 
-    let initialVisualization;
-    switch (initVis) {
-        case "beeswarm":
-            initialVisualization = (
-                <Swarm
-                    xValues={featureShapValues}
-                    colorValues={featureValues}
-                    width={500}
-                    height={100}
-                    id="bmi"
-                    selectedIndices={selectedIndices}
-                    setSelectedIndices={setSelectedIndices}
-                />
-            );
-            break;
-        case "scatter":
-            initialVisualization = (
-                <Scatter
-                    yValues={featureShapValues}
-                    xValues={featureValues}
-                    width={400}
-                    height={300}
-                    id="bmi-scatter"
-                    offsets={[0, 0]}
-                    selectedIndices={selectedIndices}
-                    setSelectedIndices={setSelectedIndices}
-                />
-            );
-            break;
-        case "bar":
-            initialVisualization = (
-                <Bar
-                    allShapValues={shap_diabetes["shap_values"].slice(0,100)}
-                    featureNames={shap_diabetes["feature_names"].slice(0,100)}
-                    width={600}
-                    height={200}
-                    id="bmi-scatter"
-                    offsets={[0, 0]}
-                />
-            );
-            break;
-        default:
-            initialVisualization = (
-                <Swarm
-                    xValues={featureShapValues}
-                    colorValues={featureValues}
-                    width={500}
-                    height={100}
-                    id="bmi"
-                    selectedIndices={selectedIndices}
-                    setSelectedIndices={setSelectedIndices}
-                />)
-    }
+  let initialVisualization;
+  switch (initVis) {
+    case "beeswarm":
+      initialVisualization = (
+        <Swarm
+          xValues={featureShapValues}
+          colorValues={featureValues}
+          width={500}
+          height={100}
+          id="bmi"
+          selectedIndices={selectedIndices}
+          setSelectedIndices={setSelectedIndices}
+        />
+      );
+      break;
+    case "scatter":
+      initialVisualization = (
+        <Scatter
+          yValues={featureShapValues}
+          xValues={featureValues}
+          width={400}
+          height={300}
+          id="bmi-scatter"
+          offsets={[0, 0]}
+          selectedIndices={selectedIndices}
+          setSelectedIndices={setSelectedIndices}
+        />
+      );
+      break;
+    case "bar":
+      initialVisualization = (
+        <Bar
+          allShapValues={shap_diabetes["shap_values"].slice(0, 100)}
+          featureNames={shap_diabetes["feature_names"].slice(0, 100)}
+          width={600}
+          height={200}
+          id="bmi-scatter"
+          offsets={[0, 0]}
+        />
+      );
+      break;
+    default:
+      initialVisualization = (
+        <Swarm
+          xValues={featureShapValues}
+          colorValues={featureValues}
+          width={500}
+          height={100}
+          id="bmi"
+          selectedIndices={selectedIndices}
+          setSelectedIndices={setSelectedIndices}
+        />
+      );
+  }
 
-    // [TODO: additional visualizations should be updated based in hypothesis]
-    const additionalVisualizations = isSubmitted && (
-        <>
-            <Scatter
-                yValues={featureShapValues}
-                xValues={featureValues}
-                width={400}
-                height={300}
-                id="bmi-scatter"
-                offsets={[0, 150]}
-                selectedIndices={selectedIndices}
-                setSelectedIndices={setSelectedIndices}
-            />
+  // [TODO: additional visualizations should be updated based in hypothesis]
+  const additionalVisualizations = isSubmitted && (
+    <>
+      <Scatter
+        yValues={featureShapValues}
+        xValues={featureValues}
+        width={400}
+        height={300}
+        id="bmi-scatter"
+        offsets={[0, 150]}
+        selectedIndices={selectedIndices}
+        setSelectedIndices={setSelectedIndices}
+      />
 
-            <g>
-                <rect
-                    x={550}
-                    y={0}
-                    width={300}
-                    height={200}
-                    fill="white"
-                    stroke="black"
-                />
-                <text x={700} y={50} textAnchor="middle">
-                    Other Explanations
-                </text>
-            </g>
-            <g>
-                <rect
-                    x={450}
-                    y={250}
-                    width={400}
-                    height={200}
-                    fill="white"
-                    stroke="black"
-                />
-                <text x={600} y={300} textAnchor="middle">
-                    Other Explanations
-                </text>
-            </g>
-        </>
-    )
+      <g>
+        <rect
+          x={550}
+          y={0}
+          width={300}
+          height={200}
+          fill="white"
+          stroke="black"
+        />
+        <text x={700} y={50} textAnchor="middle">
+          Other Explanations
+        </text>
+      </g>
+      <g>
+        <rect
+          x={450}
+          y={250}
+          width={400}
+          height={200}
+          fill="white"
+          stroke="black"
+        />
+        <text x={600} y={300} textAnchor="middle">
+          Other Explanations
+        </text>
+      </g>
+    </>
+  );
 
   return (
     <Paper style={{ padding: "15px" }}>
