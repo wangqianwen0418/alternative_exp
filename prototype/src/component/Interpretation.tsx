@@ -60,7 +60,7 @@ export default function Interpretation(props: props) {
     <>
       <Paper style={{ padding: "15px" }}>
         <Typography variant="h5" gutterBottom>
-          User Interpretation
+          Interpretation
         </Typography>
         <TextField
           id="outlined-basic"
@@ -70,33 +70,35 @@ export default function Interpretation(props: props) {
             caseName.includes("Free") && setUserText(e.target.value)
           }
           multiline
-          rows={4}
+          rows={2}
           fullWidth
         />
 
         <div style={{ alignItems: "center" }}>
-          <Button
+          {/* <Button
             variant="contained"
             color="primary"
             style={{ margin: "10px 5px" }}
             onClick={() => setIsSubmitted(!isSubmitted)}
           >
             Clear
-          </Button>
+          </Button> */}
           <Button
-            variant="contained"
+            variant="outlined"
+            disabled={isSubmitted}
             color="primary"
             style={{ margin: "10px 5px" }}
             onClick={handleSubmission}
           >
-            Submit
+            Check with Additional Visualization
           </Button>
         </div>
         {isLoading ? (
           <CircularProgress></CircularProgress>
         ) : (
           isSubmitted && (
-            <Paper className="parse-input" elevation={1}>
+            <Paper className="parse-input" elevation={0}>
+              <b>Formatted: </b>
               {GenerateTextTemplates(insight)}
             </Paper>
           )

@@ -95,7 +95,7 @@ function App(appProps: CaseProps | QuestionProps) {
         >
           <MenuIcon />
         </IconButton>
-        Are you interpreting correctly?
+        Is this the right interpretation?
       </Toolbar>
     </Grid>
   );
@@ -108,18 +108,15 @@ function App(appProps: CaseProps | QuestionProps) {
       </Drawer>
 
       <Grid item xs={10}>
-        <Paper style={{ padding: "15px" }}>
-          <Typography variant="h5" gutterBottom>
-            {" "}
-            ML Model and Dataset{" "}
-            {appProps.name.includes("Free") && <SyncIcon />}
-          </Typography>
+        <Paper style={{ padding: "15px" }} elevation={0}>
           <p style={{ margin: "0px 5px" }}>
-            Each instance in the dataset corresponds to a patient, characterized
-            by values for 10 distinct features.
+            <b>ML Model and Dataset :</b> Each instance in the dataset
+            corresponds to a patient, characterized by values for 10 distinct
+            features.
             <br />
             This machine learning model predicts the progression of diabetes in
-            patients using these 10 features.
+            patients using these 10 features.{" "}
+            {/* {appProps.name.includes("Free") && <SyncIcon />} */}
           </p>
         </Paper>
       </Grid>
