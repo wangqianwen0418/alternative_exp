@@ -6,11 +6,13 @@ import Swarm from "./Swarm";
 import Scatter from "./Scatter";
 import Bar from "./Bar";
 import PCP from "./PCP";
-import { CASES, TInsight } from "../const";
+import { CASES } from "../util/cases";
+import { TInsight } from "../util/types";
 
-type props = (typeof CASES)[0] & {
+type props = {
   isSubmitted: boolean;
   insight: TInsight;
+  initVis: string;
 };
 
 export default function Explanation({ isSubmitted, insight, initVis }: props) {

@@ -1,19 +1,16 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
 
-import { CASES } from './const'
-import Questions from './Questions'
+import { CASES } from "./util/cases";
+import Questions from "./Questions";
 
-import {
-    createBrowserRouter,
-    RouterProvider,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 const root = ReactDOM.createRoot(
-    document.getElementById('root') as HTMLElement
+  document.getElementById("root") as HTMLElement
 );
 
 // const router = createBrowserRouter([
@@ -36,25 +33,23 @@ const root = ReactDOM.createRoot(
 // ]);
 
 const cases = CASES.map((c) => {
-    return {
-        path: c.href,
-        element: <App {...c} />
-    }
-})
+  return {
+    path: c.href,
+    element: <App {...c} />,
+  };
+});
 
 cases.unshift({
-    path: '/',
-    element: <App {...CASES[0]} />
-})
+  path: "/",
+  element: <App {...CASES[0]} />,
+});
 
 cases.push({
-    path: '/questions',
-    element: <Questions />
-})
+  path: "/questions",
+  element: <Questions />,
+});
 
-root.render(
-    <RouterProvider router={createBrowserRouter(cases)} />
-);
+root.render(<RouterProvider router={createBrowserRouter(cases)} />);
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

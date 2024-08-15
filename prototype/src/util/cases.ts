@@ -1,12 +1,8 @@
-import { TCase } from ".";
-type TQuestion = TCase & {
-    testCondition: 'no vis' | 'random vis' | 'ours';
-}
-
-export const QuestionList: TQuestion[] = [
+import { TCase } from "./types";
+export const CASES: TCase[] = [
   {
-    name: "q1",
-    href: "/questions",
+    name: "Case 1",
+    href: "/case1",
     userText:
       "BMI is the more important than age for predicting diabetes progression.",
     initVis: "beeswarm",
@@ -27,11 +23,10 @@ export const QuestionList: TQuestion[] = [
       relation: "greater",
       condition: undefined,
     },
-    testCondition: 'no vis'
   },
   {
-    name: "q2",
-    href: "/questions",
+    name: "Case 2",
+    href: "/case2",
     userText:
       "bmi always contributes positively for predicting diabetes progression.",
     initVis: "bar",
@@ -48,11 +43,10 @@ export const QuestionList: TQuestion[] = [
       relation: "greater than",
       condition: undefined,
     },
-    testCondition: 'random vis'
   },
   {
-    name: "q3",
-    href: "/questions",
+    name: "Case 3",
+    href: "/case3",
     userText:
       "the larger the age, the more likely to have greater diabetes progression.",
     initVis: "bee swarm",
@@ -69,6 +63,11 @@ export const QuestionList: TQuestion[] = [
       relation: "positively",
       condition: undefined,
     },
-    testCondition: 'ours'
-  }
+  },
+  {
+    name: "Free Exploration",
+    href: "/free",
+    userText: "",
+    initVis: "random",
+  },
 ];
