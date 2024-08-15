@@ -5,6 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 import { CASES } from './const'
+import Questions from './Questions'
 
 import {
     createBrowserRouter,
@@ -34,7 +35,7 @@ const root = ReactDOM.createRoot(
 //     },
 // ]);
 
-const cases = CASES.map((c, index) => {
+const cases = CASES.map((c) => {
     return {
         path: c.href,
         element: <App {...c} />
@@ -44,6 +45,11 @@ const cases = CASES.map((c, index) => {
 cases.unshift({
     path: '/',
     element: <App {...CASES[0]} />
+})
+
+cases.push({
+    path: '/questions',
+    element: <Questions />
 })
 
 root.render(

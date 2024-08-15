@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import Explanation from "./component/Explanation";
 import Interpretation from "./component/Interpretation";
+import UserResponse from "./component/UserResponse";
 import { CASES, TCase, TInsight } from "./const";
 
 import "./App.css";
@@ -27,21 +28,12 @@ import {
     Typography,
 } from "@mui/material";
 
-export interface IHypo {
-    freetext: string;
-    features: string[];
-    featureState: string[];
-    attribution: string;
-    relation: string;
-    prediction: string;
-    condition: string;
-    constant: string;
-    possibleRelations: string[];
-    possibleConditions: string[];
-    category: number;
+type TAppProps = TCase & {
+    setQuestionIndex?: (k: number) => void;
 }
 
-function App(appProps: TCase) {
+
+function App(appProps: TAppProps) {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [open, setOpen] = useState(false); // sider drawer
 
@@ -76,7 +68,16 @@ function App(appProps: TCase) {
                             <ListItemText primary={c.name} />
                         </ListItemButton>
                     </ListItem>
-                ))}
+                )).concat(
+                    <ListItem key='questions' disablePadding>
+                        <ListItemButton href='/questions'>
+                            <ListItemIcon>
+                                <TroubleShootIcon />
+                            </ListItemIcon>
+                            <ListItemText primary='User Study Question' />
+                        </ListItemButton>
+                    </ListItem>
+                )}
             </List>
         </Box>
     );
@@ -133,6 +134,11 @@ function App(appProps: TCase) {
                     insight={insight}
                     setInsight={setInsight}
                 />
+                {appProps.setQuestionIndex && isSubmitted && (
+                    <UserResponse
+                        setQuestionIndex={appProps.setQuestionIndex}
+                        questionIndex={0} />)
+                }
             </Grid>
             <Grid item xs={7} className="App-body">
                 <Explanation
