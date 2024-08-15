@@ -1,6 +1,14 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Grid from "@mui/material/Grid";
 import { useState } from "react";
+import { useAtom } from "jotai";
+import {
+  insightAtom,
+  isSubmittedAtom,
+  freeTextAtom,
+  initVisAtom,
+  pageNameAtom,
+} from "./store";
 
 import Explanation from "./component/Explanation";
 import Interpretation from "./component/Interpretation";
@@ -29,15 +37,24 @@ import {
   Typography,
 } from "@mui/material";
 
-type CaseProps = TCase;
-type QuestionProps = TQuestion & { setQuestionIndex: (index: number) => void };
-
-function App(appProps: CaseProps | QuestionProps) {
-  const [isSubmitted, setIsSubmitted] = useState(false);
+function App(appProps: TCase | TQuestion) {
   const [open, setOpen] = useState(false); // sider drawer
 
-  const [insight, setInsight] = useState<TInsight>(appProps.insight);
-  const [freetext, setFreetext] = useState<string>(appProps.userText);
+  const [isSubmitted] = useAtom(isSubmittedAtom);
+  const [, setInsight] = useAtom(insightAtom);
+  const [, setFreetext] = useAtom(freeTextAtom);
+  const [, setInitVis] = useAtom(initVisAtom);
+  const [, setName] = useAtom(pageNameAtom);
+
+  useEffect(() => {
+    setFreetext(appProps.userText);
+    setInsight(appProps.insight);
+    setInitVis(appProps.initVis);
+    setName(appProps.pageName);
+  }, [appProps.pageName]);
+
+  //   const [insight, setInsight] = useState<TInsight>(appProps.insight);
+  //   const [freetext, setFreetext] = useState<string>(appProps.userText);
 
   const DrawerList = (
     <Box sx={{ width: 250 }} role="presentation" onClick={() => setOpen(false)}>
@@ -59,12 +76,12 @@ function App(appProps: CaseProps | QuestionProps) {
         </ListItem>
 
         {CASES.map((c) => (
-          <ListItem key={c.name} disablePadding>
+          <ListItem key={c.pageName} disablePadding>
             <ListItemButton href={c.href}>
               <ListItemIcon>
                 <TroubleShootIcon />
               </ListItemIcon>
-              <ListItemText primary={c.name} />
+              <ListItemText primary={c.pageName} />
             </ListItemButton>
           </ListItem>
         )).concat(
@@ -116,33 +133,16 @@ function App(appProps: CaseProps | QuestionProps) {
             <br />
             This machine learning model predicts the progression of diabetes in
             patients using these 10 features.{" "}
-            {/* {appProps.name.includes("Free") && <SyncIcon />} */}
+            {/* {appProps.pageName:.includes("Free") && <SyncIcon />} */}
           </p>
         </Paper>
       </Grid>
       <Grid item xs={4} className="App-body">
-        <Interpretation
-          isSubmitted={isSubmitted}
-          setIsSubmitted={setIsSubmitted}
-          name={appProps.name}
-          userText={freetext}
-          setUserText={setFreetext}
-          insight={insight}
-          setInsight={setInsight}
-        />
-        {"index" in appProps && isSubmitted && (
-          <UserResponse
-            questionIndex={appProps.index}
-            setQuestionIndex={appProps?.setQuestionIndex}
-          />
-        )}
+        <Interpretation />
+        {"index" in appProps && isSubmitted && <UserResponse />}
       </Grid>
       <Grid item xs={7} className="App-body">
-        <Explanation
-          isSubmitted={isSubmitted}
-          insight={insight}
-          initVis={appProps.initVis}
-        />
+        <Explanation />
       </Grid>
     </Grid>
   );

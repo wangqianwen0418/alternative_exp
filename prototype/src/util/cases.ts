@@ -1,7 +1,7 @@
 import { TCase } from "./types";
 export const CASES: TCase[] = [
   {
-    name: "Case 1",
+    pageName: "Case 1",
     href: "/case1",
     userText:
       "BMI is the more important than age for predicting diabetes progression.",
@@ -25,7 +25,7 @@ export const CASES: TCase[] = [
     },
   },
   {
-    name: "Case 2",
+    pageName: "Case 2",
     href: "/case2",
     userText:
       "bmi always contributes positively for predicting diabetes progression.",
@@ -45,7 +45,7 @@ export const CASES: TCase[] = [
     },
   },
   {
-    name: "Case 3",
+    pageName: "Case 3",
     href: "/case3",
     userText:
       "the larger the age, the more likely to have greater diabetes progression.",
@@ -65,9 +65,10 @@ export const CASES: TCase[] = [
     },
   },
   {
-    name: "Free Exploration",
+    pageName: "Free Exploration",
     href: "/free",
     userText: "",
     initVis: "random",
+    insight: undefined,
   },
 ];

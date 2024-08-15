@@ -1,13 +1,16 @@
 import React from "react";
 import { Button, Typography, Paper, RadioGroup, Radio } from "@mui/material";
 import { QuestionList } from "../util/questionList";
+import { useAtom } from "jotai";
+import {
+  questionIndexAtom,
+  insightAtom,
+  freeTextAtom,
+  initVisAtom,
+  pageNameAtom,
+  isSubmittedAtom,
+} from "../store";
 import Selection from "./WebUtil/Selection";
-import { on } from "events";
-
-type props = {
-  questionIndex: number;
-  setQuestionIndex: (k: number) => void;
-};
 
 const confidenceOptions = [
   "please select",
@@ -19,8 +22,13 @@ const confidenceOptions = [
   "5",
   "6 very confident",
 ];
-export default function UserResponse(props: props) {
-  const { questionIndex, setQuestionIndex } = props;
+export default function UserResponse() {
+  const [questionIndex, setQuestionIndex] = useAtom(questionIndexAtom);
+  const [, setInsight] = useAtom(insightAtom);
+  const [, setFreetext] = useAtom(freeTextAtom);
+  const [, setInitVis] = useAtom(initVisAtom);
+  const [, setName] = useAtom(pageNameAtom);
+  const [, setIsSubmitted] = useAtom(isSubmittedAtom);
 
   const [userAnswer, setUserAnswer] = React.useState<
     "yes" | "no" | undefined
@@ -33,7 +41,14 @@ export default function UserResponse(props: props) {
     // recording(userAnswer, confidence) commit the results to the database
     setUserAnswer(undefined);
     setConfidence(confidenceOptions[0]);
-    setQuestionIndex(questionIndex + 1);
+    setIsSubmitted(false);
+
+    setFreetext(QuestionList[questionIndex + 1].userText);
+    setInsight(QuestionList[questionIndex + 1].insight);
+    setInitVis(QuestionList[questionIndex + 1].initVis);
+    setName(QuestionList[questionIndex + 1].pageName);
+
+    setQuestionIndex((questionIndex) => questionIndex + 1);
   };
   return (
     <Paper style={{ padding: "15px 20px", marginTop: "10px" }}>
@@ -77,8 +92,7 @@ export default function UserResponse(props: props) {
         disabled={userAnswer == undefined || confidence == confidenceOptions[0]}
         onClick={() => onSubmit()}
       >
-        {" "}
-        {questionIndex < QuestionList.length - 1 ? "Next" : "Submit"}{" "}
+        {questionIndex < QuestionList.length - 1 ? "Next" : "Submit"}
       </Button>
     </Paper>
   );

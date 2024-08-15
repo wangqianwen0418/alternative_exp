@@ -16,29 +16,22 @@ import shapData from "../assets/shap_diabetes.json";
 import { TInsight, TCase } from "../util/types";
 import { GenerateTextTemplates } from "../util/parseTemplate";
 import { generatePrompt, parseInput } from "../util/prompt";
+import { useAtom } from "jotai";
+import {
+  freeTextAtom,
+  insightAtom,
+  isSubmittedAtom,
+  pageNameAtom,
+} from "../store";
 
-type props = {
-  name: string;
-  isSubmitted: boolean;
-  setIsSubmitted: (k: boolean) => void;
-  userText: string;
-  setUserText: (k: string) => void;
-  insight: TInsight;
-  setInsight: (k: TInsight) => void;
-};
-
-export default function Interpretation(props: props) {
-  const {
-    isSubmitted,
-    name: caseName,
-    setIsSubmitted,
-    insight,
-    setInsight,
-    userText,
-    setUserText,
-  } = props;
-
-  const [modalVisible, setModalVisible] = useState(caseName.includes("Free"));
+export default function Interpretation() {
+  const [isSubmitted, setIsSubmitted] = useAtom(isSubmittedAtom);
+  const [freeText, setFreeText] = useAtom(freeTextAtom);
+  const [insight, setInsight] = useAtom(insightAtom);
+  const [pageName] = useAtom(pageNameAtom);
+  const [modalVisible, setModalVisible] = useState<boolean>(
+    pageName ? pageName.includes("Free") : true
+  );
   const [isLoading, setIsLoading] = useState(false); // New loading state
   const [apiKey, setApiKey] = useState("");
 
@@ -49,7 +42,7 @@ export default function Interpretation(props: props) {
         shapData.feature_names,
         shapData.prediction_name
       );
-      const parsedInput = await parseInput(userText, apiKey, prompt);
+      const parsedInput: TInsight = await parseInput(freeText, apiKey, prompt);
       setInsight(parsedInput);
       setIsLoading(false); // Stop loading
     }
@@ -65,9 +58,9 @@ export default function Interpretation(props: props) {
         <TextField
           id="outlined-basic"
           label="e.g., a high bmi leads to large diabete progression"
-          value={userText}
+          value={freeText}
           onChange={(e) =>
-            caseName.includes("Free") && setUserText(e.target.value)
+            pageName.includes("Free") && setFreeText(e.target.value)
           }
           multiline
           rows={2}

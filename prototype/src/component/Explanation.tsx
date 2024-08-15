@@ -8,17 +8,15 @@ import Bar from "./Bar";
 import PCP from "./PCP";
 import { CASES } from "../util/cases";
 import { TInsight } from "../util/types";
+import { useAtom } from "jotai";
+import { initVisAtom, insightAtom, isSubmittedAtom } from "../store";
 
-type props = {
-  isSubmitted: boolean;
-  insight: TInsight;
-  initVis: string;
-};
-
-export default function Explanation({ isSubmitted, insight, initVis }: props) {
+export default function Explanation() {
+  const [isSubmitted, setIsSubmitted] = useAtom(isSubmittedAtom);
+  const [insight, setInsight] = useAtom(insightAtom);
+  const [initVis, setInitVis] = useAtom(initVisAtom);
   const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
-  console.log("SELECTED INDICES: ");
-  console.log(selectedIndices);
+
   const featureName = "bmi",
     featureIndex = shap_diabetes["feature_names"].indexOf(featureName),
     featureValues = shap_diabetes["feature_values"].map(
@@ -27,8 +25,6 @@ export default function Explanation({ isSubmitted, insight, initVis }: props) {
     featureShapValues = shap_diabetes["shap_values"].map(
       (row) => row[featureIndex]
     );
-
-  console.log("EXPLANATION HYPO: ");
 
   let initialVisualization;
   switch (initVis) {

@@ -3,7 +3,7 @@ import { TQuestion } from "./types";
 export const QuestionList: TQuestion[] = [
   {
     index: 0,
-    name: "question",
+    pageName: "question",
     userText:
       "BMI is the more important than age for predicting diabetes progression.",
     initVis: "beeswarm",
@@ -29,9 +29,9 @@ export const QuestionList: TQuestion[] = [
   },
   {
     index: 1,
-    name: "question",
+    pageName: "question",
     userText:
-      "bmi always contributes positively for predicting diabetes progression.",
+      "Blood Sugar level always contributes positively for predicting diabetes progression.",
     initVis: "bar",
     insight: {
       variables: [
@@ -51,7 +51,7 @@ export const QuestionList: TQuestion[] = [
   },
   {
     index: 2,
-    name: "question",
+    pageName: "question",
     userText:
       "the larger the age, the more likely to have greater diabetes progression.",
     initVis: "bee swarm",

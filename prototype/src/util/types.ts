@@ -1,16 +1,16 @@
 type TPageBase = {
   userText: string;
   initVis: "beeswarm" | "bar" | "scatter" | string;
-  insight?: TInsight;
+  insight: TInsight;
 };
 
 export type TCase = TPageBase & {
-  name: string; // show on the drawer
+  pageName: string; // show on the drawer
   href: string;
 };
 
 export type TQuestion = TPageBase & {
-  name: "question";
+  pageName: "question";
   testCondition: "no vis" | "random vis" | "ours";
   index: number;
   groundTruth: boolean;
