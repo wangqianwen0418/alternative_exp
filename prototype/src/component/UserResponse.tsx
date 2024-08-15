@@ -10,7 +10,7 @@ import {
   pageNameAtom,
   isSubmittedAtom,
 } from "../store";
-import Selection from "./WebUtil/Selection";
+import Selection from "./webUtil/Selection";
 
 const confidenceOptions = [
   "please select",
