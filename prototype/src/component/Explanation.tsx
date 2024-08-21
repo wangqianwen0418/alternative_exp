@@ -1,10 +1,16 @@
 import { Paper, Typography } from "@mui/material";
 import shap_diabetes from "../assets/shap_diabetes.json";
+import {
+  incomeShapValues,
+  incomeFeatureValues,
+  incomeLabels,
+} from "../util/incomeDatasets-TEMP";
 import { useState } from "react";
 
 import Swarm from "./Swarm";
 import Scatter from "./Scatter";
 import Bar from "./Bar";
+import Heatmap from "./Heatmap";
 import PCP from "./PCP";
 import { CASES } from "../util/cases";
 import { TInsight } from "../util/types";
@@ -64,6 +70,18 @@ export default function Explanation() {
           height={200}
           id="bmi-scatter"
           offsets={[0, 0]}
+        />
+      );
+      break;
+    case "heatmap":
+      initialVisualization = (
+        <Heatmap
+          shapValuesArray={incomeShapValues}
+          featureValuesArray={incomeFeatureValues}
+          labels={incomeLabels}
+          width={800}
+          height={50}
+          title="Capital Gain Heatmap"
         />
       );
       break;
@@ -129,7 +147,7 @@ export default function Explanation() {
       <Typography variant="h5" gutterBottom>
         Visual Explanation
       </Typography>
-      <svg className="swarm" width={900} height="70vh">
+      <svg className="swarm" width={1300} height="70vh">
         {initialVisualization}
 
         {isSubmitted && additionalVisualizations}

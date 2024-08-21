@@ -13,6 +13,7 @@ import "./Interpretation.css";
 import { useState } from "react";
 
 import shapData from "../assets/shap_diabetes.json";
+import Form from "./Form";
 import { TInsight, TCase } from "../util/types";
 import { GenerateTextTemplates } from "../util/parseTemplate";
 import { generatePrompt, parseInput } from "../util/prompt";
@@ -96,6 +97,9 @@ export default function Interpretation() {
             </Paper>
           )
         )}
+      </Paper>
+      <Paper style={{ padding: "15px", marginTop: "10px" }}>
+        <Form />
       </Paper>
       <Modal open={modalVisible} onClose={() => {}}>
         <Box
