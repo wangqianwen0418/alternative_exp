@@ -4,11 +4,11 @@ import { weburl } from "../util/appscript_url";
 import { v4 as uuidv4 } from "uuid";
 import Cookies from "js-cookie";
 
-let userId = Cookies.get("userId");
+let uuid = Cookies.get("uuid");
 
-if (!userId) {
-  userId = uuidv4();
-  Cookies.set("userId", userId, { expires: 7 });
+if (!uuid) {
+  uuid = uuidv4();
+  Cookies.set("uuid", uuid);
 }
 
 const prompts = [
@@ -47,8 +47,8 @@ const UserInsight = () => {
 
   const handleSubmit = async () => {
     const data = {
-      userId: userId,
-      timestamp: new Date().toISOString(),
+      uuid: uuid,
+      timestamp: new Date().toLocaleString(),
       prompt,
       confidence,
       insight,
