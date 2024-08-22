@@ -6,21 +6,19 @@ import {
   incomeLabels,
 } from "../util/incomeDatasets-TEMP";
 import { useState } from "react";
+import React from "react";
 
 import Swarm from "./Swarm";
 import Scatter from "./Scatter";
 import Bar from "./Bar";
 import Heatmap from "./Heatmap";
-import PCP from "./PCP";
-import { CASES } from "../util/cases";
-import { TInsight } from "../util/types";
 import { useAtom } from "jotai";
 import { initVisAtom, insightAtom, isSubmittedAtom } from "../store";
 
 export default function Explanation() {
-  const [isSubmitted, setIsSubmitted] = useAtom(isSubmittedAtom);
+  const [isSubmitted] = useAtom(isSubmittedAtom);
   const [insight, setInsight] = useAtom(insightAtom);
-  const [initVis, setInitVis] = useAtom(initVisAtom);
+  const [initVis] = useAtom(initVisAtom);
   const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
 
   const featureName = "bmi",
@@ -87,16 +85,11 @@ export default function Explanation() {
       break;
     default:
       initialVisualization = (
-        <Swarm
-          xValues={featureShapValues}
-          colorValues={featureValues}
-          width={500}
-          height={100}
-          id="bmi"
-          selectedIndices={selectedIndices}
-          setSelectedIndices={setSelectedIndices}
-        />
+        <text x={50} y={50}>
+          Loading ....{" "}
+        </text>
       );
+      break;
   }
 
   // [TODO: additional visualizations should be updated based in hypothesis]

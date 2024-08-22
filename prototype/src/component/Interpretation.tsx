@@ -14,7 +14,7 @@ import { useState } from "react";
 
 import shapData from "../assets/shap_diabetes.json";
 import Form from "./Form";
-import { TInsight, TCase } from "../util/types";
+import { TInsight } from "../util/types";
 import { GenerateTextTemplates } from "../util/parseTemplate";
 import { generatePrompt, parseInput } from "../util/prompt";
 import { useAtom } from "jotai";
@@ -31,7 +31,7 @@ export default function Interpretation() {
   const [insight, setInsight] = useAtom(insightAtom);
   const [pageName] = useAtom(pageNameAtom);
   const [modalVisible, setModalVisible] = useState<boolean>(
-    pageName ? pageName.includes("Free") : true
+    pageName ? pageName.includes("Free") : false
   );
   const [isLoading, setIsLoading] = useState(false); // New loading state
   const [apiKey, setApiKey] = useState("");
@@ -61,7 +61,7 @@ export default function Interpretation() {
           label="e.g., a high bmi leads to large diabete progression"
           value={freeText}
           onChange={(e) =>
-            pageName.includes("Free") && setFreeText(e.target.value)
+            pageName?.includes("Free") && setFreeText(e.target.value)
           }
           multiline
           rows={2}
