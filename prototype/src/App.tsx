@@ -8,6 +8,7 @@ import {
     freeTextAtom,
     initVisAtom,
     pageNameAtom,
+    questionIndexAtom
 } from "./store";
 
 import Explanation from "./component/Explanation";
@@ -36,7 +37,7 @@ import {
     Paper,
 } from "@mui/material";
 
-function App(appProps: TCase | TQuestion) {
+function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
     const [open, setOpen] = useState(false); // sider drawer
 
     const [isSubmitted] = useAtom(isSubmittedAtom);
@@ -44,16 +45,17 @@ function App(appProps: TCase | TQuestion) {
     const [, setFreetext] = useAtom(freeTextAtom);
     const [, setInitVis] = useAtom(initVisAtom);
     const [, setName] = useAtom(pageNameAtom);
+    const [, setQuestionIndex] = useAtom(questionIndexAtom);
 
     useEffect(() => {
         setFreetext(appProps.userText);
         setInsight(appProps.insight);
         setInitVis(appProps.initVis);
         setName(appProps.pageName);
+        setQuestionIndex(appProps.questionIndex);
+
     }, [appProps.pageName]);
 
-    //   const [insight, setInsight] = useState<TInsight>(appProps.insight);
-    //   const [freetext, setFreetext] = useState<string>(appProps.userText);
 
     const DrawerList = (
         <Box sx={{ width: 250 }} role="presentation" onClick={() => setOpen(false)}>

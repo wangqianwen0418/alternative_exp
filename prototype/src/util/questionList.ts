@@ -54,7 +54,7 @@ export const QuestionList: TQuestion[] = [
     pageName: "question",
     userText:
       "the larger the age, the more likely to have greater diabetes progression.",
-    initVis: "bee swarm",
+    initVis: "beeswarm",
     insight: {
       variables: [
         { featureName: "age", type: "value", transform: undefined },
