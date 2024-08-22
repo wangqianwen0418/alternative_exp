@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Button, Slider, TextField, Typography } from "@mui/material";
 import { weburl } from "../util/appscript_url";
+import { v4 as uuidv4 } from "uuid";
+import Cookies from "js-cookie";
+
+let userId = Cookies.get("userId");
+
+if (!userId) {
+  userId = uuidv4();
+  Cookies.set("userId", userId, { expires: 7 });
+}
 
 const prompts = [
   "Example Prompt 1",
@@ -38,6 +47,7 @@ const UserInsight = () => {
 
   const handleSubmit = async () => {
     const data = {
+      userId: userId,
       timestamp: new Date().toISOString(),
       prompt,
       confidence,
