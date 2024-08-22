@@ -67,16 +67,9 @@ export default function Explanation() {
             break;
         default:
             initialVisualization = (
-                <Swarm
-                    xValues={featureShapValues}
-                    colorValues={featureValues}
-                    width={500}
-                    height={100}
-                    id="bmi"
-                    selectedIndices={selectedIndices}
-                    setSelectedIndices={setSelectedIndices}
-                />
+                <text x={50} y={50}>Loading .... </text>
             );
+            break
     }
 
     // [TODO: additional visualizations should be updated based in hypothesis]
