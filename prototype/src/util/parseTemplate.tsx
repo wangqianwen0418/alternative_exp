@@ -2,6 +2,8 @@ import React from "react";
 import { TCase, TInsight } from "./types";
 
 export const GenerateTextTemplates = (insight: TInsight) => {
+  console.log("INSIGHT: ");
+  console.log(insight);
   if (!insight) return "";
 
   if (insight?.type === "read") {
@@ -42,7 +44,7 @@ export const GenerateTextTemplates = (insight: TInsight) => {
     return `As the ${var1.featureName} increases, it will ${
       insight.relation == "positively" ? "more" : "less"
     } to the prediction.`;
-  } else if (insight?.type === "fetureaInteraction") {
+  } else if (insight?.type === "featureInteraction") {
     const [var1, var2] = insight.variables;
     return `The ${var1.featureName} is ${insight.relation} with ${var2}.`;
   }

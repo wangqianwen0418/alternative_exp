@@ -1,73 +1,90 @@
 import OpenAI from "openai";
+import { TInsight } from "./types";
 
 export const generatePrompt = (
   feature_names: string[],
   prediction_name: string
-) => `You are a bot that extracts the content from 'insight' statements. You produce JSON that contains the following data from an inputted sentence: \:
-Features (Independent Variable(s))
-Feature State (any context about how the feature is used)
-Attribution (Dependent Variable)
-Relationship 
-Constant
-Condition
+) => `You are a bot that extracts the content from User Interpretations (“insight” ) of Graphs and formats them in a structured way. The graphs in question are centered around the way that a machine learning system treats certain features/variables.  You will return a JSON object containing specific information from the structured sentence. 
 
-The features have to be present in this list: ${feature_names.join(
-  ", "
-)}, and the Attribution should be ${prediction_name}. 
+You are a bot that extracts the content from User Interpretations (“insight” ) of Graphs and formats them in a structured way. The graphs in question are centered around the way that a machine learning system treats certain features/variables.  You will return a JSON object containing specific information from the structured sentence. 
 
-It's fine if they use abbreviations/the full form of an abbreviation (ie Body Mass Index for BMI and vice versa), but if the user's interpretation describes a feature that is not present in the list, set the feature value to ["ERROR"]. This is very important, do not forget about this!
+Before you start, you need to make sure that any features/variables that are present are in this list: ${feature_names.join(", ")}. 
+It's fine if they use abbreviations/the full form of an abbreviation (ie Body Mass Index for BMI and vice versa), but if the user's interpretation describes a feature that is not present in the list, set the Variables value to ["ERROR"]. This is very important, do not forget about this!
 
-For example, if the sentence is: "The average contribution of BMI to diabetes risk is larger than 0.5", the values you should return is as follows:
+Assuming that all works out, the first thing I need you to determine is the Category that a particular “insight” belongs to. 
 
-Features: ["BMI"]
-FeatureState: ["Average Contribution"]
-Attribution: diabetes risk
-Relationship: Greater than
-Constant: 0.5
-Condition: NONE
+Here’s some information about the categories: 
+    Category 1:
+    Attribution (DV) by Feature (IV), univariate. 
+    Possible Examples: The <feature> values contribute at least <constant> to the <attribution>, The average contribution of F_i to the prediction is larger than <constant>
 
-There may be multiple features, so the value for the "features" key and Feature State should always be an array (of same length). 
+    Category 2:
+    Bivariate comparison (Feature1, Feature2):
+    Possible Examples: 
+    Feature1 contributes more to the prediction than Feature2
+    Feature1 influences a greater number of instances than Feature2
 
+    Category 3:
+    Attribution [DV1] by Feature Value [IV1] 
+    Possible Examples:
+    There is a positive correlation between the contribution of Feature1 to predictions and the Feature1 values when values are above 15
 
-In addition, you should also include the following three fields (as arrays):
-Possible Relationships: 
-Possible Conditions:  
-Possible Constants: 
+    Category 4:
+    Multivariate Attribution by Feature Values
+    Possible Examples:
+    The correlation between the Feature1 Values and Feature1 is stronger/weaker when Feature2 is in range A compared to range B.
 
-In this example, some possible relationships would include: "greater than", "Less than", etc. Note that these conditions should apply to the feature state (since we're looking at average contribution in this case, we should not be considering things like overall correlation, but that might be the case in different situations).
-Some possible conditions would include: "when the BMI is above 25". Note that possible conditions should be included even if there are no conditions in the original statement.
+The first value in the JSON file you provide will be the category that the given insight belongs to (1,2,3,4). This will determine how we parse the rest of the insight going forward. 
 
 
-If there is no actual condition in the sentence, make sure you still include a couple options for possible conditions, based on reasonable values for the given feature/variable.
+The remaining details we care about are as follows:
+Variables
+Variable Types (“value” or “contribution”)
+Variable Transformations (average or undefined)
+Number: If there are any constants in the insight statement, they go here (in an array). If not, this will be an empty array. This array will *usually* have length 1, but not necessarily.
+Type (options are “read”, “comparison”, “correlation”, or “featureInteraction”) - note that these are the same as the four categories. So if category 1, type=”read”, if category 2, type=”comparison” and so on
+Relationship (this depends on the category). Here are the options for each category:
+Category 1 (“read”): options are “greater than”, “less than”, “equal to”
+Category 2 (“comparison”): options are “greater”, “less”, “equal”
+Category 3 (“correlation”): options are “positively” or “negatively”
+Category 4 (“featureInteraction”): options are “same” or “different”
+The last value in the JSON will be Condition. 
+Condition refers to a restriction on a range for a given variable. For example, in the statement “BMI is the most important feature in predicting diabetes risk when the value is above 25”, the variable being restricted is BMI and the range of the restriction is 25 to infinity. 
+In the JSON, this should be represented as follows: a nested JSON object that contains a featureName (string) and ‘range’ (array of two numbers). In this example, the Condition value would look like this:
+Condition: {
+	featureName: “BMI”,
+	range: [25, infinity]
+}
 
-Finally, there is one last thing you need to return: One of four categories that an insight can fall into. This can best be explained in the following way: 
+If there is no condition, just include an empty JSON object: {}
 
-Category 1:
-Attribution (DV) by Feature (IV), univariate. 
-Possible Examples: The <feature> values contribute at least <constant> to the <attribution>, The average contribution of F_i to the prediction is larger than <constant>
+Here’s an example of the full JSON:
+Suppose that the user input statement was “BMI is more important than age for predicting diabetes progression.” 
 
-Category 2:
-Bivariate comparison (Feature1, Feature2):
-Possible Examples: 
-Feature1 contributes [more] to the prediction than Feature2
-Feature1 influences a [greater] number of instances than Feature2
+In this case, there are two variables: BMI and Age. Even though it is not specified, it is clear that this statement is referring to these on “average” (since we are not looking at specific values). Furthermore, we are looking at the contribution of BMI and age to diabetes progression (as opposed to the feature values themselves), so the variable type for both of these would be “contribution”. So the Variables array (which will be in the JSON) will look like this: 
+variables: [
+        {
+          featureName: "bmi",
+          transform: "average",
+          type: "contribution",
+        },
+        {
+          featureName: "age",
+          transform: "average",
+          type: "contribution",
+        },
+      ]
+Numbers, in this case, would be an empty array: []
+The relationship in this case is a comparison of two variables (category 2), so the type value will be “comparison” while the relation value will be “greater”. 
+Condition would also be empty: {}
 
-Category 3:
-Attribution [DV1] by Feature Value [IV1] 
-Possible Examples:
-There is a [positive] correlation between the contribution of Feature1 to predictions and the Feature1 values [when values are above 15]
 
-Category 4:
-Multivariate Attribution by Feature Values
-Possible Examples:
-The correlation between the Feature1Values and Feature1 is [stronger/weaker] when Feature2 is in [range A] compared to [range B].
-
-
-
-Please return the integer value of the Category in the JSON as well.
-
-This should be formatted in a JSON object, structured like this: 
-
+So your final JSON should have the following structure:
+Category: (In this case, value would be 2)
+Variables: (in this case, value would be the array displayed above)
+Type (in this case, value would be “comparison”)
+Relation: (In this case, value would be “greater”)
+Condition: {}
 `;
 
 export const parseInput = async (
@@ -105,14 +122,24 @@ export const parseInput = async (
       ) {
         console.error("Improper feature/prediction detected");
       } else {
-        return jsonObject;
+        console.log("JSON returned");
+        console.log(jsonObject);
+        
+        return {
+          variables: jsonObject.Variables,
+          type: jsonObject.Type,
+          relation: jsonObject.Relation,
+          condition: jsonObject.Condition
+        } as TInsight;
+         
+
       }
     } catch (error) {
       console.error("Error parsing JSON:", error);
-      return null;
+      
     }
   } else {
     console.error("JSON string is null");
-    return null;
+    
   }
 };

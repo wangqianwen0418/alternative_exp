@@ -46,7 +46,7 @@ export type TInsight3 = {
 
 export type TInsight4 = {
   variables: [TVariable, TVariable];
-  type: "fetureaInteraction";
+  type: "featureInteraction";
   relation: "same" | "different";
   condition: { featureName: string; range: [number, number][] } | undefined;
 };
