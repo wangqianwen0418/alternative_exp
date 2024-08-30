@@ -42,6 +42,8 @@ export default function Interpretation() {
               shapData.feature_names,
               shapData.prediction_name
           );
+          const inputJSON = await parseInput(freeText, apiKey, prompt);
+          
           const parsedInput: TInsight = await parseInput(freeText, apiKey, prompt);
           
           console.log(parsedInput);

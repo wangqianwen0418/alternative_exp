@@ -124,9 +124,12 @@ export const parseInput = async (
       } else {
         console.log("JSON returned");
         console.log(jsonObject);
-        
+        let variableArray = jsonObject.Variables;
+        if (jsonObject.Number && jsonObject.Number.length > 0){
+          variableArray.push(jsonObject.Number[0]);
+        }
         return {
-          variables: jsonObject.Variables,
+          variables: variableArray,
           type: jsonObject.Type,
           relation: jsonObject.Relation,
           condition: jsonObject.Condition
