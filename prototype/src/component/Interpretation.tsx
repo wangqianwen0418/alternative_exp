@@ -10,7 +10,7 @@ import {
 import React from "react";
 
 import "./Interpretation.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import shapData from "../assets/shap_diabetes.json";
 import { TInsight } from "../util/types";
@@ -29,50 +29,77 @@ export default function Interpretation() {
   const [freeText, setFreeText] = useAtom(freeTextAtom);
   const [insight, setInsight] = useAtom(insightAtom);
   const [pageName] = useAtom(pageNameAtom);
-  const [modalVisible, setModalVisible] = useState<boolean>(
-      pageName ? pageName.includes("free") : true
-  );
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+
   const [isLoading, setIsLoading] = useState(false); // New loading state
-  const [apiKey, setApiKey] = useState("");
+  const [apiKey, setApiKey] = useState<string>("");
+
+  // 1. Use useEffect to check if an API key is already stored in localStorage
+  useEffect(() => {
+    const storedApiKey = localStorage.getItem("apiKey");
+    console.log("Stored API key: " + storedApiKey);
+    // 2. Check both conditions: pageName includes "Free" AND apiKey is not found
+    if (pageName?.includes("Free") && !storedApiKey) {
+      // Set modalVisible to true only if we are on the "Free" page and no API key is stored
+      setModalVisible(true);
+    }
+
+    // If there is an API key, set it in the state so that it's ready for use
+    if (storedApiKey) {
+      setApiKey(storedApiKey);
+    }
+  }, [pageName]); // Dependency on pageName ensures this runs when pageName changes
+
+  const handleApiKeySubmit = () => {
+    // Store the API key in localStorage when submitted
+    localStorage.setItem("apiKey", apiKey);
+    setModalVisible(false); // Close the modal after submission
+  };
+
+  const clearApiKey = () => {
+    localStorage.removeItem("apiKey");
+    setApiKey(""); // Clear the state as well
+    setModalVisible(true); // Reopen the modal to ask for the key again
+  };
 
   const handleSubmission = async () => {
-      if (insight == undefined) {
-          setIsLoading(true); // Start loading
-          const prompt = generatePrompt(
-              shapData.feature_names,
-              shapData.prediction_name
-          );
-          const inputJSON = await parseInput(freeText, apiKey, prompt);
-          
-          const parsedInput: TInsight = await parseInput(freeText, apiKey, prompt);
-          
-          console.log(parsedInput);
-          setInsight(parsedInput);
-          setIsLoading(false); // Stop loading
-      }
-      setIsSubmitted(true);
+    if (insight == undefined) {
+      setIsLoading(true); // Start loading
+      const prompt = generatePrompt(
+        shapData.feature_names,
+        shapData.prediction_name
+      );
+      const inputJSON = await parseInput(freeText, apiKey, prompt);
+
+      const parsedInput: TInsight = await parseInput(freeText, apiKey, prompt);
+
+      console.log(parsedInput);
+      setInsight(parsedInput);
+      setIsLoading(false); // Stop loading
+    }
+    setIsSubmitted(true);
   };
 
   return (
-      <>
-          <Paper style={{ padding: "15px" }}>
-              <Typography variant="h5" gutterBottom>
-                  Interpretation
-              </Typography>
-              <TextField
-                  id="outlined-basic"
-                  label="e.g., a high bmi leads to large diabete progression"
-                  value={freeText}
-                  onChange={(e) =>
-                      pageName?.includes("Free") && setFreeText(e.target.value)
-                  }
-                  multiline
-                  rows={2}
-                  fullWidth
-              />
+    <>
+      <Paper style={{ padding: "15px" }}>
+        <Typography variant="h5" gutterBottom>
+          Interpretation
+        </Typography>
+        <TextField
+          id="outlined-basic"
+          label="e.g., a high bmi leads to large diabete progression"
+          value={freeText}
+          onChange={(e) =>
+            pageName?.includes("Free") && setFreeText(e.target.value)
+          }
+          multiline
+          rows={2}
+          fullWidth
+        />
 
-              <div style={{ alignItems: "center" }}>
-                  {/* <Button
+        <div style={{ alignItems: "center" }}>
+          {/* <Button
           variant="contained"
           color="primary"
           style={{ margin: "10px 5px" }}
@@ -80,60 +107,67 @@ export default function Interpretation() {
         >
           Clear
         </Button> */}
-                  <Button
-                      variant="outlined"
-                      disabled={isSubmitted}
-                      color="primary"
-                      style={{ margin: "10px 5px" }}
-                      onClick={handleSubmission}
-                  >
-                      Check with Additional Visualization
-                  </Button>
-              </div>
-              {isLoading ? (
-                  <CircularProgress></CircularProgress>
-              ) : (
-                  isSubmitted && (
-                      <Paper className="parse-input" elevation={0}>
-                          <b>Formatted: </b>
-                          {GenerateTextTemplates(insight)}
-                      </Paper>
-                  )
-              )}
-          </Paper>
-          <Modal open={modalVisible} onClose={() => { }}>
-              <Box
-                  sx={{
-                      position: "absolute",
-                      top: "50%",
-                      left: "50%",
-                      transform: "translate(-50%, -50%)",
-                      width: 400,
-                      bgcolor: "background.paper",
-                      border: "2px solid #000",
-                      boxShadow: 24,
-                      p: 4,
-                  }}
-              >
-                  <TextField
-                      id="api-key"
-                      label="Enter your OpenAI API key here"
-                      value={apiKey}
-                      onChange={(e) => setApiKey(e.target.value)}
-                      rows={1}
-                      fullWidth
-                      style={{ marginTop: "15px" }}
-                  />
-                  <Button
-                      variant="contained"
-                      color="primary"
-                      style={{ margin: "10px 5px" }}
-                      onClick={() => setModalVisible(false)}
-                  >
-                      Submit
-                  </Button>
-              </Box>
-          </Modal>
-      </>
+          <Button
+            variant="outlined"
+            disabled={isSubmitted}
+            color="primary"
+            style={{ margin: "10px 5px" }}
+            onClick={handleSubmission}
+          >
+            Check with Additional Visualization
+          </Button>
+        </div>
+        {isLoading ? (
+          <CircularProgress></CircularProgress>
+        ) : (
+          isSubmitted && (
+            <Paper className="parse-input" elevation={0}>
+              <b>Formatted: </b>
+              {GenerateTextTemplates(insight)}
+            </Paper>
+          )
+        )}
+
+        {pageName?.includes("Free") && (
+          <Button variant="contained" color="secondary" onClick={clearApiKey}>
+            Change API Key
+          </Button>
+        )}
+
+      </Paper>
+      <Modal open={modalVisible} onClose={() => {}}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            border: "2px solid #000",
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          <TextField
+            id="api-key"
+            label="Enter your OpenAI API key here"
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value)}
+            rows={1}
+            fullWidth
+            style={{ marginTop: "15px" }}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            style={{ margin: "10px 5px" }}
+            onClick={handleApiKeySubmit}
+          >
+            Submit
+          </Button>
+        </Box>
+      </Modal>
+    </>
   );
 }
