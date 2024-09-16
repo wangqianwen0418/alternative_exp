@@ -40,8 +40,14 @@ The first value in the JSON file you provide will be the category that the given
 The remaining details we care about are as follows:
 Variables
 Variable Types (“value” or “contribution”)
-Variable Transformations (average or undefined)
-Number: If there are any constants in the insight statement, they go here (in an array). If not, this will be an empty array. This array will *usually* have length 1, but not necessarily.
+Variable Transformations ("average" or "")
+In the case of "correlation" (category 3), there might be two different variables with the same Feature Name. 
+For example: "There is correlation between the contribution of bp to predictions and the bp values"
+In this case, there are two variables: contribution of BP and BP values. 
+So the variables array should have length 2.
+
+Numbers: If there are any constants in the core part of the insight statement, they go here (in an array). If not, this will be an empty array. This array will *usually* have length 1, but not necessarily.
+It is important to note that this only applies to numbers that are part of the main insight statement - if there are numbers in a condition/restriction (described below), those should not go in this array. 
 Type (options are “read”, “comparison”, “correlation”, or “featureInteraction”) - note that these are the same as the four categories. So if category 1, type=”read”, if category 2, type=”comparison” and so on
 Relationship (this depends on the category). Here are the options for each category:
 Category 1 (“read”): options are “greater than”, “less than”, “equal to”
@@ -55,8 +61,18 @@ Condition: {
 	featureName: “BMI”,
 	range: [25, infinity]
 }
+In the case of Category 4, there will be TWO ranges included in the condition, formatted as an array. 
+Here's an example: Suppose we have the following statement
+"The correlation between bmi and its feature values is stronger when the feature value for age is in the range 0.05 to 0.1 compared to -0.01 to 0"
+
+Then condition would look like this:
+Condition: {
+  featureName: "age",
+  range: [[0.05, 0.1], [-0.01, 0]]
+}
 
 If there is no condition, just include an empty JSON object: {}
+
 
 Here’s an example of the full JSON:
 Suppose that the user input statement was “BMI is more important than age for predicting diabetes progression.” 
@@ -83,8 +99,11 @@ So your final JSON should have the following structure:
 Category: (In this case, value would be 2)
 Variables: (in this case, value would be the array displayed above)
 Type (in this case, value would be “comparison”)
-Relation: (In this case, value would be “greater”)
+Relationship: (In this case, value would be “greater”)
 Condition: {}
+
+One thing that is important to note: Sometimes, constants (numbers) are implicitly present in the statement even if they are not explicitly stated. For example, in the sentence "bmi always contributes positively for predicting diabetes progression", the implied number is 0, since the sentence can be rewritten as "the contribution of bmi is always greater than 0".
+In these cases, make sure you include the implied constant in the numbers array.   
 `;
 
 export const parseInput = async (
@@ -122,16 +141,17 @@ export const parseInput = async (
       ) {
         console.error("Improper feature/prediction detected");
       } else {
-        console.log("JSON returned");
+        console.log("JSON!!");
         console.log(jsonObject);
         let variableArray = jsonObject.Variables;
-        if (jsonObject.Number && jsonObject.Number.length > 0){
-          variableArray.push(jsonObject.Number[0]);
+        if (jsonObject.Numbers && jsonObject.Numbers.length > 0){
+          variableArray.push(jsonObject.Numbers[0]);
+
         }
         return {
           variables: variableArray,
           type: jsonObject.Type,
-          relation: jsonObject.Relation,
+          relation: jsonObject.Relationship,
           condition: jsonObject.Condition
         } as TInsight;
          

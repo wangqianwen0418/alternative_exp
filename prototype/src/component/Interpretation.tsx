@@ -6,8 +6,10 @@ import {
   CircularProgress,
   Modal,
   Box,
+  IconButton,
 } from "@mui/material";
 import React from "react";
+import { Settings } from "@mui/icons-material";
 
 import "./Interpretation.css";
 import { useState, useEffect } from "react";
@@ -63,29 +65,58 @@ export default function Interpretation() {
   };
 
   const handleSubmission = async () => {
+
+    if(!freeText.trim()) return;
+    setIsLoading(true);
+
     if (insight == undefined) {
-      setIsLoading(true); // Start loading
       const prompt = generatePrompt(
         shapData.feature_names,
         shapData.prediction_name
       );
-      const inputJSON = await parseInput(freeText, apiKey, prompt);
-
-      const parsedInput: TInsight = await parseInput(freeText, apiKey, prompt);
-
-      console.log(parsedInput);
-      setInsight(parsedInput);
-      setIsLoading(false); // Stop loading
+      try {
+        const parsedInput: TInsight = await parseInput(freeText, apiKey, prompt);
+        console.log(parsedInput);
+        setInsight(parsedInput);
+      } catch(error){
+        console.error("Error parsing input: ", error);
+      }
     }
+    setIsLoading(false);
     setIsSubmitted(true);
   };
+
+  const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFreeText(e.target.value);
+    setIsSubmitted(false);
+  }
 
   return (
     <>
       <Paper style={{ padding: "15px" }}>
-        <Typography variant="h5" gutterBottom>
-          Interpretation
-        </Typography>
+        <Box display="flex" alignItems="baseline">
+          <Typography variant="h5" gutterBottom>
+            Interpretation
+          </Typography>
+          {pageName?.includes("Free") && (
+            <IconButton
+              color="secondary"
+              onClick={clearApiKey}
+              aria-label="settings"
+              sx={{
+                border: "1px solid", // Add a border around the icon
+                borderRadius: "8px", // Rounded square shape (8px gives a subtle curve)
+                padding: "4px", // Control padding inside the button
+                width: "24x", // Set fixed width for the button
+                height: "24px", // Set fixed height for the button
+                ml: 1,
+              }}
+            >
+              <Settings sx={{ fontSize: 12 }} />{" "}
+              {/* Reduced font size for the icon */}
+            </IconButton>
+          )}
+        </Box>
         <TextField
           id="outlined-basic"
           label="e.g., a high bmi leads to large diabete progression"
@@ -109,7 +140,6 @@ export default function Interpretation() {
         </Button> */}
           <Button
             variant="outlined"
-            disabled={isSubmitted}
             color="primary"
             style={{ margin: "10px 5px" }}
             onClick={handleSubmission}
@@ -127,13 +157,6 @@ export default function Interpretation() {
             </Paper>
           )
         )}
-
-        {pageName?.includes("Free") && (
-          <Button variant="contained" color="secondary" onClick={clearApiKey}>
-            Change API Key
-          </Button>
-        )}
-
       </Paper>
       <Modal open={modalVisible} onClose={() => {}}>
         <Box
