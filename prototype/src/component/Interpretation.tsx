@@ -100,10 +100,10 @@ export default function Interpretation() {
           </Typography>
           {pageName?.includes("Free") && (
             <IconButton
-              color="secondary"
               onClick={clearApiKey}
               aria-label="settings"
               sx={{
+                color: "#aaaaaaa",
                 border: "1px solid", // Add a border around the icon
                 borderRadius: "8px", // Rounded square shape (8px gives a subtle curve)
                 padding: "4px", // Control padding inside the button

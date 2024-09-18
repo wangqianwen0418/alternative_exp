@@ -20,8 +20,16 @@ span.featureName {
   background-color: deepskyblue;
 }
 span.constant {
-  background-color: deepskyblue;
+  background-color: #bfc5d9;
 }
 span.relation {
   background-color: rgb(167, 233, 157);
+}
+
+span.condition-range {
+  background-color: #ba9ca4;
+}
+
+span.condition-range.range-1 {
+  background-color: #FF6347;
 }
