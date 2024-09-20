@@ -1,5 +1,5 @@
 import { TQuestion } from "./types";
-import { QuestionList } from "./questionList-aiGenerated";
+import { QuestionList } from "./questionList";
 
 const shuffleArray = <T>(array: T[]): T[] => {
   const shuffled = array.slice();
