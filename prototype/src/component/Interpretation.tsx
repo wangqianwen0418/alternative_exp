@@ -24,6 +24,10 @@ import {
   insightAtom,
   isSubmittedAtom,
   pageNameAtom,
+  freeTextAtom,
+  insightAtom,
+  isSubmittedAtom,
+  pageNameAtom,
 } from "../store";
 
 export default function Interpretation() {
@@ -65,8 +69,7 @@ export default function Interpretation() {
   };
 
   const handleSubmission = async () => {
-
-    if(!freeText.trim()) return;
+    if (!freeText.trim()) return;
     setIsLoading(true);
 
     if (insight == undefined) {
@@ -75,10 +78,14 @@ export default function Interpretation() {
         shapData.prediction_name
       );
       try {
-        const parsedInput: TInsight = await parseInput(freeText, apiKey, prompt);
+        const parsedInput: TInsight = await parseInput(
+          freeText,
+          apiKey,
+          prompt
+        );
         console.log(parsedInput);
         setInsight(parsedInput);
-      } catch(error){
+      } catch (error) {
         console.error("Error parsing input: ", error);
       }
     }
@@ -89,7 +96,7 @@ export default function Interpretation() {
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFreeText(e.target.value);
     setIsSubmitted(false);
-  }
+  };
 
   return (
     <>
