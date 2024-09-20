@@ -24,10 +24,6 @@ import {
   insightAtom,
   isSubmittedAtom,
   pageNameAtom,
-  freeTextAtom,
-  insightAtom,
-  isSubmittedAtom,
-  pageNameAtom,
 } from "../store";
 
 export default function Interpretation() {
