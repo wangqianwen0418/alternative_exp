@@ -33,52 +33,48 @@ export default function Interpretation() {
   const [pageName] = useAtom(pageNameAtom);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
-  const [isLoading, setIsLoading] = useState(false); // New loading state
+  const [isLoading, setIsLoading] = useState(false); // Loading state
   const [apiKey, setApiKey] = useState<string>("");
 
   // 1. Use useEffect to check if an API key is already stored in localStorage
   useEffect(() => {
     const storedApiKey = localStorage.getItem("apiKey");
     console.log("Stored API key: " + storedApiKey);
-    // 2. Check both conditions: pageName includes "Free" AND apiKey is not found
+
     if (pageName?.includes("Free") && !storedApiKey) {
-      // Set modalVisible to true only if we are on the "Free" page and no API key is stored
       setModalVisible(true);
     }
 
-    // If there is an API key, set it in the state so that it's ready for use
     if (storedApiKey) {
       setApiKey(storedApiKey);
     }
-  }, [pageName]); // Dependency on pageName ensures this runs when pageName changes
+  }, [pageName]);
 
   const handleApiKeySubmit = () => {
-    // Store the API key in localStorage when submitted
     localStorage.setItem("apiKey", apiKey);
-    setModalVisible(false); // Close the modal after submission
+    setModalVisible(false);
   };
 
   const clearApiKey = () => {
     localStorage.removeItem("apiKey");
-    setApiKey(""); // Clear the state as well
-    setModalVisible(true); // Reopen the modal to ask for the key again
+    setApiKey("");
+    setModalVisible(true);
   };
 
+  // Handle full submission including the "Check with Additional Visualization"
   const handleSubmission = async () => {
-
-    if(!freeText.trim()) return;
+    if (!freeText.trim()) return;
     setIsLoading(true);
 
-    if (insight == undefined) {
+    if (insight === undefined) {
       const prompt = generatePrompt(
         shapData.feature_names,
         shapData.prediction_name
       );
       try {
         const parsedInput: TInsight = await parseInput(freeText, apiKey, prompt);
-        console.log(parsedInput);
         setInsight(parsedInput);
-      } catch(error){
+      } catch (error) {
         console.error("Error parsing input: ", error);
       }
     }
@@ -86,10 +82,28 @@ export default function Interpretation() {
     setIsSubmitted(true);
   };
 
+  // Handle the new "Parse" button click (parse only without submission state change)
+  const handleParseOnly = async () => {
+    if (!freeText.trim()) return;
+    setIsLoading(true);
+
+    const prompt = generatePrompt(
+      shapData.feature_names,
+      shapData.prediction_name
+    );
+    try {
+      const parsedInput: TInsight = await parseInput(freeText, apiKey, prompt);
+      setInsight(parsedInput); // Update insight to reflect the newly parsed input
+    } catch (error) {
+      console.error("Error parsing input: ", error);
+    }
+    setIsLoading(false);
+  };
+
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFreeText(e.target.value);
     setIsSubmitted(false);
-  }
+  };
 
   return (
     <>
@@ -104,40 +118,29 @@ export default function Interpretation() {
               aria-label="settings"
               sx={{
                 color: "#aaaaaaa",
-                border: "1px solid", // Add a border around the icon
-                borderRadius: "8px", // Rounded square shape (8px gives a subtle curve)
-                padding: "4px", // Control padding inside the button
-                width: "24x", // Set fixed width for the button
-                height: "24px", // Set fixed height for the button
+                border: "1px solid",
+                borderRadius: "8px",
+                padding: "4px",
+                width: "24px",
+                height: "24px",
                 ml: 1,
               }}
             >
-              <Settings sx={{ fontSize: 12 }} />{" "}
-              {/* Reduced font size for the icon */}
+              <Settings sx={{ fontSize: 12 }} />
             </IconButton>
           )}
         </Box>
         <TextField
           id="outlined-basic"
-          label="e.g., a high bmi leads to large diabete progression"
+          label="e.g., a high bmi leads to large diabetes progression"
           value={freeText}
-          onChange={(e) =>
-            pageName?.includes("Free") && setFreeText(e.target.value)
-          }
+          onChange={handleTextChange}
           multiline
           rows={2}
           fullWidth
         />
 
         <div style={{ alignItems: "center" }}>
-          {/* <Button
-          variant="contained"
-          color="primary"
-          style={{ margin: "10px 5px" }}
-          onClick={() => setIsSubmitted(!isSubmitted)}
-        >
-          Clear
-        </Button> */}
           <Button
             variant="outlined"
             color="primary"
@@ -146,11 +149,22 @@ export default function Interpretation() {
           >
             Check with Additional Visualization
           </Button>
+
+          {/* New Parse Button */}
+          <Button
+            variant="contained"
+            color="secondary"
+            style={{ margin: "10px 5px" }}
+            onClick={handleParseOnly}
+          >
+            Parse
+          </Button>
         </div>
+
         {isLoading ? (
-          <CircularProgress></CircularProgress>
+          <CircularProgress />
         ) : (
-          isSubmitted && (
+          (isSubmitted || insight) && (
             <Paper className="parse-input" elevation={0}>
               <b>Formatted: </b>
               {GenerateTextTemplates(insight)}
@@ -194,3 +208,4 @@ export default function Interpretation() {
     </>
   );
 }
+//test check

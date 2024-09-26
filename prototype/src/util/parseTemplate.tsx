@@ -12,7 +12,7 @@ export const GenerateTextTemplates = (insight: TInsight) => {
         <span className="label transform">
           {var1.transform} {var1.type}{" "}
         </span>{" "}
-        of <span className="label featureName">{var1.featureName}</span> is{" "}
+        <span className="label featureName">{var1.featureName}</span> is{" "}
         <span className="label relation">{insight.relation}</span> than{" "}
         <span className="label constant">{var2}</span>{" "}
         {/* Add condition to check if insight.condition is not empty */}
@@ -20,7 +20,7 @@ export const GenerateTextTemplates = (insight: TInsight) => {
           <>
             {" "}
             when{" "}
-            <span className="label condition-feature">
+            <span className="label featureName">
               {insight.condition.featureName}
             </span>{" "}
             is in the interval{" "}
@@ -42,19 +42,19 @@ export const GenerateTextTemplates = (insight: TInsight) => {
           {" "}
           {var1.transform} {var1.type}{" "}
         </span>{" "}
-        of <span className="label featureName">{var1.featureName}</span> is{" "}
+        <span className="label featureName">{var1.featureName}</span> is{" "}
         <span className="label relation">{insight.relation}</span> than the{" "}
         <span className="label transform">
           {var2.transform} {var1.type}{" "}
         </span>{" "}
-        of
+        
         <span className="label featureName">{var2.featureName}</span>.{" "}
         {/* Add condition to check if insight.condition is not empty */}
         {insight.condition && Object.keys(insight.condition).length > 0 && (
           <>
             {" "}
             when{" "}
-            <span className="label condition-feature">
+            <span className="label featureName">
               {insight.condition.featureName}
             </span>{" "}
             is in the interval{" "}
@@ -77,19 +77,19 @@ export const GenerateTextTemplates = (insight: TInsight) => {
         <span className="label transform">
           {var1.transform} {var1.type}
         </span>
-        of <span className="label featureName">{var1.featureName}</span>
+        <span className="label featureName">{var1.featureName}</span>
         is <span className="label relation">{insight.relation}</span> correlated
         with the
         <span className="label transform">
           {var2.transform} {var2.type}
         </span>
-        of <span className="label featureName">{var2.featureName}</span>.
+        <span className="label featureName">{var2.featureName}</span>.
         {/* Add condition to check if insight.condition is not empty */}
         {insight.condition && Object.keys(insight.condition).length > 0 && (
           <>
             {" "}
             when{" "}
-            <span className="label condition-feature">
+            <span className="label featureName">
               {insight.condition.featureName}
             </span>{" "}
             is in the interval{" "}
@@ -114,14 +114,14 @@ export const GenerateTextTemplates = (insight: TInsight) => {
           <>
             {" "}
             when{" "}
-            <span className="label condition-feature">
+            <span className="label featureName">
               {insight.condition.featureName}
             </span>{" "}
             is in the interval{" "}
             <span className="label condition-range range-1">
               [{insight.condition.range[0][0]}, {insight.condition.range[0][1]}]
             </span>{" "}
-            or{" "}
+            compared to {" "}
             <span className="label condition-range range-2">
               [{insight.condition.range[1][0]}, {insight.condition.range[1][1]}]
             </span>
