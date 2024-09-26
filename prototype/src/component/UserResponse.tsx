@@ -20,16 +20,19 @@ import {
 } from "../store";
 import Selection from "./webUtil/Selection";
 import { weburl } from "../util/appscript_url";
-import { GenerateTextTemplates } from "../util/parseTemplate";
+import { generateQuestionOrder } from "../util/RNDM-questionBalance";
 import { v4 as uuidv4 } from "uuid";
 import Cookies from "js-cookie";
 
-let uuid = Cookies.get("uuid");
+// let uuid = Cookies.get("uuid");
 
-if (!uuid) {
-  uuid = uuidv4();
-  Cookies.set("uuid", uuid);
-}
+// if (!uuid) {
+//   uuid = uuidv4();
+//   Cookies.set("uuid", uuid);
+// }
+
+// let uuid = "d42ccc56-b330-427b-9b4f-d99b0a626b5b"; // test uuid
+let uuid = "d46741cf-57b6-43a1-a661-119204bb7a00"; // test uuid
 
 const confidenceOptions = [
   "please select",
@@ -57,11 +60,19 @@ export default function UserResponse() {
     confidenceOptions[0]
   );
 
+  // question order to be passed into sheet
+  const questionIndexesArray = generateQuestionOrder(uuid);
+
+  // Current question to be displayed, from the shuffled question order
+  const currentQuestionIndex = questionIndexesArray[questionIndex];
+
   const onSubmit = async () => {
     // recording(userAnswer, confidence) commit the results to the database
     const data = {
       uuid: uuid,
       timestamp: new Date().toLocaleString(),
+      currentIndex: currentQuestionIndex,
+      questionOrder: questionIndexesArray.toString(),
       freeText,
       userAnswer,
       confidence,
@@ -79,21 +90,26 @@ export default function UserResponse() {
     } catch (error) {
       console.error("Error submitting form:", error);
     }
-    if (questionIndex == QuestionList.length - 1) {
+
+    if (questionIndex === QuestionList.length - 1) {
       setModalVisible(true);
       return;
     }
+
     setUserAnswer(undefined);
     setConfidence(confidenceOptions[0]);
     setIsSubmitted(false);
 
-    setFreetext(QuestionList[questionIndex + 1].userText);
-    setInsight(QuestionList[questionIndex + 1].insight);
-    setInitVis(QuestionList[questionIndex + 1].initVis);
-    setName(QuestionList[questionIndex + 1].pageName);
+    // Move to the next question in the questionIndexesArray
+    const nextQuestionIndex = questionIndexesArray[questionIndex + 1];
+    setFreetext(QuestionList[nextQuestionIndex].userText);
+    setInsight(QuestionList[nextQuestionIndex].insight);
+    setInitVis(QuestionList[nextQuestionIndex].initVis);
+    setName(QuestionList[nextQuestionIndex].pageName);
 
-    setQuestionIndex((questionIndex) => questionIndex + 1);
+    setQuestionIndex((prevIndex) => prevIndex + 1);
   };
+
   return (
     <>
       <Paper style={{ padding: "15px 20px", marginTop: "10px" }}>
