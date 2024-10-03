@@ -144,4 +144,11 @@ export const GenerateTextTemplates = (insight: TInsight) => {
       </span>
     );
   }
+  else {
+    return (
+      <span className="formatted error-message">
+        The provided insight statement doesn't match our categorization scheme. Please enter an insight that belongs to one of the four categories and try again.
+      </span>
+    );
+  }
 };

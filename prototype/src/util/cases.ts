@@ -68,7 +68,7 @@ export const CASES: TCase[] = [
     pageName: "Free Exploration",
     href: "/free",
     userText: "",
-    initVis: "bar",
+    initVis: "scatter",
     insight: undefined,
   },
 ];
