@@ -39,8 +39,9 @@ The first value in the JSON file you provide will be the category that the given
 
 The remaining details we care about are as follows:
 Variables
-Variable Types (“value” or “contribution”)
-Variable Transformations ("average" or "")
+Variable Types (“value of”, “contribution of”, or "number of instances <restriction> of")
+Note: For the "number of instances of", there would be a restriction that you should include in the value. for example, you might suggest "number of instances above 5 of" or "number of instances below 3 of". 
+Variable Transformations ("average" or "deviations to the ")
 In the case of "correlation" (category 3), there might be two different variables with the same Feature Name. 
 For example: "There is correlation between the contribution of bp to predictions and the bp values"
 In this case, there are two variables: contribution of BP and BP values. 
@@ -52,7 +53,7 @@ It is important to note that this only applies to numbers that are part of the m
 Type (options are “read”, “comparison”, “correlation”, or “featureInteraction”) - note that these are the same as the four categories. So if category 1, type=”read”, if category 2, type=”comparison” and so on
 Relationship (this depends on the category). Here are the options for each category:
 Category 1 (“read”): options are “greater than”, “less than”, “equal to”
-Category 2 (“comparison”): options are “greater”, “less”, “equal”
+Category 2 (“comparison”): options are “greater than”, “less than”, “equal to”
 Category 3 (“correlation”): options are “positively” or “negatively”
 Category 4 (“featureInteraction”): options are “same” or “different”
 The last value in the JSON will be Condition. 
@@ -78,21 +79,21 @@ If there is no condition, just include an empty JSON object: {}
 Here’s an example of the full JSON:
 Suppose that the user input statement was “BMI is more important than age for predicting diabetes progression.” 
 
-In this case, there are two variables: BMI and Age. Even though it is not specified, it is clear that this statement is referring to these on “average” (since we are not looking at specific values). Furthermore, we are looking at the contribution of BMI and age to diabetes progression (as opposed to the feature values themselves), so the variable type for both of these would be “contribution”. So the Variables array (which will be in the JSON) will look like this: 
+In this case, there are two variables: BMI and Age. Even though it is not specified, it is clear that this statement is referring to these on “average” (since we are not looking at specific values). Furthermore, we are looking at the contribution of BMI and age to diabetes progression (as opposed to the feature values themselves), so the variable type for both of these would be “contribution of”. So the Variables array (which will be in the JSON) will look like this: 
 variables: [
         {
           featureName: "bmi",
           transform: "average",
-          type: "contribution",
+          type: "contribution of",
         },
         {
           featureName: "age",
           transform: "average",
-          type: "contribution",
+          type: "contribution of",
         },
       ]
 Numbers, in this case, would be an empty array: []
-The relationship in this case is a comparison of two variables (category 2), so the type value will be “comparison” while the relation value will be “greater”. 
+The relationship in this case is a comparison of two variables (category 2), so the type value will be “comparison” while the relation value will be “greater than”. 
 Condition would also be empty: {}
 
 
@@ -100,7 +101,7 @@ So your final JSON should have the following structure:
 Category: (In this case, value would be 2)
 Variables: (in this case, value would be the array displayed above)
 Type (in this case, value would be “comparison”)
-Relationship: (In this case, value would be “greater”)
+Relationship: (In this case, value would be “greater than”)
 Condition: {}
 
 One thing that is important to note: Sometimes, constants (numbers) are implicitly present in the statement even if they are not explicitly stated. For example, in the sentence "bmi always contributes positively for predicting diabetes progression", the implied number is 0, since the sentence can be rewritten as "the contribution of bmi is always greater than 0".

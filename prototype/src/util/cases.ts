@@ -11,16 +11,16 @@ export const CASES: TCase[] = [
         {
           featureName: "bmi",
           transform: "average",
-          type: "contribution",
+          type: "contribution of",
         },
         {
           featureName: "age",
           transform: "average",
-          type: "contribution",
+          type: "contribution of",
         },
       ],
       type: "comparison",
-      relation: "greater",
+      relation: "greater than",
       condition: undefined,
     },
   },
@@ -34,7 +34,7 @@ export const CASES: TCase[] = [
       variables: [
         {
           featureName: "bmi",
-          type: "contribution",
+          type: "contribution of",
           transform: undefined,
         },
         0,
@@ -52,10 +52,10 @@ export const CASES: TCase[] = [
     initVis: "beeswarm",
     insight: {
       variables: [
-        { featureName: "age", type: "value", transform: undefined },
+        { featureName: "age", type: "value of", transform: undefined },
         {
           featureName: "age",
-          type: "contribution",
+          type: "contribution of",
           transform: undefined,
         },
       ],
