@@ -64,7 +64,6 @@ export default function Interpretation() {
   // Handle full submission including the "Check with Additional Visualization"
   const handleSubmission = async () => {
     if (!freeText.trim()) return;
-    if (!freeText.trim()) return;
     setIsLoading(true);
 
     if (insight === undefined) {

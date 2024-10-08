@@ -12,16 +12,16 @@ export const QuestionList: TQuestion[] = [
         {
           featureName: "bmi",
           transform: "average",
-          type: "contribution",
+          type: "contribution of",
         },
         {
           featureName: "age",
           transform: "average",
-          type: "contribution",
+          type: "contribution of",
         },
       ],
       type: "comparison",
-      relation: "greater",
+      relation: "greater than",
       condition: undefined,
     },
     testCondition: "no vis",
@@ -37,7 +37,7 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "bmi",
-          type: "contribution",
+          type: "contribution of",
           transform: undefined,
         },
         0,
@@ -57,10 +57,10 @@ export const QuestionList: TQuestion[] = [
     initVis: "beeswarm",
     insight: {
       variables: [
-        { featureName: "age", type: "value", transform: undefined },
+        { featureName: "age", type: "value of", transform: undefined },
         {
           featureName: "age",
-          type: "contribution",
+          type: "contribution of",
           transform: undefined,
         },
       ],

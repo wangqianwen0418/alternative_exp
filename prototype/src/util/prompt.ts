@@ -39,8 +39,9 @@ The first value in the JSON file you provide will be the category that the given
 
 The remaining details we care about are as follows:
 Variables
-Variable Types (“value of” or “contribution of”)
-Variable Transformations ("average" or "")
+Variable Types (“value of”, “contribution of”, or "number of instances <restriction> of")
+Note: For the "number of instances of", there would be a restriction that you should include in the value. for example, you might suggest "number of instances above 5 of" or "number of instances below 3 of". 
+Variable Transformations ("average" or "deviations to the ")
 In the case of "correlation" (category 3), there might be two different variables with the same Feature Name. 
 For example: "There is correlation between the contribution of bp to predictions and the bp values"
 In this case, there are two variables: contribution of BP and BP values. 
@@ -50,10 +51,11 @@ For example, suppose the input prompt was as follows: "age has more instances ab
 
 Numbers: If there are any constants in the core part of the insight statement, they go here (in an array). If not, this will be an empty array. This array will *usually* have length 1, but not necessarily.
 It is important to note that this only applies to numbers that are part of the main insight statement - if there are numbers in a condition/restriction (described below), those should not go in this array. 
+
 Type (options are “read”, “comparison”, “correlation”, or “featureInteraction”) - note that these are the same as the four categories. So if category 1, type=”read”, if category 2, type=”comparison” and so on
 Relationship (this depends on the category). Here are the options for each category:
 Category 1 (“read”): options are “greater than”, “less than”, “equal to”
-Category 2 (“comparison”): options are “greater”, “less”, “equal”
+Category 2 (“comparison”): options are “greater than”, “less than”, “equal to”
 Category 3 (“correlation”): options are “positively” or “negatively”
 Category 4 (“featureInteraction”): options are “same” or “different”
 The last value in the JSON will be Condition. 
@@ -79,7 +81,7 @@ If there is no condition, just include an empty JSON object: {}
 Here’s an example of the full JSON:
 Suppose that the user input statement was “BMI is more important than age for predicting diabetes progression.” 
 
-In this case, there are two variables: BMI and Age. Even though it is not specified, it is clear that this statement is referring to these on “average” (since we are not looking at specific values). Furthermore, we are looking at the contribution of BMI and age to diabetes progression (as opposed to the feature values themselves), so the variable type for both of these would be “contribution”. So the Variables array (which will be in the JSON) will look like this: 
+In this case, there are two variables: BMI and Age. Even though it is not specified, it is clear that this statement is referring to these on “average” (since we are not looking at specific values). Furthermore, we are looking at the contribution of BMI and age to diabetes progression (as opposed to the feature values themselves), so the variable type for both of these would be “contribution of”. So the Variables array (which will be in the JSON) will look like this: 
 variables: [
         {
           featureName: "bmi",
@@ -93,7 +95,7 @@ variables: [
         },
       ]
 Numbers, in this case, would be an empty array: []
-The relationship in this case is a comparison of two variables (category 2), so the type value will be “comparison” while the relation value will be “greater”. 
+The relationship in this case is a comparison of two variables (category 2), so the type value will be “comparison” while the relation value will be “greater than”. 
 Condition would also be empty: {}
 
 
@@ -101,11 +103,52 @@ So your final JSON should have the following structure:
 Category: (In this case, value would be 2)
 Variables: (in this case, value would be the array displayed above)
 Type (in this case, value would be “comparison”)
-Relationship: (In this case, value would be “greater”)
+Relationship: (In this case, value would be “greater than”)
 Condition: {}
 
 One thing that is important to note: Sometimes, constants (numbers) are implicitly present in the statement even if they are not explicitly stated. For example, in the sentence "bmi always contributes positively for predicting diabetes progression", the implied number is 0, since the sentence can be rewritten as "the contribution of bmi is always greater than 0".
-In these cases, make sure you include the implied constant in the numbers array.   
+In these cases, make sure you include the implied constant in the numbers array.
+
+There might be an implied number that is not 0 or infinity. If it helps, feel free to use the number table below for the average/median SHAP values of each feature: 
+
+age:
+  Average SHAP Value: -0.30
+  Median SHAP Value: -0.43
+sex:
+  Average SHAP Value: 0.00
+  Median SHAP Value: 0.69
+bmi:
+  Average SHAP Value: 0.59
+  Median SHAP Value: -16.36
+blood pressure:
+  Average SHAP Value: -0.04
+  Median SHAP Value: -2.60
+serum cholesterol:
+  Average SHAP Value: 0.62
+  Median SHAP Value: 0.49
+low-density lipoproteins:
+  Average SHAP Value: 0.40
+  Median SHAP Value: 0.12
+high-density lipoproteins:
+  Average SHAP Value: 0.32
+  Median SHAP Value: 1.36
+total/HDL cholesterol ratio:
+  Average SHAP Value: -0.26
+  Median SHAP Value: -0.82
+serum triglycerides level:
+  Average SHAP Value: 0.34
+  Median SHAP Value: -8.19
+blood sugar level:
+  Average SHAP Value: -0.17
+  Median SHAP Value: -1.27
+total average SHAP value (across ALL features): 0.15
+
+For example, if someone was to provide a statement along the lines of "serum triglycerides has a higher than average contribution to the prediction", 
+this could get parsed as "the average contribution of serum triglycerides level is greater than [average SHAP value for ALL features = 0.15]". 
+
+Similarly, if a sentence is referring to the average/median SHAP value for a particular feature, insert the value from this table.
+
+The final note: If you can't figure out any of these values (you can't fit the sentence the user inputs to any of these statement types meaningfully), then set the "type" field to ERROR. 
 `;
 
 export const parseInput = async (
