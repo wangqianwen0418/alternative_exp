@@ -46,6 +46,8 @@ In the case of "correlation" (category 3), there might be two different variable
 For example: "There is correlation between the contribution of bp to predictions and the bp values"
 In this case, there are two variables: contribution of BP and BP values. 
 So the variables array should have length 2.
+In the case of "comparison" (Category 2), there is a special third option for variable types: "number of instances <condition> for " would be the value you should use in the Variable Types field if this is similar to what you find in the insight statement.
+For example, suppose the input prompt was as follows: "age has more instances above 3 than s2". Then, your Variable Type value would be "number of instances above 3 for". This is vital to make sure that the resulting program runs smoothly. 
 
 Numbers: If there are any constants in the core part of the insight statement, they go here (in an array). If not, this will be an empty array. This array will *usually* have length 1, but not necessarily.
 It is important to note that this only applies to numbers that are part of the main insight statement - if there are numbers in a condition/restriction (described below), those should not go in this array. 

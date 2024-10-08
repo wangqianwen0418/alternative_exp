@@ -7,10 +7,14 @@ import reportWebVitals from "./reportWebVitals";
 import { CASES } from "./util/cases";
 import Questions from "./Questions";
 
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  createHashRouter,
+} from "react-router-dom";
 
 const root = ReactDOM.createRoot(
-    document.getElementById("root") as HTMLElement
+  document.getElementById("root") as HTMLElement
 );
 
 // const router = createBrowserRouter([
@@ -33,23 +37,23 @@ const root = ReactDOM.createRoot(
 // ]);
 
 const cases = CASES.map((c) => {
-    return {
-        path: c.href,
-        element: <App {...c} questionIndex={-1} />,
-    };
+  return {
+    path: c.href,
+    element: <App {...c} questionIndex={-1} />,
+  };
 });
 
 cases.unshift({
-    path: "/",
-    element: <App {...CASES[0]} questionIndex={-1} />,
+  path: "/",
+  element: <App {...CASES[0]} questionIndex={-1} />,
 });
 
 cases.push({
-    path: "/questions",
-    element: <Questions />,
+  path: "/questions",
+  element: <Questions />,
 });
 
-root.render(<RouterProvider router={createBrowserRouter(cases)} />);
+root.render(<RouterProvider router={createHashRouter(cases)} />);
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
