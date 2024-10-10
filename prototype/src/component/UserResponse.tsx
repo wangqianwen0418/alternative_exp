@@ -17,19 +17,12 @@ import {
   initVisAtom,
   pageNameAtom,
   isSubmittedAtom,
+  uuidAtom,
+  questionOrderAtom,
 } from "../store";
 import Selection from "./webUtil/Selection";
 import { weburl } from "../util/appscript_url";
 import { generateQuestionOrder } from "../util/questionBalance";
-import { v4 as uuidv4 } from "uuid";
-import Cookies from "js-cookie";
-
-let uuid = Cookies.get("uuid");
-
-if (!uuid) {
-  uuid = uuidv4();
-  Cookies.set("uuid", uuid);
-}
 
 const confidenceOptions = [
   "please select",
@@ -47,6 +40,8 @@ export default function UserResponse() {
   const [, setInitVis] = useAtom(initVisAtom);
   const [, setName] = useAtom(pageNameAtom);
   const [, setIsSubmitted] = useAtom(isSubmittedAtom);
+  const [uuid] = useAtom(uuidAtom);
+  const [questionIndexesArray] = useAtom(questionOrderAtom);
 
   const [modelVisible, setModalVisible] = React.useState<boolean>(false); // the thank you modal when finish all questions
 
@@ -56,9 +51,6 @@ export default function UserResponse() {
   const [confidence, setConfidence] = React.useState<string>(
     confidenceOptions[0]
   );
-
-  // question order to be passed into sheet
-  const questionIndexesArray = generateQuestionOrder(uuid!);
 
   // Current question to be displayed, from the shuffled question order
   const currentQuestionIndex = questionIndexesArray[questionIndex];

@@ -9,6 +9,8 @@ import {
   initVisAtom,
   pageNameAtom,
   questionIndexAtom,
+  uuidAtom,
+  questionOrderAtom,
 } from "./store";
 
 import Explanation from "./component/Explanation";
@@ -37,6 +39,9 @@ import {
   Box,
   Paper,
 } from "@mui/material";
+import { v4 as uuidv4 } from "uuid";
+import Cookies from "js-cookie";
+import { generateQuestionOrder } from "./util/questionBalance";
 
 function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
   const [open, setOpen] = useState(false); // sider drawer
@@ -47,6 +52,23 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
   const [, setInitVis] = useAtom(initVisAtom);
   const [, setName] = useAtom(pageNameAtom);
   const [, setQuestionIndex] = useAtom(questionIndexAtom);
+  const [, setUUID] = useAtom(uuidAtom);
+  const [, setQuestionOrder] = useAtom(questionOrderAtom);
+
+  let uuid = Cookies.get("uuid");
+
+  if (!uuid) {
+    uuid = uuidv4();
+    Cookies.set("uuid", uuid);
+  }
+
+  useEffect(() => {
+    setUUID(uuid);
+
+    const questionIndexesArray = generateQuestionOrder(uuid!);
+    console.log(questionIndexesArray);
+    setQuestionOrder(questionIndexesArray);
+  }, []);
 
   useEffect(() => {
     setFreetext(appProps.userText);

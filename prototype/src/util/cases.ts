@@ -70,8 +70,7 @@ export const CASES: TCase[] = [
   {
     pageName: "Case 4",
     href: "/case4",
-    userText:
-      "the larger the capital gain, the more likely to have greater income.",
+    userText: "bp contributes more to the prediction than age.",
     initVis: "heatmap",
     secondVis: undefined,
     insight: undefined,
