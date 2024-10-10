@@ -64,7 +64,8 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
 
   useEffect(() => {
     setUUID(uuid);
-
+    // setUUID("d42ccc56-b330-427b-9b4f-d99b0a626b5b"); // test uuid
+    // setUUID("d46741cf-57b6-43a1-a661-119204bb7a00"); // test uuid
     const questionIndexesArray = generateQuestionOrder(uuid!);
     console.log(questionIndexesArray);
     setQuestionOrder(questionIndexesArray);
