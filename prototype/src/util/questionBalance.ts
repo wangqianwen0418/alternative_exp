@@ -28,39 +28,9 @@ const createCounterbalancedOrder = (
   questionList: TQuestion[],
   uuid: string
 ): number[] => {
-  const categories = ["random vis", "ours"];
-
-  const questionsByCondition: Record<string, TQuestion[]> = {
-    "random vis": questionList.filter((q) => q.testCondition === "random vis"),
-    ours: questionList.filter((q) => q.testCondition === "ours"),
-  };
-
-  const shuffledQuestionsByCondition: Record<string, TQuestion[]> = {
-    "random vis": seededShuffle(questionsByCondition["random vis"], uuid),
-    ours: seededShuffle(questionsByCondition["ours"], uuid),
-  };
-
-  const questionOrder: TQuestion[] = [];
-  const questionIndexes: number[] = [];
-  let conditionIndex = 0;
-
-  while (
-    shuffledQuestionsByCondition["random vis"].length > 0 ||
-    shuffledQuestionsByCondition["ours"].length > 0
-  ) {
-    const currentCondition = categories[conditionIndex % categories.length];
-    if (shuffledQuestionsByCondition[currentCondition].length > 0) {
-      const nextQuestion = shuffledQuestionsByCondition[
-        currentCondition
-      ].shift() as TQuestion;
-      questionOrder.push(nextQuestion);
-      questionIndexes.push(nextQuestion.index);
-    }
-    conditionIndex++;
-  }
-
-  // questionOrder is for debugging
-  return questionIndexes;
+  const questionIndices = questionList.map((q) => q.index);
+  const shuffledIndices = seededShuffle(questionIndices, uuid);
+  return shuffledIndices;
 };
 
 export const generateQuestionOrder = (uuid: string): number[] => {
