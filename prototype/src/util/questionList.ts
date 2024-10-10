@@ -200,7 +200,7 @@ export const QuestionList: TQuestion[] = [
     index: 8,
     pageName: "question",
     userText:
-      "There is correlation between the contribution of bp to predictions and the bp values.",
+      "There is a positive correlation between the contribution of bp to predictions and the bp values.",
     initVis: "heatmap",
     secondVis: "scatter",
     insight: {
@@ -217,7 +217,7 @@ export const QuestionList: TQuestion[] = [
         },
       ],
       type: "correlation",
-      relation: "positively", // #TODO
+      relation: "positively",
       condition: undefined,
     },
     testCondition: "ours",
@@ -227,7 +227,7 @@ export const QuestionList: TQuestion[] = [
     index: 9,
     pageName: "question",
     userText:
-      "There is correlation between the contribution of age to predictions and the age values when the feature value is between |0.05 and 0.10|.",
+      "There is no correlation between the contribution of age to predictions and the age values when the feature value is between -0.05 and 0.05.",
     initVis: "heatmap",
     secondVis: "scatter", // randomly chosen
     insight: {
@@ -244,7 +244,7 @@ export const QuestionList: TQuestion[] = [
         },
       ],
       type: "correlation",
-      relation: "positively", // #TODO
+      relation: "no correlation",
       condition: undefined,
     },
     testCondition: "random vis",
@@ -254,7 +254,7 @@ export const QuestionList: TQuestion[] = [
     index: 10,
     pageName: "question",
     userText:
-      "There is correlation between the contribution of bmi to predictions and the bmi values when the feature value is between |0.05 and 0.10|.",
+      "There is a positive correlation between the contribution of bmi to predictions and the bmi values when the feature value is between 0.05 and 0.10.",
     initVis: "heatmap",
     secondVis: "scatter",
     insight: {
@@ -271,7 +271,7 @@ export const QuestionList: TQuestion[] = [
         },
       ],
       type: "correlation",
-      relation: "positively", // #TODO
+      relation: "positively",
       condition: undefined,
     },
     testCondition: "ours",

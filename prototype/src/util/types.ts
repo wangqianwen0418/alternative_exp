@@ -41,7 +41,7 @@ export type TInsight2 = {
 export type TInsight3 = {
   variables: [TVariable, TVariable];
   type: "correlation";
-  relation: "positively" | "negatively";
+  relation: "positively" | "negatively" | "no correlation";
   condition: { featureName: string; range: [number, number] } | undefined;
 };
 
