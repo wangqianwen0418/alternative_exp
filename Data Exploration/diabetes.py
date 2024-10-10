@@ -236,27 +236,6 @@ t_statistic, p_value = ttest_rel(bmi_shape_values, s5_shape_values)
 print(f"T-statistic: {t_statistic}")
 print(f"P-value: {p_value}")
 
-# %%
-
-# Calculate the mean SHAP values for each feature without taking the absolute value
-mean_shap_values = np.mean(shap_values.values, axis=0)
-
-# Get feature names from the dataset
-feature_names = X.columns
-
-# Create a bar chart
-plt.figure(figsize=(10, 6))
-plt.barh(feature_names, mean_shap_values, color='skyblue')
-
-# Add labels and title
-plt.xlabel('Mean SHAP value')
-plt.ylabel('Features')
-plt.title('Mean SHAP Values (Without Absolute Values)')
-plt.legend()
-
-# Show plot
-plt.show()
-
 shap.plots.bar(shap_values)
 shap.plots.scatter(explanation[:, "bmi"], color=explanation[:, "age"])
 shap.plots.scatter(explanation[:, "age"])

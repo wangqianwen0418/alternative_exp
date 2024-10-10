@@ -1,4 +1,4 @@
-import shap_diabetes from "../assets/shap_diabetes.json";
+import shap_diabetes from "../assets/shap_diabetes_new.json";
 
 const diabetes_s5 = "s5",
   diabetes_s5_featureIndex =

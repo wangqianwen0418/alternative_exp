@@ -62,7 +62,7 @@ export default function Heatmap({
       [datasets]
     );
 
-  const [minShap, maxShap] = useMemo(() => [-2, 2], []);
+  const [minShap, maxShap] = useMemo(() => [-50, 50], []);
 
   const colorScale = useMemo(
     () =>
