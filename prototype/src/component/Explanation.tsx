@@ -1,10 +1,10 @@
 import { Paper, Typography } from "@mui/material";
 import shap_diabetes from "../assets/shap_diabetes.json";
 import {
-  incomeShapValues,
-  incomeFeatureValues,
-  incomeLabels,
-} from "../util/incomeDatasets-TEMP";
+  diabetesShapValues,
+  diabetesFeatureValues,
+  diabetesLabels,
+} from "../util/diabetesHeatmapData";
 import { useState } from "react";
 import React from "react";
 
@@ -74,12 +74,12 @@ export default function Explanation() {
     case "heatmap":
       initialVisualization = (
         <Heatmap
-          shapValuesArray={incomeShapValues}
-          featureValuesArray={incomeFeatureValues}
-          labels={incomeLabels}
+          shapValuesArray={diabetesShapValues}
+          featureValuesArray={diabetesFeatureValues}
+          labels={diabetesLabels}
           width={800}
           height={50}
-          title="Capital Gain Heatmap"
+          title="Diabetes Heatmap"
         />
       );
       break;
