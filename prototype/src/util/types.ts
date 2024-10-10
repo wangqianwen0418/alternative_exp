@@ -1,6 +1,7 @@
 type TPageBase = {
   userText: string;
   initVis: "beeswarm" | "bar" | "scatter" | string;
+  secondVis: "beeswarm" | "bar" | "scatter" | string | undefined;
   insight: TInsight;
 };
 

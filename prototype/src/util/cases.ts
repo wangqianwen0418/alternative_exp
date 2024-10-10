@@ -6,6 +6,7 @@ export const CASES: TCase[] = [
     userText:
       "BMI is the more important than age for predicting diabetes progression.",
     initVis: "beeswarm",
+    secondVis: undefined,
     insight: {
       variables: [
         {
@@ -30,6 +31,7 @@ export const CASES: TCase[] = [
     userText:
       "bmi always contributes positively for predicting diabetes progression.",
     initVis: "bar",
+    secondVis: undefined,
     insight: {
       variables: [
         {
@@ -50,6 +52,7 @@ export const CASES: TCase[] = [
     userText:
       "the larger the age, the more likely to have greater diabetes progression.",
     initVis: "beeswarm",
+    secondVis: undefined,
     insight: {
       variables: [
         { featureName: "age", type: "value of", transform: undefined },
@@ -70,6 +73,7 @@ export const CASES: TCase[] = [
     userText:
       "the larger the capital gain, the more likely to have greater income.",
     initVis: "heatmap",
+    secondVis: undefined,
     insight: undefined,
   },
   {
@@ -77,6 +81,7 @@ export const CASES: TCase[] = [
     href: "/free",
     userText: "",
     initVis: "random",
+    secondVis: undefined,
     insight: undefined,
   },
 ];

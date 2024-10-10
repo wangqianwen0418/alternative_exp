@@ -6,7 +6,8 @@ export const QuestionList: TQuestion[] = [
     pageName: "question",
     userText:
       "The average contribution of the bmi to the prediction is larger than 20.",
-    initVis: "bar",
+    initVis: "beeswarm",
+    secondVis: "scatter", // randomly chosen
     insight: {
       variables: [
         {
@@ -28,7 +29,8 @@ export const QuestionList: TQuestion[] = [
     pageName: "question",
     userText:
       "The average contribution of bp to the prediction is larger than 5.",
-    initVis: "bar",
+    initVis: "beeswarm",
+    secondVis: "bar",
     insight: {
       variables: [
         {
@@ -49,7 +51,8 @@ export const QuestionList: TQuestion[] = [
     index: 2,
     pageName: "question",
     userText: "The s5 values contribute at least 30 to the prediction.",
-    initVis: "bar",
+    initVis: "beeswarm",
+    secondVis: "bar", // randomly chosen
     insight: {
       variables: [
         {
@@ -70,7 +73,8 @@ export const QuestionList: TQuestion[] = [
     index: 3,
     pageName: "question",
     userText: "The s1 values contribute at least 2.5 to the prediction.",
-    initVis: "bar",
+    initVis: "beeswarm",
+    secondVis: "bar",
     insight: {
       variables: [
         {
@@ -92,6 +96,7 @@ export const QuestionList: TQuestion[] = [
     pageName: "question",
     userText: "bp contributes more to the prediction than age.",
     initVis: "heatmap",
+    secondVis: "beeswarm", // randomly chosen
     insight: {
       variables: [
         {
@@ -116,7 +121,8 @@ export const QuestionList: TQuestion[] = [
     index: 5,
     pageName: "question",
     userText: "bmi has more instances above 5 than sex.",
-    initVis: "beeswarm",
+    initVis: "scatter",
+    secondVis: "beeswarm", // randomly chosen
     insight: {
       variables: [
         {
@@ -141,7 +147,8 @@ export const QuestionList: TQuestion[] = [
     index: 6,
     pageName: "question",
     userText: "age has more instances above 3 than s2.",
-    initVis: "beeswarm",
+    initVis: "scatter",
+    secondVis: "beeswarm",
     insight: {
       variables: [
         {
@@ -167,7 +174,8 @@ export const QuestionList: TQuestion[] = [
     pageName: "question",
     userText:
       "bp has larger deviations in its contribution to the prediction compared to age.",
-    initVis: "beeswarm",
+    initVis: "scatter",
+    secondVis: "bar", // randomly chosen
     insight: {
       variables: [
         {
@@ -193,7 +201,8 @@ export const QuestionList: TQuestion[] = [
     pageName: "question",
     userText:
       "There is correlation between the contribution of bp to predictions and the bp values.",
-    initVis: "scatter",
+    initVis: "heatmap",
+    secondVis: "scatter",
     insight: {
       variables: [
         {
@@ -219,7 +228,8 @@ export const QuestionList: TQuestion[] = [
     pageName: "question",
     userText:
       "There is correlation between the contribution of age to predictions and the age values when the feature value is between |0.05 and 0.10|.",
-    initVis: "scatter",
+    initVis: "heatmap",
+    secondVis: "scatter", // randomly chosen
     insight: {
       variables: [
         {
@@ -245,7 +255,8 @@ export const QuestionList: TQuestion[] = [
     pageName: "question",
     userText:
       "There is correlation between the contribution of bmi to predictions and the bmi values when the feature value is between |0.05 and 0.10|.",
-    initVis: "scatter",
+    initVis: "heatmap",
+    secondVis: "scatter",
     insight: {
       variables: [
         {
@@ -271,7 +282,8 @@ export const QuestionList: TQuestion[] = [
     pageName: "question",
     userText:
       "The correlation between bmi and its feature values is stronger when the feature value for age is in the range |0.05 to 0.1| compared to |0 to 0.02|.",
-    initVis: "scatter",
+    initVis: "heatmap",
+    secondVis: "scatter",
     insight: {
       variables: [
         {
