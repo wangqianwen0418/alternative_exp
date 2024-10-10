@@ -24,15 +24,12 @@ import { generateQuestionOrder } from "../util/RNDM-questionBalance";
 import { v4 as uuidv4 } from "uuid";
 import Cookies from "js-cookie";
 
-// let uuid = Cookies.get("uuid");
+let uuid = Cookies.get("uuid");
 
-// if (!uuid) {
-//   uuid = uuidv4();
-//   Cookies.set("uuid", uuid);
-// }
-
-// let uuid = "d42ccc56-b330-427b-9b4f-d99b0a626b5b"; // test uuid
-let uuid = "d46741cf-57b6-43a1-a661-119204bb7a00"; // test uuid
+if (!uuid) {
+  uuid = uuidv4();
+  Cookies.set("uuid", uuid);
+}
 
 const confidenceOptions = [
   "please select",
@@ -61,7 +58,7 @@ export default function UserResponse() {
   );
 
   // question order to be passed into sheet
-  const questionIndexesArray = generateQuestionOrder(uuid);
+  const questionIndexesArray = generateQuestionOrder(uuid!);
 
   // Current question to be displayed, from the shuffled question order
   const currentQuestionIndex = questionIndexesArray[questionIndex];
@@ -79,7 +76,7 @@ export default function UserResponse() {
     };
     try {
       console.log("Submitting form:", JSON.stringify(data));
-      const response = await fetch(weburl!, {
+      await fetch(weburl!, {
         method: "POST",
         mode: "no-cors",
         headers: {
@@ -125,12 +122,12 @@ export default function UserResponse() {
           name="row-radio-buttons-group"
         >
           <Radio
-            checked={userAnswer == "yes"}
+            checked={userAnswer === "yes"}
             onChange={() => setUserAnswer("yes")}
           />{" "}
           <span style={{ margin: "auto 0" }}>Yes, accurate</span>
           <Radio
-            checked={userAnswer == "no"}
+            checked={userAnswer === "no"}
             onChange={() => setUserAnswer("no")}
           />{" "}
           <span style={{ margin: "auto 0" }}>No, inaccurate </span>
@@ -151,7 +148,7 @@ export default function UserResponse() {
         <Button
           variant="contained"
           disabled={
-            userAnswer == undefined || confidence == confidenceOptions[0]
+            userAnswer === undefined || confidence === confidenceOptions[0]
           }
           onClick={() => onSubmit()}
         >

@@ -12,7 +12,7 @@ export const QuestionList: TQuestion[] = [
         {
           featureName: "bmi",
           transform: "average",
-          type: "contribution",
+          type: "contribution of",
         },
         20,
       ],
@@ -33,7 +33,7 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "bp",
-          type: "contribution",
+          type: "contribution of",
           transform: "average",
         },
         5,
@@ -54,7 +54,7 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "s5",
-          type: "contribution",
+          type: "contribution of",
           transform: "average",
         },
         30,
@@ -75,7 +75,7 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "s1",
-          type: "contribution",
+          type: "contribution of",
           transform: "average",
         },
         2.5,
@@ -90,131 +90,106 @@ export const QuestionList: TQuestion[] = [
   {
     index: 4,
     pageName: "question",
-    userText:
-      "The bmi contributes more positively than negatively to the prediction.",
-    initVis: "heatmap",
-    insight: {
-      variables: [
-        {
-          featureName: "s1",
-          type: "contribution",
-          transform: "average",
-        },
-        0, // what to put here?
-      ],
-      type: "read",
-      relation: "greater than",
-      condition: undefined,
-    },
-    testCondition: "random vis",
-    groundTruth: false,
-  },
-  {
-    index: 5,
-    pageName: "question",
     userText: "bp contributes more to the prediction than age.",
     initVis: "heatmap",
     insight: {
       variables: [
         {
           featureName: "bp",
-          type: "contribution",
+          type: "contribution of",
           transform: "average",
         },
         {
           featureName: "age",
-          type: "contribution",
+          type: "contribution of",
           transform: "average",
         },
       ],
       type: "comparison",
-      relation: "greater",
+      relation: "greater than",
       condition: undefined,
     },
     testCondition: "ours",
     groundTruth: true,
   },
   {
-    index: 6,
+    index: 5,
     pageName: "question",
     userText: "bmi has more instances above 5 than sex.",
     initVis: "beeswarm",
     insight: {
       variables: [
-        // what to do here?
         {
           featureName: "bmi",
-          type: "contribution",
+          type: "number of instances",
           transform: "average",
         },
         {
           featureName: "sex",
-          type: "contribution",
+          type: "number of instances",
           transform: "average",
         },
       ],
       type: "comparison",
-      relation: "greater",
+      relation: "greater than",
       condition: undefined,
     },
     testCondition: "no vis",
     groundTruth: true,
   },
   {
-    index: 7,
+    index: 6,
     pageName: "question",
     userText: "age has more instances above 3 than s2.",
     initVis: "beeswarm",
     insight: {
       variables: [
-        // what to do here?
         {
           featureName: "age",
-          type: "contribution",
+          type: "number of instances",
           transform: "average",
         },
         {
           featureName: "s2",
-          type: "contribution",
+          type: "number of instances",
           transform: "average",
         },
       ],
       type: "comparison",
-      relation: "greater",
+      relation: "greater than",
       condition: undefined,
     },
     testCondition: "random vis",
     groundTruth: true,
   },
   {
-    index: 8,
+    index: 7,
     pageName: "question",
     userText:
       "bp has larger deviations in its contribution to the prediction compared to age.",
     initVis: "beeswarm",
     insight: {
       variables: [
-        // what to do here?
         {
           featureName: "bp",
-          type: "contribution",
-          transform: "average",
+          type: "contribution of",
+          transform: "deviation",
         },
         {
           featureName: "age",
-          type: "contribution",
-          transform: "average",
+          type: "contribution of",
+          transform: "deviation",
         },
       ],
       type: "comparison",
-      relation: "greater",
+      relation: "greater than",
       condition: undefined,
     },
     testCondition: "ours",
     groundTruth: true,
   },
   {
-    index: 9,
+    index: 8,
     pageName: "question",
     userText:
       "There is correlation between the contribution of bp to predictions and the bp values.",
@@ -223,24 +198,24 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "bp",
-          type: "contribution",
+          type: "contribution of",
           transform: "average",
         },
         {
           featureName: "bp",
-          type: "contribution",
+          type: "contribution of",
           transform: "average",
         },
       ],
       type: "correlation",
-      relation: "positively", // what to do here?
+      relation: "positively", // #TODO
       condition: undefined,
     },
     testCondition: "no vis",
     groundTruth: true,
   },
   {
-    index: 10,
+    index: 9,
     pageName: "question",
     userText:
       "There is correlation between the contribution of age to predictions and the age values when the feature value is between |0.05 and 0.10|.",
@@ -249,24 +224,24 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "age",
-          type: "contribution",
+          type: "contribution of",
           transform: "average",
         },
         {
           featureName: "age",
-          type: "contribution",
+          type: "contribution of",
           transform: "average",
         },
       ],
       type: "correlation",
-      relation: "positively", // what to do here?
+      relation: "positively", // #TODO
       condition: undefined,
     },
     testCondition: "random vis",
     groundTruth: true,
   },
   {
-    index: 11,
+    index: 10,
     pageName: "question",
     userText:
       "There is correlation between the contribution of bmi to predictions and the bmi values when the feature value is between |0.05 and 0.10|.",
@@ -275,24 +250,24 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "bmi",
-          type: "contribution",
+          type: "contribution of",
           transform: "average",
         },
         {
           featureName: "bmi",
-          type: "contribution",
+          type: "contribution of",
           transform: "average",
         },
       ],
       type: "correlation",
-      relation: "positively", // what to do here?
+      relation: "positively", // #TODO
       condition: undefined,
     },
     testCondition: "ours",
     groundTruth: true,
   },
   {
-    index: 12,
+    index: 11,
     pageName: "question",
     userText:
       "The correlation between bmi and its feature values is stronger when the feature value for age is in the range |0.05 to 0.1| compared to |0 to 0.02|.",
@@ -301,12 +276,12 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "bmi",
-          type: "contribution",
+          type: "contribution of",
           transform: "average",
         },
         {
           featureName: "age",
-          type: "contribution",
+          type: "contribution of",
           transform: "average",
         },
       ],

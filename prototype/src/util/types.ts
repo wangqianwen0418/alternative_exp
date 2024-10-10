@@ -33,7 +33,7 @@ export type TInsight1 = {
 export type TInsight2 = {
   variables: [TVariable, TVariable];
   type: "comparison";
-  relation: "greater" | "less" | "equal";
+  relation: "greater than" | "less than" | "equal to";
   condition: { featureName: string; range: [number, number] } | undefined;
 };
 
@@ -53,6 +53,6 @@ export type TInsight4 = {
 
 export type TVariable = {
   featureName: string;
-  transform: "average" | undefined;
-  type: "value" | "contribution";
+  transform: "average" | "deviation" | undefined;
+  type: "value of" | "contribution of" | "number of instances";
 };
