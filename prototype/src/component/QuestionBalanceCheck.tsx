@@ -1,6 +1,6 @@
 import React from "react";
 import Button from "@mui/material/Button";
-import { generateQuestionOrder } from "../util/RNDM-questionBalance";
+import { generateQuestionOrder } from "../util/questionBalance";
 
 const CounterbalanceButton: React.FC = () => {
   const handleClick = () => {

@@ -20,7 +20,7 @@ import {
 } from "../store";
 import Selection from "./webUtil/Selection";
 import { weburl } from "../util/appscript_url";
-import { generateQuestionOrder } from "../util/RNDM-questionBalance";
+import { generateQuestionOrder } from "../util/questionBalance";
 import { v4 as uuidv4 } from "uuid";
 import Cookies from "js-cookie";
 
