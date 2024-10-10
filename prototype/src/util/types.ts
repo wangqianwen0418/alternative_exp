@@ -11,7 +11,7 @@ export type TCase = TPageBase & {
 
 export type TQuestion = TPageBase & {
   pageName: "question";
-  testCondition: "no vis" | "random vis" | "ours";
+  testCondition: "random vis" | "ours";
   index: number;
   groundTruth: boolean;
 };

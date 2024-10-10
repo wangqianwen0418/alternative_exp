@@ -2,7 +2,7 @@ import { TQuestion } from "./types";
 import { QuestionList } from "./questionList";
 
 const seededShuffle = <T>(array: T[], seed: string): T[] => {
-  const shuffled = array.slice(); // Copy array to avoid modifying the original
+  const shuffled = array.slice();
   let currentIndex = shuffled.length;
   let randomIndex;
 
@@ -28,16 +28,14 @@ const createCounterbalancedOrder = (
   questionList: TQuestion[],
   uuid: string
 ): number[] => {
-  const categories = ["random vis", "ours", "no vis"];
+  const categories = ["random vis", "ours"];
 
   const questionsByCondition: Record<string, TQuestion[]> = {
-    "no vis": questionList.filter((q) => q.testCondition === "no vis"),
     "random vis": questionList.filter((q) => q.testCondition === "random vis"),
     ours: questionList.filter((q) => q.testCondition === "ours"),
   };
 
   const shuffledQuestionsByCondition: Record<string, TQuestion[]> = {
-    "no vis": seededShuffle(questionsByCondition["no vis"], uuid),
     "random vis": seededShuffle(questionsByCondition["random vis"], uuid),
     ours: seededShuffle(questionsByCondition["ours"], uuid),
   };
@@ -47,7 +45,6 @@ const createCounterbalancedOrder = (
   let conditionIndex = 0;
 
   while (
-    shuffledQuestionsByCondition["no vis"].length > 0 ||
     shuffledQuestionsByCondition["random vis"].length > 0 ||
     shuffledQuestionsByCondition["ours"].length > 0
   ) {

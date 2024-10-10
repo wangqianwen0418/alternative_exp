@@ -20,7 +20,7 @@ export const QuestionList: TQuestion[] = [
       relation: "greater than",
       condition: undefined,
     },
-    testCondition: "no vis",
+    testCondition: "random vis",
     groundTruth: true,
   },
   {
@@ -42,7 +42,7 @@ export const QuestionList: TQuestion[] = [
       relation: "greater than",
       condition: undefined,
     },
-    testCondition: "random vis",
+    testCondition: "ours",
     groundTruth: true,
   },
   {
@@ -63,7 +63,7 @@ export const QuestionList: TQuestion[] = [
       relation: "greater than",
       condition: undefined,
     },
-    testCondition: "ours",
+    testCondition: "random vis",
     groundTruth: false,
   },
   {
@@ -84,7 +84,7 @@ export const QuestionList: TQuestion[] = [
       relation: "greater than",
       condition: undefined,
     },
-    testCondition: "no vis",
+    testCondition: "ours",
     groundTruth: false,
   },
   {
@@ -109,7 +109,7 @@ export const QuestionList: TQuestion[] = [
       relation: "greater than",
       condition: undefined,
     },
-    testCondition: "ours",
+    testCondition: "random vis",
     groundTruth: true,
   },
   {
@@ -134,7 +134,7 @@ export const QuestionList: TQuestion[] = [
       relation: "greater than",
       condition: undefined,
     },
-    testCondition: "no vis",
+    testCondition: "random vis",
     groundTruth: true,
   },
   {
@@ -159,7 +159,7 @@ export const QuestionList: TQuestion[] = [
       relation: "greater than",
       condition: undefined,
     },
-    testCondition: "random vis",
+    testCondition: "ours",
     groundTruth: true,
   },
   {
@@ -185,7 +185,7 @@ export const QuestionList: TQuestion[] = [
       relation: "greater than",
       condition: undefined,
     },
-    testCondition: "ours",
+    testCondition: "random vis",
     groundTruth: true,
   },
   {
@@ -211,7 +211,7 @@ export const QuestionList: TQuestion[] = [
       relation: "positively", // #TODO
       condition: undefined,
     },
-    testCondition: "no vis",
+    testCondition: "ours",
     groundTruth: true,
   },
   {
@@ -289,7 +289,7 @@ export const QuestionList: TQuestion[] = [
       relation: "same",
       condition: undefined,
     },
-    testCondition: "no vis",
+    testCondition: "ours",
     groundTruth: false,
   },
 ];
