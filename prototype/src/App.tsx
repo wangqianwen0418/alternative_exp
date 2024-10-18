@@ -1,10 +1,9 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import Grid from "@mui/material/Grid";
 import { useState } from "react";
 import { useAtom } from "jotai";
 import {
   insightAtom,
-  isSubmittedAtom,
   freeTextAtom,
   initVisAtom,
   pageNameAtom,
@@ -46,7 +45,6 @@ import { generateQuestionOrder } from "./util/questionBalance";
 function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
   const [open, setOpen] = useState(false); // sider drawer
 
-  const [isSubmitted] = useAtom(isSubmittedAtom);
   const [, setInsight] = useAtom(insightAtom);
   const [, setFreetext] = useAtom(freeTextAtom);
   const [, setInitVis] = useAtom(initVisAtom);
@@ -162,10 +160,10 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
       </Grid>
       <Grid item xs={4} className="App-body">
         <Interpretation />
-        {"index" in appProps && isSubmitted && <UserResponse />}
-        <Paper style={{ padding: "15px", marginTop: "10px" }}>
+        {"index" in appProps && <UserResponse />}
+        {/* <Paper style={{ padding: "15px", marginTop: "10px" }}>
           <CounterbalanceButton />
-        </Paper>
+        </Paper> */}
       </Grid>
       <Grid item xs={7} className="App-body">
         <Explanation />

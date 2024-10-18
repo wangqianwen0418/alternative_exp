@@ -7,7 +7,6 @@ import {
   Modal,
   Box,
 } from "@mui/material";
-import React from "react";
 
 import "./Interpretation.css";
 import { useState } from "react";
@@ -34,6 +33,8 @@ export default function Interpretation() {
   );
   const [isLoading, setIsLoading] = useState(false); // New loading state
   const [apiKey, setApiKey] = useState("");
+
+  const isUserStudy = pageName?.includes("question");
 
   const handleSubmission = async () => {
     if (insight == undefined) {
@@ -68,24 +69,20 @@ export default function Interpretation() {
         />
 
         <div style={{ alignItems: "center" }}>
-          {/* <Button
-            variant="contained"
-            color="primary"
-            style={{ margin: "10px 5px" }}
-            onClick={() => setIsSubmitted(!isSubmitted)}
-          >
-            Clear
-          </Button> */}
-          <Button
-            variant="outlined"
-            disabled={isSubmitted}
-            color="primary"
-            style={{ margin: "10px 5px" }}
-            onClick={handleSubmission}
-          >
-            Check with Additional Visualization
-          </Button>
+          {/* Conditionally render the button if the user is NOT in the user study */}
+          {!isUserStudy && (
+            <Button
+              variant="outlined"
+              disabled={isSubmitted}
+              color="primary"
+              style={{ margin: "10px 5px" }}
+              onClick={handleSubmission}
+            >
+              Check with Additional Visualization
+            </Button>
+          )}
         </div>
+
         {isLoading ? (
           <CircularProgress></CircularProgress>
         ) : (

@@ -1,6 +1,6 @@
-import shap_diabetes from "../assets/shap_diabetes_new.json";
+import shap_diabetes from "../assets/shap_diabetes.json";
 
-const diabetes_s5 = "s5",
+const diabetes_s5 = "serum triglycerides level",
   diabetes_s5_featureIndex =
     shap_diabetes["feature_names"].indexOf(diabetes_s5),
   diabetes_s5_featureValues = shap_diabetes["feature_values"].map(
@@ -20,7 +20,7 @@ const diabetes_bmi = "bmi",
     (row) => row[diabetes_bmi_featureIndex]
   );
 
-const diabetes_bp = "bp",
+const diabetes_bp = "blood pressure",
   diabetes_bp_featureIndex =
     shap_diabetes["feature_names"].indexOf(diabetes_bp),
   diabetes_bp_featureValues = shap_diabetes["feature_values"].map(
@@ -30,7 +30,7 @@ const diabetes_bp = "bp",
     (row) => row[diabetes_bp_featureIndex]
   );
 
-const diabetes_s3 = "s3",
+const diabetes_s3 = "high-density lipoproteins",
   diabetes_s3_featureIndex =
     shap_diabetes["feature_names"].indexOf(diabetes_s3),
   diabetes_s3_featureValues = shap_diabetes["feature_values"].map(
@@ -40,7 +40,7 @@ const diabetes_s3 = "s3",
     (row) => row[diabetes_s3_featureIndex]
   );
 
-const diabetes_s6 = "s6",
+const diabetes_s6 = "blood sugar level",
   diabetes_s6_featureIndex =
     shap_diabetes["feature_names"].indexOf(diabetes_s6),
   diabetes_s6_featureValues = shap_diabetes["feature_values"].map(
@@ -60,7 +60,7 @@ const diabetes_age = "age",
     (row) => row[diabetes_age_featureIndex]
   );
 
-const diabetes_s2 = "s2",
+const diabetes_s2 = "low-density lipoproteins",
   diabetes_s2_featureIndex =
     shap_diabetes["feature_names"].indexOf(diabetes_s2),
   diabetes_s2_featureValues = shap_diabetes["feature_values"].map(
@@ -80,7 +80,7 @@ const diabetes_sex = "sex",
     (row) => row[diabetes_sex_featureIndex]
   );
 
-const diabetes_s1 = "s1",
+const diabetes_s1 = "serum cholesterol",
   diabetes_s1_featureIndex =
     shap_diabetes["feature_names"].indexOf(diabetes_s2),
   diabetes_s1_featureValues = shap_diabetes["feature_values"].map(
@@ -90,7 +90,7 @@ const diabetes_s1 = "s1",
     (row) => row[diabetes_s1_featureIndex]
   );
 
-const diabetes_s4 = "s4",
+const diabetes_s4 = "total/HDL cholesterol ratio",
   diabetes_s4_featureIndex =
     shap_diabetes["feature_names"].indexOf(diabetes_s2),
   diabetes_s4_featureValues = shap_diabetes["feature_values"].map(

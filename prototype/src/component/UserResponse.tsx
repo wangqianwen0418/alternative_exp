@@ -22,50 +22,50 @@ import {
 } from "../store";
 import Selection from "./webUtil/Selection";
 import { weburl } from "../util/appscript_url";
-import { generateQuestionOrder } from "../util/questionBalance";
 
 const confidenceOptions = [
   "please select",
-  "1 not confidence at all",
+  "1 not confident at all",
   "2",
   "3",
   "4",
   "5",
   "6 very confident",
 ];
+
 export default function UserResponse() {
   const [questionIndex, setQuestionIndex] = useAtom(questionIndexAtom);
   const [, setInsight] = useAtom(insightAtom);
   const [freeText, setFreetext] = useAtom(freeTextAtom);
-  const [, setInitVis] = useAtom(initVisAtom);
+  const [initVis, setInitVis] = useAtom(initVisAtom);
   const [, setName] = useAtom(pageNameAtom);
   const [, setIsSubmitted] = useAtom(isSubmittedAtom);
   const [uuid] = useAtom(uuidAtom);
   const [questionIndexesArray] = useAtom(questionOrderAtom);
 
-  const [modelVisible, setModalVisible] = React.useState<boolean>(false); // the thank you modal when finish all questions
-
+  const [modalVisible, setModalVisible] = React.useState(false);
   const [userAnswer, setUserAnswer] = React.useState<
     "yes" | "no" | undefined
   >();
-  const [confidence, setConfidence] = React.useState<string>(
-    confidenceOptions[0]
-  );
+  const [confidence, setConfidence] = React.useState(confidenceOptions[0]);
+  const [isSecondPart, setIsSecondPart] = React.useState(false);
 
-  // Current question to be displayed, from the shuffled question order
   const currentQuestionIndex = questionIndexesArray[questionIndex];
+  const isLastQuestion = questionIndex >= questionIndexesArray.length - 1;
 
   const onSubmit = async () => {
-    // recording(userAnswer, confidence) commit the results to the database
     const data = {
-      uuid: uuid,
+      uuid,
       timestamp: new Date().toLocaleString(),
       currentIndex: currentQuestionIndex,
       questionOrder: questionIndexesArray.toString(),
       freeText,
+      currentVis: initVis,
+      isSecondPart: isSecondPart ? "Yes" : "No",
       userAnswer,
       confidence,
     };
+
     try {
       console.log("Submitting form:", JSON.stringify(data));
       await fetch(weburl!, {
@@ -80,22 +80,33 @@ export default function UserResponse() {
       console.error("Error submitting form:", error);
     }
 
-    if (questionIndex === QuestionList.length - 1) {
-      setModalVisible(true);
-      return;
+    if (isSecondPart) {
+      if (isLastQuestion) {
+        setModalVisible(true);
+      } else {
+        moveToNextQuestion();
+      }
+    } else {
+      // Switch to second visualization
+      setInitVis(QuestionList[currentQuestionIndex].secondVis);
+      setUserAnswer(undefined);
+      setConfidence(confidenceOptions[0]);
+      setIsSecondPart(true);
     }
+  };
 
-    setUserAnswer(undefined);
-    setConfidence(confidenceOptions[0]);
-    setIsSubmitted(false);
-
-    // Move to the next question in the questionIndexesArray
+  const moveToNextQuestion = () => {
     const nextQuestionIndex = questionIndexesArray[questionIndex + 1];
+
     setFreetext(QuestionList[nextQuestionIndex].userText);
     setInsight(QuestionList[nextQuestionIndex].insight);
     setInitVis(QuestionList[nextQuestionIndex].initVis);
     setName(QuestionList[nextQuestionIndex].pageName);
 
+    setUserAnswer(undefined);
+    setConfidence(confidenceOptions[0]);
+    setIsSubmitted(false);
+    setIsSecondPart(false);
     setQuestionIndex((prevIndex) => prevIndex + 1);
   };
 
@@ -106,7 +117,10 @@ export default function UserResponse() {
           Please Respond Here
         </Typography>
         <span>
-          <b>Q1:</b>Is the above interpretation accurate?
+          <b>Q1:</b>{" "}
+          {isSecondPart
+            ? "Given the new visualization, is the above interpretation accurate?"
+            : "Is the above interpretation accurate?"}
         </span>
         <RadioGroup
           row
@@ -127,7 +141,10 @@ export default function UserResponse() {
 
         <div style={{ display: "flex" }}>
           <span style={{ margin: "auto 0" }}>
-            <b>Q2:</b>Please rate your confidence{" "}
+            <b>Q2:</b>{" "}
+            {isSecondPart
+              ? "Given the new visualization, please rate your confidence"
+              : "Please rate your confidence"}{" "}
           </span>
           <Selection
             label=""
@@ -144,18 +161,19 @@ export default function UserResponse() {
           }
           onClick={() => onSubmit()}
         >
-          {questionIndex < QuestionList.length - 1 ? "Next" : "Submit"}
+          {isSecondPart ? (isLastQuestion ? "Submit" : "Next") : "Next"}
         </Button>
       </Paper>
-      {/* Thank You Model */}
-      <Modal open={modelVisible} onClose={() => {}}>
+
+      {/* Thank You Modal */}
+      <Modal open={modalVisible} onClose={() => {}}>
         <Box
           sx={{
             position: "absolute",
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: "400",
+            width: "400px",
             bgcolor: "background.paper",
             border: "2px solid #000",
             boxShadow: 24,

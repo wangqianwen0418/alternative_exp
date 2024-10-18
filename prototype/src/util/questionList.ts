@@ -28,13 +28,13 @@ export const QuestionList: TQuestion[] = [
     index: 1,
     pageName: "question",
     userText:
-      "The average contribution of bp to the prediction is larger than 5.",
+      "The average contribution of blood pressure to the prediction is larger than 5.",
     initVis: "beeswarm",
     secondVis: "bar",
     insight: {
       variables: [
         {
-          featureName: "bp",
+          featureName: "blood pressure",
           type: "contribution of",
           transform: "average",
         },
@@ -50,13 +50,14 @@ export const QuestionList: TQuestion[] = [
   {
     index: 2,
     pageName: "question",
-    userText: "The s5 values contribute at least 30 to the prediction.",
+    userText:
+      "The serum triglycerides level values contribute at least 30 to the prediction.",
     initVis: "beeswarm",
     secondVis: "bar", // randomly chosen
     insight: {
       variables: [
         {
-          featureName: "s5",
+          featureName: "serum triglycerides level",
           type: "contribution of",
           transform: "average",
         },
@@ -72,13 +73,14 @@ export const QuestionList: TQuestion[] = [
   {
     index: 3,
     pageName: "question",
-    userText: "The s1 values contribute at least 2.5 to the prediction.",
+    userText:
+      "The serum cholesterol values contribute at least 2.5 to the prediction.",
     initVis: "beeswarm",
     secondVis: "bar",
     insight: {
       variables: [
         {
-          featureName: "s1",
+          featureName: "serum cholesterol",
           type: "contribution of",
           transform: "average",
         },
@@ -94,13 +96,13 @@ export const QuestionList: TQuestion[] = [
   {
     index: 4,
     pageName: "question",
-    userText: "bp contributes more to the prediction than age.",
+    userText: "blood pressure contributes more to the prediction than age.",
     initVis: "heatmap",
     secondVis: "beeswarm", // randomly chosen
     insight: {
       variables: [
         {
-          featureName: "bp",
+          featureName: "blood pressure",
           type: "contribution of",
           transform: "average",
         },
@@ -146,7 +148,7 @@ export const QuestionList: TQuestion[] = [
   {
     index: 6,
     pageName: "question",
-    userText: "age has more instances above 3 than s2.",
+    userText: "age has more instances above 3 than low-density lipoproteins.",
     initVis: "scatter",
     secondVis: "beeswarm",
     insight: {
@@ -157,7 +159,7 @@ export const QuestionList: TQuestion[] = [
           transform: "average",
         },
         {
-          featureName: "s2",
+          featureName: "low-density lipoproteins",
           type: "number of instances",
           transform: "average",
         },
@@ -173,13 +175,13 @@ export const QuestionList: TQuestion[] = [
     index: 7,
     pageName: "question",
     userText:
-      "bp has larger deviations in its contribution to the prediction compared to age.",
+      "blood pressure has larger deviations in its contribution to the prediction compared to age.",
     initVis: "scatter",
     secondVis: "bar", // randomly chosen
     insight: {
       variables: [
         {
-          featureName: "bp",
+          featureName: "blood pressure",
           type: "contribution of",
           transform: "deviation",
         },
@@ -200,18 +202,18 @@ export const QuestionList: TQuestion[] = [
     index: 8,
     pageName: "question",
     userText:
-      "There is a positive correlation between the contribution of bp to predictions and the bp values.",
+      "There is a positive correlation between the contribution of blood pressure to predictions and the blood pressure values.",
     initVis: "heatmap",
     secondVis: "scatter",
     insight: {
       variables: [
         {
-          featureName: "bp",
+          featureName: "blood pressure",
           type: "contribution of",
           transform: "average",
         },
         {
-          featureName: "bp",
+          featureName: "blood pressure",
           type: "contribution of",
           transform: "average",
         },
