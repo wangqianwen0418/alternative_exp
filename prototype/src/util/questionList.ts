@@ -229,7 +229,7 @@ export const QuestionList: TQuestion[] = [
     index: 9,
     pageName: "question",
     userText:
-      "There is no correlation between the contribution of age to predictions and the age values when the feature value is between -0.05 and 0.05.",
+      "There is a negative correlation between the contribution of age to predictions and the age values when the feature value is between -0.10 and 0.00.",
     initVis: "heatmap",
     secondVis: "scatter", // randomly chosen
     insight: {
@@ -246,7 +246,7 @@ export const QuestionList: TQuestion[] = [
         },
       ],
       type: "correlation",
-      relation: "no correlation",
+      relation: "negatively",
       condition: undefined,
     },
     testCondition: "random vis",
