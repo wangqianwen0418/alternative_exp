@@ -15,6 +15,25 @@ import Heatmap from "./Heatmap";
 import { useAtom } from "jotai";
 import { initVisAtom, insightAtom, isSubmittedAtom } from "../store";
 
+function getRandomPoints(arr: number[]) {
+  if (arr.length < 25) {
+    throw new Error("Array has fewer than 25 points.");
+  }
+
+  const randomPoints = [];
+  const randomIndices = new Set();
+
+  while (randomIndices.size < 25) {
+    const randomIndex = Math.floor(Math.random() * arr.length);
+    if (!randomIndices.has(randomIndex)) {
+      randomIndices.add(randomIndex);
+      randomPoints.push(arr[randomIndex]);
+    }
+  }
+
+  return randomPoints;
+}
+
 export default function Explanation() {
   const [isSubmitted] = useAtom(isSubmittedAtom);
   const [insight, setInsight] = useAtom(insightAtom);
@@ -30,6 +49,9 @@ export default function Explanation() {
       (row) => row[featureIndex]
     );
 
+  const test_random_shap = getRandomPoints(featureShapValues);
+  const test_random_feature = getRandomPoints(featureValues);
+
   let initialVisualization;
   switch (initVis) {
     case "beeswarm":
@@ -38,10 +60,13 @@ export default function Explanation() {
           xValues={featureShapValues}
           colorValues={featureValues}
           width={500}
-          height={100}
+          height={300}
           id="bmi"
           selectedIndices={selectedIndices}
           setSelectedIndices={setSelectedIndices}
+          // annotation={{ type: "highlightRange", shapRange: [-20, 30] }}
+          // annotation={{ type: "verticalLine", xValue: 15 }}
+          // annotation={{ type: "highlightPoints", shapValues: test_points }}
         />
       );
       break;
@@ -56,6 +81,12 @@ export default function Explanation() {
           offsets={[0, 0]}
           selectedIndices={selectedIndices}
           setSelectedIndices={setSelectedIndices}
+          // annotation={{ type: "highlightRange", featureRange: [-0.04, 0.08] }}
+          // annotation={{ type: "verticalLine", xValue: 0.04 }}
+          // annotation={{
+          //   type: "highlightPoints",
+          //   featureValues: test_random_feature,
+          // }}
         />
       );
       break;
@@ -68,6 +99,7 @@ export default function Explanation() {
           height={200}
           id="bmi-scatter"
           offsets={[0, 0]}
+          // annotation={{ type: "verticalLine", xValue: 15 }}
         />
       );
       break;

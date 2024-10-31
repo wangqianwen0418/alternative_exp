@@ -8,18 +8,28 @@ interface BarProps {
   height: number;
   id: string;
   offsets: number[];
+  annotation?: Annotation;
 }
+
+type Annotation = { type: "verticalLine"; xValue: number };
 
 export default function Bar(props: BarProps) {
   const margin = [200, 10, 100, 40];
 
-  const { allShapValues, featureNames, height, width, id, offsets } = props;
+  const {
+    allShapValues,
+    featureNames,
+    height,
+    width,
+    id,
+    offsets,
+    annotation,
+  } = props;
   let avgShapeValues: { [featureName: string]: number } = {};
   for (let i = 0; i < featureNames.length; i++) {
     avgShapeValues[featureNames[i]] =
-      allShapValues
-        .map((val, index) => Math.abs(val[i]))
-        .reduce((a, b) => a + b, 0) / allShapValues.length;
+      allShapValues.map((val) => Math.abs(val[i])).reduce((a, b) => a + b, 0) /
+      allShapValues.length;
   }
 
   let sortedAvgShapeValues = Object.entries(avgShapeValues)
@@ -31,14 +41,14 @@ export default function Bar(props: BarProps) {
     .domain(sortedAvgShapeValues.map((d) => d[0]))
     .range([margin[1], height - margin[3]])
     .padding(0.1);
-  // const xScale = d3.scaleLinear().domain([0, d3.max(sortedAvgShapeValues, d => d[1]) as number]).range([margin[0], width - margin[2]])
+
   const xScale = d3
     .scaleLinear()
     .domain([0, Math.max(...allShapValues.flat().map((d) => Math.abs(d)))])
     .range([margin[0], width - margin[2]]);
 
-  // calculate the 95% confidence interval for each feature
-  const confidenceIntervals: { [k: string]: [number, number] } = {};
+  // Calculate the 95% confidence interval for each feature
+  const confidenceIntervals: { [key: string]: [number, number] } = {};
   featureNames.forEach((featureName, index) => {
     const values = allShapValues.map((val) => Math.abs(val[index]));
     const mean = d3.mean(values) as number;
@@ -109,9 +119,19 @@ export default function Bar(props: BarProps) {
         })}
       </g>
       <text x={width / 2} y={height - 5} textAnchor="middle">
-        {" "}
         Average contribution to the prediction
       </text>
+
+      {annotation?.type === "verticalLine" && (
+        <line
+          x1={xScale(annotation.xValue)}
+          y1={margin[1]}
+          x2={xScale(annotation.xValue)}
+          y2={height - margin[3]}
+          stroke="black"
+          strokeDasharray="4,2"
+        />
+      )}
     </g>
   );
 }

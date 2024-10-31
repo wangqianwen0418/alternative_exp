@@ -1,4 +1,3 @@
-import { Diversity2 } from "@mui/icons-material";
 import * as d3 from "d3";
 import { useEffect, useState } from "react";
 
@@ -7,13 +6,19 @@ interface SwarmProps {
   colorValues: number[];
   width: number;
   height: number;
-  id: string; // make sure accurate d3 selection with multiple swarms on the same page
+  id: string;
   selectedIndices: number[];
   setSelectedIndices: (index: number[]) => void;
+  annotation?: Annotation;
 }
 
+type Annotation =
+  | { type: "highlightPoints"; shapValues: number[] }
+  | { type: "highlightRange"; shapRange: [number, number] }
+  | { type: "verticalLine"; xValue: number };
+
 export default function Swarm(props: SwarmProps) {
-  let margin = [10, 10, 40, 10],
+  let margin = [10, 40, 40, 10],
     radius = 2,
     leftTitleMargin = 40;
   const [selectedPoints, setSelectedPoints] = useState<number[]>([]);
@@ -29,21 +34,21 @@ export default function Swarm(props: SwarmProps) {
     id,
     selectedIndices,
     setSelectedIndices,
+    annotation,
   } = props;
+
   const xScale = d3
     .scaleLinear()
     .domain(d3.extent(xValues) as [number, number])
-    .range([margin[3] + leftTitleMargin, width - margin[1]]);
+    .range([margin[3] + leftTitleMargin, width - margin[1] - 40]);
 
   const colorScale = d3
     .scaleSequential()
     .domain(d3.extent(colorValues) as [number, number])
-    // .interpolator(d3.interpolatePuRd);
-    // .interpolator(d3.interpolateHcl(d3.hcl('#008BFB'), d3.hcl('#FF004C')))
     .interpolator(
       d3.interpolateHcl(
-        d3.hcl((4.6588 * 180) / Math.PI, 70, 54), // blue
-        d3.hcl((0.35470565 * 180) / Math.PI, 90, 54) // red
+        d3.hcl((4.6588 * 180) / Math.PI, 70, 54),
+        d3.hcl((0.35470565 * 180) / Math.PI, 90, 54)
       )
     );
 
@@ -55,167 +60,147 @@ export default function Swarm(props: SwarmProps) {
     ]);
 
   useEffect(() => {
-    d3.select("g.x-axis").remove();
-    d3.select("text.axis-title").remove();
+    d3.select(`g.swarm#${id} g.x-axis`).remove();
+    d3.select(`g.swarm#${id} g.brush`).remove();
 
-    d3.select("svg")
-      .select(`g.swarm#${id}`)
+    const xAxis = d3.axisBottom(xScale);
+    d3.select(`g.swarm#${id}`)
       .append("g")
       .attr("class", "x-axis")
       .attr("transform", `translate(0,${height / 2 + radius * 2 + 5})`)
-      .call(d3.axisBottom(xScale));
+      .call(xAxis);
 
-    d3.select(`g.swarm#${id}`)
-      .append("text")
-      .attr("class", "axis-title")
-      .attr("y", height - 6)
-      .attr("x", leftTitleMargin + margin[3])
-      .text("contribution of bmi to the predicted diabetes progression");
+    const defs = d3.select(`g.swarm#${id}`).select("defs");
+    if (defs.empty()) {
+      const newDefs = d3.select(`g.swarm#${id}`).append("defs");
+      const gradient = newDefs
+        .append("linearGradient")
+        .attr("id", `color-legend-gradient-${id}`)
+        .attr("x1", "0%")
+        .attr("x2", "0%")
+        .attr("y1", "100%")
+        .attr("y2", "0%");
+
+      gradient
+        .append("stop")
+        .attr("offset", "0%")
+        .attr("stop-color", colorScale(colorScale.domain()[0]));
+      gradient
+        .append("stop")
+        .attr("offset", "100%")
+        .attr("stop-color", colorScale(colorScale.domain()[1]));
+    }
+
     const legendWidth = 20;
-    const legendHeight = height - margin[0] - margin[2];
-    const legendX = width - margin[1] - legendWidth;
-    const legendY = margin[0];
+    const legendHeight = 50;
+    const legendX = width - legendWidth - 30;
+    const legendY = height / 2 - 60;
+    const xAxisTextSize = 12;
 
-    const gradient = d3
-      .select(`g.swarm#${id}`)
-      .append("linearGradient")
-      .attr("id", "color-legend-gradient")
-      .attr("x1", "0%")
-      .attr("x2", "0%")
-      .attr("y1", "0%")
-      .attr("y2", "100%");
+    if (d3.select(`g.swarm#${id} .legend`).empty()) {
+      d3.select(`g.swarm#${id}`)
+        .append("rect")
+        .attr("class", "legend")
+        .attr("x", legendX)
+        .attr("y", legendY)
+        .attr("width", legendWidth)
+        .attr("height", legendHeight)
+        .attr("fill", `url(#color-legend-gradient-${id})`);
 
-    gradient
-      .selectAll("stop")
-      .data([
-        { offset: "0%", color: colorScale.domain()[0] },
-        { offset: "100%", color: colorScale.domain()[1] },
-      ])
-      .enter()
-      .append("stop")
-      .attr("offset", (d) => d.offset)
-      .attr("stop-color", (d) => colorScale(d.color));
+      d3.select(`g.swarm#${id}`)
+        .append("text")
+        .attr("class", "legend-title")
+        .attr("x", legendX + legendWidth / 2)
+        .attr("y", legendY - 25)
+        .attr("text-anchor", "middle")
+        .attr("font-size", xAxisTextSize)
+        .text("Feature Value");
 
-    d3.select(`g.swarm#${id}`)
-      .append("rect")
-      .attr("class", "legend")
-      .attr("x", legendX)
-      .attr("y", legendY)
-      .attr("width", legendWidth)
-      .attr("height", legendHeight)
-      .attr("fill", "url(#color-legend-gradient)");
+      d3.select(`g.swarm#${id}`)
+        .append("text")
+        .attr("class", "legend-label")
+        .attr("x", legendX + legendWidth / 2)
+        .attr("y", legendY + legendHeight + 15)
+        .attr("text-anchor", "middle")
+        .attr("font-size", xAxisTextSize)
+        .text(colorScale.domain()[0].toFixed(2));
 
-    d3.select(`g.swarm#${id}`)
-      .append("text")
-      .attr("class", "legend-title")
-      .attr("x", legendX + legendWidth / 2)
-      .attr("y", legendY - 10)
-      .text("Feature Value");
-
-    d3.select(`g.swarm#${id}`)
-      .append("text")
-      .attr("class", "legend-label")
-      .attr("x", legendX + legendWidth / 2)
-      .attr("y", legendY + legendHeight)
-      .text(colorScale.domain()[0].toFixed(2));
-
-    d3.select(`g.swarm#${id}`)
-      .append("text")
-      .attr("class", "legend-label")
-      .attr("x", legendX + legendWidth / 2)
-      .attr("y", legendY)
-      .text(colorScale.domain()[1].toFixed(2));
-
-    const points = d3.select(`g.points#${id}`);
-    points.selectAll("circle").on("click", (i: number) => {
-      const index = i;
-      const isSelected = selectedPoints.includes(index);
-      if (isSelected) {
-        setSelectedPoints(selectedPoints.filter((j) => j !== index));
-      } else {
-        setSelectedPoints([...selectedPoints, index]);
-      }
-    });
-
-    const brush = d3.brushX().extent([
-      [margin[3] + leftTitleMargin, 0],
-      [width - margin[1], height],
-    ])
-    .on("start", brushstart)
-    .on("end", brushended);
-
-    const brushGroup = d3
-      .select(`g.swarm#${id}`)
-      .append("g")
-      .attr("class", "brush")
-      .call(brush);
-    
-    function brushstart(event: any) {
-      brushGroup.call(brush.move, null);
+      d3.select(`g.swarm#${id}`)
+        .append("text")
+        .attr("class", "legend-label")
+        .attr("x", legendX + legendWidth / 2)
+        .attr("y", legendY - 5)
+        .attr("text-anchor", "middle")
+        .attr("font-size", xAxisTextSize)
+        .text(colorScale.domain()[1].toFixed(2));
     }
 
-    function brushended(event: any) {
-      console.log("Point 1");
-      const selection = event.selection;
-      console.log(selection);
-      if (!selection) return;
-      console.log("Point 2");
-      const brushedIndices: number[] = [];
-      const [x0, x1] = selection;
+    if (!annotation) {
+      const brush = d3
+        .brushX()
+        .extent([
+          [margin[3] + leftTitleMargin, 0],
+          [width - margin[1] - 40, height],
+        ])
+        .on("start", (event) => brushstart(event))
+        .on("end", (event) => brushended(event));
 
-      console.log("Point 3");
-      d3.selectAll(`g.swarm#${id} .points circle`)
-        .attr("stroke-width", (d: any, i: number) => {
-          const x = xScale(xValues[i]);
-          return x0 <= x && x <= x1 ? 2 : 1;
-        })
-        .each(function (d: any, i: number) {
-          const x = xScale(xValues[i]);
-          if (x0 <= x && x <= x1){
-            brushedIndices.push(i);
-          }
-        });
-        console.log("174");
-        setSelectedIndices(brushedIndices);
+      const brushGroup = d3
+        .select(`g.swarm#${id}`)
+        .append("g")
+        .attr("class", "brush")
+        .call(brush);
 
-    }
+      const brushstart = (event: any) => {
+        brushGroup.call(brush.move, null);
+      };
 
-    brush.on("brush", (event) => {
-      const selection = event.selection;
-      if (selection) {
+      const brushended = (event: any) => {
+        const selection = event.selection;
+        if (!selection) return;
+        const brushedIndices: number[] = [];
         const [x0, x1] = selection;
-        const selectedIndices = xValues.reduce((acc: number[], x, i) => {
-          if (x0 <= xScale(x) && xScale(x) <= x1) {
-            acc.push(i);
-          }
-          return acc;
-        }, []);
-        setSelectedPoints(selectedIndices);
-        setBrushSelection([x0, x1]);
-      } else {
-        setSelectedPoints([]);
-        setBrushSelection(null);
-      }
-    });
+
+        d3.selectAll(`g.swarm#${id} .points circle`)
+          .attr("opacity", (d: any, i: number) => {
+            const x = xScale(xValues[i]);
+            const isInBrush = x0 <= x && x <= x1;
+            return isInBrush ? 1 : 0.3;
+          })
+          .each(function (d: any, i: number) {
+            const x = xScale(xValues[i]);
+            if (x0 <= x && x <= x1) {
+              brushedIndices.push(i);
+            }
+          });
+
+        setSelectedIndices(brushedIndices);
+        brushGroup.call(brush.move, null);
+      };
+
+      brush.on("brush", (event) => {
+        const selection = event.selection;
+        if (selection) {
+          const [x0, x1] = selection;
+          const selectedIndices = xValues.reduce((acc: number[], x, i) => {
+            if (x0 <= xScale(x) && xScale(x) <= x1) {
+              acc.push(i);
+            }
+            return acc;
+          }, []);
+          setSelectedPoints(selectedIndices);
+          setBrushSelection([x0, x1]);
+        } else {
+          setSelectedPoints([]);
+          setBrushSelection(null);
+        }
+      });
+    }
 
     return () => {
-      points.selectAll("circle").on("click", null);
-      brush.on("brush", null);
+      d3.select(`g.swarm#${id} .brush`).remove();
     };
-  }, [xValues, height, width]);
-
-  useEffect(() => {
-    if (selectedPoints.length > 0) {
-      console.log("Selected Points: ");
-      console.log(
-        selectedPoints.map((i) => ({
-          id: i,
-          value: xValues[i],
-          color: colorValues[i],
-        }))
-      );
-    }
-  }, [selectedPoints, xValues, colorValues]);
+  }, [xValues, height, width, annotation]);
 
   let bucketWidth = 1;
   let buckets: { [key: number]: { value: number; index: number }[] } = {};
@@ -239,7 +224,74 @@ export default function Swarm(props: SwarmProps) {
     });
   }
 
-  // Update the y-values by iterating through the x-values and incrementing the y-value for each point
+  function isPointHighlighted(i: number): boolean {
+    if (!annotation) {
+      return true;
+    }
+
+    if (annotation.type === "highlightRange") {
+      const x = xValues[i];
+      const [minRange, maxRange] = annotation.shapRange;
+      return x >= minRange && x <= maxRange;
+    } else if (annotation.type === "highlightPoints") {
+      const x = xValues[i];
+      return annotation.shapValues.includes(x);
+    } else {
+      return true;
+    }
+  }
+
+  function renderAnnotations() {
+    if (!annotation) {
+      return null;
+    }
+
+    const lineStartY = height / 2 + radius * 2 + 5;
+    const lineEndY = 65;
+
+    if (annotation.type === "verticalLine") {
+      const xPos = xScale(annotation.xValue);
+      return (
+        <line
+          x1={xPos}
+          y1={lineStartY}
+          x2={xPos}
+          y2={lineEndY}
+          stroke="black"
+          strokeDasharray="4, 2"
+        />
+      );
+    } else if (annotation.type === "highlightRange") {
+      const [minRange, maxRange] = annotation.shapRange;
+      const xStart = xScale(minRange);
+      const xEnd = xScale(maxRange);
+
+      return (
+        <>
+          <line
+            x1={xStart}
+            y1={lineStartY}
+            x2={xStart}
+            y2={lineEndY}
+            stroke="black"
+            strokeDasharray="4, 2"
+          />
+          <line
+            x1={xEnd}
+            y1={lineStartY}
+            x2={xEnd}
+            y2={lineEndY}
+            stroke="black"
+            strokeDasharray="4, 2"
+          />
+        </>
+      );
+    }
+    return null;
+  }
+
+  const avgYPosition = (Math.min(...yVals) + Math.max(...yVals)) / 2;
+
   return (
     <g className="swarm" id={id}>
       <rect
@@ -250,33 +302,26 @@ export default function Swarm(props: SwarmProps) {
         stroke="black"
       />
       <g className="points">
-        <text x={leftTitleMargin} y={height / 2 + radius * 2} textAnchor="end">
+        <text
+          x={leftTitleMargin - 10}
+          y={yScale(avgYPosition)}
+          textAnchor="end"
+          alignmentBaseline="middle"
+        >
           {id}
         </text>
-        {xValues.map((x, i) => {
-          return (
-            <circle
-              key={i}
-              cx={xScale(x)}
-              cy={yScale(yVals[i])}
-              r={3}
-              fill={colorScale(colorValues[i])}
-              opacity={
-                props.selectedIndices.length == 0 ||
-                props.selectedIndices.includes(i)
-                  ? 1
-                  : 0.3
-              }
-              onMouseEnter={() => {
-                props.setSelectedIndices([i]);
-              }}
-              onMouseLeave={() => {
-                props.setSelectedIndices([]);
-              }}
-            />
-          );
-        })}
+        {xValues.map((x, i) => (
+          <circle
+            key={i}
+            cx={xScale(x)}
+            cy={yScale(yVals[i])}
+            r={3}
+            fill={colorScale(colorValues[i])}
+            opacity={isPointHighlighted(i) ? 1 : 0.3}
+          />
+        ))}
       </g>
+      {renderAnnotations()}
     </g>
   );
 }

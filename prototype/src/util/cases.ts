@@ -51,7 +51,7 @@ export const CASES: TCase[] = [
     href: "/case3",
     userText:
       "the larger the age, the more likely to have greater diabetes progression.",
-    initVis: "beeswarm",
+    initVis: "scatter",
     secondVis: undefined,
     insight: {
       variables: [
