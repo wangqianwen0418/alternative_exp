@@ -1,3 +1,4 @@
+// Scatter.tsx
 import * as d3 from "d3";
 import { useEffect } from "react";
 
@@ -14,8 +15,12 @@ interface ScatterProps {
 }
 
 type Annotation =
-  | { type: "highlightPoints"; featureValues: number[] }
-  | { type: "highlightRange"; featureRange: [number, number] }
+  | { type: "highlightPoints"; xValues: number[] }
+  | {
+      type: "highlightRange";
+      xValueRange?: [number, number];
+      yValueRange?: [number, number];
+    }
   | { type: "verticalLine"; xValue: number };
 
 export default function Scatter(props: ScatterProps) {
@@ -136,12 +141,25 @@ export default function Scatter(props: ScatterProps) {
     }
 
     const x = xValues[i];
+    const y = yValues[i];
 
     if (annotation.type === "highlightRange") {
-      const [minRange, maxRange] = annotation.featureRange;
-      return x >= minRange && x <= maxRange;
+      let xHighlighted = true;
+      let yHighlighted = true;
+
+      if (annotation.xValueRange) {
+        const [xMin, xMax] = annotation.xValueRange;
+        xHighlighted = x >= xMin && x <= xMax;
+      }
+
+      if (annotation.yValueRange) {
+        const [yMin, yMax] = annotation.yValueRange;
+        yHighlighted = y >= yMin && y <= yMax;
+      }
+
+      return xHighlighted && yHighlighted;
     } else if (annotation.type === "highlightPoints") {
-      return annotation.featureValues.includes(x);
+      return annotation.xValues.includes(x);
     } else {
       return true;
     }
@@ -152,48 +170,103 @@ export default function Scatter(props: ScatterProps) {
       return null;
     }
 
-    const lineStartY = 0;
-    const lineEndY = height;
+    const elements = [];
 
     if (annotation.type === "verticalLine") {
       const xPos = xScale(annotation.xValue);
-      return (
+      elements.push(
         <line
+          key="verticalLine"
           x1={xPos}
-          y1={lineStartY}
+          y1={0}
           x2={xPos}
-          y2={lineEndY}
+          y2={height}
           stroke="black"
           strokeDasharray="4, 2"
         />
       );
     } else if (annotation.type === "highlightRange") {
-      const [minRange, maxRange] = annotation.featureRange;
-      const xStart = xScale(minRange);
-      const xEnd = xScale(maxRange);
+      const hasXRange = annotation.xValueRange !== undefined;
+      const hasYRange = annotation.yValueRange !== undefined;
 
-      return (
-        <>
+      if (hasXRange && hasYRange) {
+        const [xMin, xMax] = annotation.xValueRange!;
+        const xStart = xScale(xMin);
+        const xEnd = xScale(xMax);
+        const [yMin, yMax] = annotation.yValueRange!;
+        const yStart = yScale(yMin);
+        const yEnd = yScale(yMax);
+
+        elements.push(
+          <rect
+            key="highlightRect"
+            x={Math.min(xStart, xEnd)}
+            y={Math.min(yStart, yEnd)}
+            width={Math.abs(xEnd - xStart)}
+            height={Math.abs(yEnd - yStart)}
+            fill="none"
+            stroke="black"
+            strokeDasharray="4,2"
+          />
+        );
+      } else if (hasXRange) {
+        const [xMin, xMax] = annotation.xValueRange!;
+        const xStart = xScale(xMin);
+        const xEnd = xScale(xMax);
+
+        elements.push(
           <line
+            key="xMinLine"
             x1={xStart}
-            y1={lineStartY}
+            y1={0}
             x2={xStart}
-            y2={lineEndY}
+            y2={height}
             stroke="black"
             strokeDasharray="4, 2"
           />
+        );
+        elements.push(
           <line
+            key="xMaxLine"
             x1={xEnd}
-            y1={lineStartY}
+            y1={0}
             x2={xEnd}
-            y2={lineEndY}
+            y2={height}
             stroke="black"
             strokeDasharray="4, 2"
           />
-        </>
-      );
+        );
+      } else if (hasYRange) {
+        const [yMin, yMax] = annotation.yValueRange!;
+        const yStart = yScale(yMin);
+        const yEnd = yScale(yMax);
+
+        elements.push(
+          <line
+            key="yMinLine"
+            x1={0}
+            y1={yStart}
+            x2={width}
+            y2={yStart}
+            stroke="black"
+            strokeDasharray="4, 2"
+          />
+        );
+        elements.push(
+          <line
+            key="yMaxLine"
+            x1={0}
+            y1={yEnd}
+            x2={width}
+            y2={yEnd}
+            stroke="black"
+            strokeDasharray="4, 2"
+          />
+        );
+      }
     }
-    return null;
+
+    return elements;
   }
 
   return (

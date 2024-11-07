@@ -66,7 +66,7 @@ export default function Explanation() {
           setSelectedIndices={setSelectedIndices}
           // annotation={{ type: "highlightRange", shapRange: [-20, 30] }}
           // annotation={{ type: "verticalLine", xValue: 15 }}
-          // annotation={{ type: "highlightPoints", shapValues: test_points }}
+          // annotation={{ type: "highlightPoints", shapValues: test_random_shap }}
         />
       );
       break;
@@ -81,7 +81,11 @@ export default function Explanation() {
           offsets={[0, 0]}
           selectedIndices={selectedIndices}
           setSelectedIndices={setSelectedIndices}
-          // annotation={{ type: "highlightRange", featureRange: [-0.04, 0.08] }}
+          // annotation={{
+          //   type: "highlightRange",
+          //   xValueRange: [-0.04, 0.08],
+          //   yValueRange: [-20, 30],
+          // }}
           // annotation={{ type: "verticalLine", xValue: 0.04 }}
           // annotation={{
           //   type: "highlightPoints",
@@ -100,6 +104,10 @@ export default function Explanation() {
           id="bmi-scatter"
           offsets={[0, 0]}
           // annotation={{ type: "verticalLine", xValue: 15 }}
+          // annotation={{
+          //   type: "highlightBars",
+          //   labels: ["bmi", "age"],
+          // }}
         />
       );
       break;

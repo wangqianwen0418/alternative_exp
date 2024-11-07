@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface BarProps {
   allShapValues: number[][];
@@ -11,7 +11,9 @@ interface BarProps {
   annotation?: Annotation;
 }
 
-type Annotation = { type: "verticalLine"; xValue: number };
+type Annotation =
+  | { type: "verticalLine"; xValue: number }
+  | { type: "highlightBars"; labels: string[] };
 
 export default function Bar(props: BarProps) {
   const margin = [200, 10, 100, 40];
@@ -25,6 +27,9 @@ export default function Bar(props: BarProps) {
     offsets,
     annotation,
   } = props;
+
+  const [selectedBars, setSelectedBars] = useState<string[]>([]);
+
   let avgShapeValues: { [featureName: string]: number } = {};
   for (let i = 0; i < featureNames.length; i++) {
     avgShapeValues[featureNames[i]] =
@@ -47,14 +52,13 @@ export default function Bar(props: BarProps) {
     .domain([0, Math.max(...allShapValues.flat().map((d) => Math.abs(d)))])
     .range([margin[0], width - margin[2]]);
 
-  // Calculate the 95% confidence interval for each feature
   const confidenceIntervals: { [key: string]: [number, number] } = {};
   featureNames.forEach((featureName, index) => {
     const values = allShapValues.map((val) => Math.abs(val[index]));
     const mean = d3.mean(values) as number;
     const stdDev = d3.deviation(values) as number;
     const n = values.length;
-    const t = 1.96; // 95% confidence interval
+    const t = 1.96;
     const confidenceInterval = t * (stdDev / Math.sqrt(n));
     confidenceIntervals[featureName] = [
       mean - confidenceInterval,
@@ -71,7 +75,78 @@ export default function Bar(props: BarProps) {
       .attr("transform", `translate(0,${height - margin[3]})`);
 
     xAxisGroup.call(d3.axisBottom(xScale));
-  }, [allShapValues, featureNames, height, width, id, offsets]);
+
+    if (!annotation || annotation.type !== "highlightBars") {
+      d3.select(`g.bar#${id}`).selectAll("g.brush").remove();
+
+      const brushGroup = d3
+        .select(`g.bar#${id}`)
+        .append("g")
+        .attr("class", "brush");
+
+      const brushEnd = (event: any) => {
+        const selection = event.selection;
+
+        if (!selection) {
+          setSelectedBars([]);
+          d3.selectAll(`g.bar#${id} .bars g.bar-group`).attr("opacity", 1);
+          return;
+        }
+
+        const [y0, y1] = selection;
+
+        const brushedBars = sortedAvgShapeValues
+          .filter(([featureName]) => {
+            const yPos = yScale(featureName);
+            if (yPos === undefined) return false;
+            return (
+              y0 <= yPos + yScale.bandwidth() / 2 &&
+              yPos + yScale.bandwidth() / 2 <= y1
+            );
+          })
+          .map(([featureName]) => featureName);
+
+        setSelectedBars(brushedBars);
+
+        d3.selectAll(`g.bar#${id} .bars g.bar-group`).each(function () {
+          const featureName = d3.select(this).attr("data-feature-name");
+          if (brushedBars.length === 0) {
+            d3.select(this).attr("opacity", 1);
+          } else {
+            const isSelected = brushedBars.includes(featureName);
+            d3.select(this).attr("opacity", isSelected ? 1 : 0.3);
+          }
+        });
+      };
+
+      const brush = d3
+        .brushY()
+        .extent([
+          [margin[0], margin[1]],
+          [width - margin[2], height - margin[3]],
+        ])
+        .on("end", brushEnd);
+
+      brushGroup.call(brush);
+
+      return () => {
+        d3.select(`g.bar#${id} .brush`).remove();
+      };
+    } else if (annotation.type === "highlightBars") {
+      d3.select(`g.bar#${id}`).selectAll("g.brush").remove();
+      setSelectedBars(annotation.labels);
+    }
+  }, [
+    allShapValues,
+    featureNames,
+    height,
+    width,
+    id,
+    offsets,
+    annotation,
+    sortedAvgShapeValues,
+    yScale,
+  ]);
 
   return (
     <g
@@ -89,8 +164,15 @@ export default function Bar(props: BarProps) {
 
       <g className="bars">
         {sortedAvgShapeValues.map(([featureName, value], index) => {
+          const isSelected =
+            selectedBars.length > 0 ? selectedBars.includes(featureName) : true;
           return (
-            <g key={featureName}>
+            <g
+              key={featureName}
+              className="bar-group"
+              data-feature-name={featureName}
+              opacity={isSelected ? 1 : 0.3}
+            >
               <text
                 x={margin[0] - 2}
                 y={(yScale(featureName) as number) + yScale.bandwidth() * 0.8}
@@ -99,7 +181,7 @@ export default function Bar(props: BarProps) {
                 {featureName}
               </text>
               <rect
-                key={featureName}
+                className="bar-rect"
                 x={xScale(0)}
                 y={yScale(featureName)}
                 width={xScale(value) - xScale(0)}
@@ -107,6 +189,7 @@ export default function Bar(props: BarProps) {
                 fill="steelblue"
               />
               <line
+                className="error-bar"
                 x1={xScale(confidenceIntervals[featureName][0])}
                 x2={xScale(confidenceIntervals[featureName][1])}
                 y1={(yScale(featureName) as number) + yScale.bandwidth() / 2}
