@@ -65,7 +65,7 @@ export default function Explanation() {
           selectedIndices={selectedIndices}
           setSelectedIndices={setSelectedIndices}
           // annotation={{ type: "highlightRange", shapRange: [-20, 30] }}
-          // annotation={{ type: "verticalLine", xValue: 15 }}
+          // annotation={{ type: "singleLine", xValue: 15 }}
           // annotation={{ type: "highlightPoints", shapValues: test_random_shap }}
         />
       );
@@ -86,10 +86,10 @@ export default function Explanation() {
           //   xValueRange: [-0.04, 0.08],
           //   yValueRange: [-20, 30],
           // }}
-          // annotation={{ type: "verticalLine", xValue: 0.04 }}
+          // annotation={{ type: "singleLine", xValue: 0.04 }}
           // annotation={{
           //   type: "highlightPoints",
-          //   featureValues: test_random_feature,
+          //   xValues: test_random_feature,
           // }}
         />
       );
