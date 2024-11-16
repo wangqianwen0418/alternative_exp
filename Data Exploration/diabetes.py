@@ -234,4 +234,11 @@ t_statistic, p_value = ttest_rel(bmi_shape_values, s5_shape_values)
 print(f"T-statistic: {t_statistic}")
 print(f"P-value: {p_value}")
 
-# %%
+shap.plots.bar(shap_values)
+shap.plots.scatter(explanation[:, "bmi"], color=explanation[:, "age"])
+shap.plots.scatter(explanation[:, "age"])
+shap.plots.scatter(explanation[:, "s2"])
+shap.plots.scatter(explanation[:, "s5"])
+shap.plots.scatter(explanation[:, "bp"])
+shap.plots.scatter(explanation[:, "sex"])
+shap.plots.heatmap(shap_values)

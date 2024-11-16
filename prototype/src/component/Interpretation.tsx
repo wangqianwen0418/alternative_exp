@@ -61,9 +61,9 @@ export default function Interpretation() {
     setModalVisible(true);
   };
 
-  // Handle full submission including the "Check with Additional Visualization"
+  const isUserStudy = pageName?.includes("question");
+
   const handleSubmission = async () => {
-    if (!freeText.trim()) return;
     if (!freeText.trim()) return;
     setIsLoading(true);
 
@@ -73,7 +73,11 @@ export default function Interpretation() {
         shapData.prediction_name
       );
       try {
-        const parsedInput: TInsight = await parseInput(freeText, apiKey, prompt);
+        const parsedInput: TInsight = await parseInput(
+          freeText,
+          apiKey,
+          prompt
+        );
         setInsight(parsedInput);
       } catch (error) {
         console.error("Error parsing input: ", error);
@@ -142,14 +146,18 @@ export default function Interpretation() {
         />
 
         <div style={{ alignItems: "center" }}>
-          <Button
-            variant="outlined"
-            color="primary"
-            style={{ margin: "10px 5px" }}
-            onClick={handleSubmission}
-          >
-            Check with Additional Visualization
-          </Button>
+          {/* Conditionally render the button if the user is NOT in the user study */}
+          {!isUserStudy && (
+            <Button
+              variant="outlined"
+              disabled={isSubmitted}
+              color="primary"
+              style={{ margin: "10px 5px" }}
+              onClick={handleSubmission}
+            >
+              Check with Additional Visualization
+            </Button>
+          )}
 
           {/* New Parse Button */}
           <Button
@@ -161,7 +169,6 @@ export default function Interpretation() {
             Parse
           </Button>
         </div>
-
         {isLoading ? (
           <CircularProgress />
         ) : (

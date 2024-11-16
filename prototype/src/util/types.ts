@@ -1,6 +1,7 @@
 type TPageBase = {
   userText: string;
   initVis: "beeswarm" | "bar" | "scatter" | string;
+  secondVis: "beeswarm" | "bar" | "scatter" | string | undefined;
   insight: TInsight;
 };
 
@@ -11,7 +12,7 @@ export type TCase = TPageBase & {
 
 export type TQuestion = TPageBase & {
   pageName: "question";
-  testCondition: "no vis" | "random vis" | "ours";
+  testCondition: "random vis" | "ours";
   index: number;
   groundTruth: boolean;
 };
@@ -33,14 +34,14 @@ export type TInsight1 = {
 export type TInsight2 = {
   variables: [TVariable, TVariable];
   type: "comparison";
-  relation: "greater" | "less" | "equal";
+  relation: "greater than" | "less than" | "equal to";
   condition: { featureName: string; range: [number, number] } | undefined;
 };
 
 export type TInsight3 = {
   variables: [TVariable, TVariable];
   type: "correlation";
-  relation: "positively" | "negatively";
+  relation: "positively" | "negatively" | "no correlation";
   condition: { featureName: string; range: [number, number] } | undefined;
 };
 
@@ -53,6 +54,6 @@ export type TInsight4 = {
 
 export type TVariable = {
   featureName: string;
-  transform: "average" | undefined;
-  type: "value" | "contribution";
+  transform: "average" | "deviation" | undefined;
+  type: "value of" | "contribution of" | "number of instances";
 };

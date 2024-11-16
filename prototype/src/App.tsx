@@ -1,14 +1,15 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import Grid from "@mui/material/Grid";
 import { useState } from "react";
 import { useAtom } from "jotai";
 import {
   insightAtom,
-  isSubmittedAtom,
   freeTextAtom,
   initVisAtom,
   pageNameAtom,
   questionIndexAtom,
+  uuidAtom,
+  questionOrderAtom,
 } from "./store";
 
 import Explanation from "./component/Explanation";
@@ -36,16 +37,36 @@ import {
   Box,
   Paper,
 } from "@mui/material";
+import { v4 as uuidv4 } from "uuid";
+import Cookies from "js-cookie";
+import { generateQuestionOrder } from "./util/questionBalance";
 
 function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
   const [open, setOpen] = useState(false); // sider drawer
 
-  const [isSubmitted] = useAtom(isSubmittedAtom);
   const [, setInsight] = useAtom(insightAtom);
   const [, setFreetext] = useAtom(freeTextAtom);
   const [, setInitVis] = useAtom(initVisAtom);
   const [, setName] = useAtom(pageNameAtom);
   const [, setQuestionIndex] = useAtom(questionIndexAtom);
+  const [, setUUID] = useAtom(uuidAtom);
+  const [, setQuestionOrder] = useAtom(questionOrderAtom);
+
+  let uuid = Cookies.get("uuid");
+
+  if (!uuid) {
+    uuid = uuidv4();
+    Cookies.set("uuid", uuid);
+  }
+
+  useEffect(() => {
+    setUUID(uuid);
+    // setUUID("d42ccc56-b330-427b-9b4f-d99b0a626b5b"); // test uuid
+    // setUUID("d46741cf-57b6-43a1-a661-119204bb7a00"); // test uuid
+    const questionIndexesArray = generateQuestionOrder(uuid!);
+    console.log(questionIndexesArray);
+    setQuestionOrder(questionIndexesArray);
+  }, []);
 
   useEffect(() => {
     setFreetext(appProps.userText);
@@ -138,7 +159,10 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
       </Grid>
       <Grid item xs={4} className="App-body">
         <Interpretation />
-        {"index" in appProps && isSubmitted && <UserResponse />}
+        {"index" in appProps && <UserResponse />}
+        {/* <Paper style={{ padding: "15px", marginTop: "10px" }}>
+          <CounterbalanceButton />
+        </Paper> */}
       </Grid>
       <Grid item xs={7} className="App-body">
         <Explanation />
