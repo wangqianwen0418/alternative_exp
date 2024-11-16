@@ -6,10 +6,13 @@ import {
   CircularProgress,
   Modal,
   Box,
+  IconButton,
 } from "@mui/material";
+import React from "react";
+import { Settings } from "@mui/icons-material";
 
 import "./Interpretation.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import shapData from "../assets/shap_diabetes.json";
 import { TInsight } from "../util/types";
@@ -28,48 +31,123 @@ export default function Interpretation() {
   const [freeText, setFreeText] = useAtom(freeTextAtom);
   const [insight, setInsight] = useAtom(insightAtom);
   const [pageName] = useAtom(pageNameAtom);
-  const [modalVisible, setModalVisible] = useState<boolean>(
-    pageName ? pageName.includes("Free") : false
-  );
-  const [isLoading, setIsLoading] = useState(false); // New loading state
-  const [apiKey, setApiKey] = useState("");
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
 
+  const [isLoading, setIsLoading] = useState(false); // Loading state
+  const [apiKey, setApiKey] = useState<string>("");
+
+  // 1. Use useEffect to check if an API key is already stored in localStorage
+  useEffect(() => {
+    const storedApiKey = localStorage.getItem("apiKey");
+    console.log("Stored API key: " + storedApiKey);
+
+    if (pageName?.includes("Free") && !storedApiKey) {
+      setModalVisible(true);
+    }
+
+    if (storedApiKey) {
+      setApiKey(storedApiKey);
+    }
+  }, [pageName]);
+
+  const handleApiKeySubmit = () => {
+    localStorage.setItem("apiKey", apiKey);
+    setModalVisible(false);
+  };
+
+  const clearApiKey = () => {
+    localStorage.removeItem("apiKey");
+    setApiKey("");
+    setModalVisible(true);
+  };
+
+  // Handle full submission including the "Check with Additional Visualization"
   const isUserStudy = pageName?.includes("question");
 
   const handleSubmission = async () => {
-    if (insight == undefined) {
-      setIsLoading(true); // Start loading
+    if (!freeText.trim()) return;
+    if (!freeText.trim()) return;
+    setIsLoading(true);
+
+    if (insight === undefined) {
       const prompt = generatePrompt(
         shapData.feature_names,
         shapData.prediction_name
       );
-      const parsedInput: TInsight = await parseInput(freeText, apiKey, prompt);
-      setInsight(parsedInput);
-      setIsLoading(false); // Stop loading
+      try {
+        const parsedInput: TInsight = await parseInput(
+          freeText,
+          apiKey,
+          prompt
+        );
+        setInsight(parsedInput);
+      } catch (error) {
+        console.error("Error parsing input: ", error);
+      }
     }
+    setIsLoading(false);
     setIsSubmitted(true);
+  };
+
+  // Handle the new "Parse" button click (parse only without submission state change)
+  const handleParseOnly = async () => {
+    if (!freeText.trim()) return;
+    setIsLoading(true);
+
+    const prompt = generatePrompt(
+      shapData.feature_names,
+      shapData.prediction_name
+    );
+    try {
+      const parsedInput: TInsight = await parseInput(freeText, apiKey, prompt);
+      setInsight(parsedInput); // Update insight to reflect the newly parsed input
+    } catch (error) {
+      console.error("Error parsing input: ", error);
+    }
+    setIsLoading(false);
+  };
+
+  const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFreeText(e.target.value);
+    setIsSubmitted(false);
   };
 
   return (
     <>
       <Paper style={{ padding: "15px" }}>
-        <Typography variant="h5" gutterBottom>
-          Interpretation
-        </Typography>
+        <Box display="flex" alignItems="baseline">
+          <Typography variant="h5" gutterBottom>
+            Interpretation
+          </Typography>
+          {pageName?.includes("Free") && (
+            <IconButton
+              onClick={clearApiKey}
+              aria-label="settings"
+              sx={{
+                color: "#aaaaaaa",
+                border: "1px solid",
+                borderRadius: "8px",
+                padding: "4px",
+                width: "24px",
+                height: "24px",
+                ml: 1,
+              }}
+            >
+              <Settings sx={{ fontSize: 12 }} />
+            </IconButton>
+          )}
+        </Box>
         <TextField
           id="outlined-basic"
-          label="e.g., a high bmi leads to large diabete progression"
+          label="e.g., a high bmi leads to large diabetes progression"
           value={freeText}
-          onChange={(e) =>
-            pageName?.includes("Free") && setFreeText(e.target.value)
-          }
+          onChange={handleTextChange}
           multiline
           rows={2}
           fullWidth
         />
 
         <div style={{ alignItems: "center" }}>
-          {/* Conditionally render the button if the user is NOT in the user study */}
           {!isUserStudy && (
             <Button
               variant="outlined"
@@ -81,12 +159,31 @@ export default function Interpretation() {
               Check with Additional Visualization
             </Button>
           )}
+          <Button
+            variant="outlined"
+            color="primary"
+            style={{ margin: "10px 5px" }}
+            onClick={handleSubmission}
+          >
+            Check with Additional Visualization
+          </Button>
+
+          {/* New Parse Button */}
+          <Button
+            variant="contained"
+            color="secondary"
+            style={{ margin: "10px 5px" }}
+            onClick={handleParseOnly}
+          >
+            Parse
+          </Button>
+          {/* Conditionally render the button if the user is NOT in the user study */}
         </div>
 
         {isLoading ? (
-          <CircularProgress></CircularProgress>
+          <CircularProgress />
         ) : (
-          isSubmitted && (
+          (isSubmitted || insight) && (
             <Paper className="parse-input" elevation={0}>
               <b>Formatted: </b>
               {GenerateTextTemplates(insight)}
@@ -121,7 +218,7 @@ export default function Interpretation() {
             variant="contained"
             color="primary"
             style={{ margin: "10px 5px" }}
-            onClick={() => setModalVisible(false)}
+            onClick={handleApiKeySubmit}
           >
             Submit
           </Button>
@@ -130,3 +227,4 @@ export default function Interpretation() {
     </>
   );
 }
+//test check

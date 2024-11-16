@@ -15,7 +15,6 @@ import {
 import Explanation from "./component/Explanation";
 import Interpretation from "./component/Interpretation";
 import UserResponse from "./component/UserResponse";
-import CounterbalanceButton from "./component/QuestionBalanceCheck";
 import { TCase, TQuestion } from "./util/types";
 import { CASES } from "./util/cases";
 
@@ -98,7 +97,7 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
 
         {CASES.map((c) => (
           <ListItem key={c.pageName} disablePadding>
-            <ListItemButton href={c.href}>
+            <ListItemButton href={`#${c.href}`}>
               <ListItemIcon>
                 <TroubleShootIcon />
               </ListItemIcon>

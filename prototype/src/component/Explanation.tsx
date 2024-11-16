@@ -11,7 +11,6 @@ import React from "react";
 import Swarm from "./Swarm";
 import Scatter from "./Scatter";
 import Bar from "./Bar";
-import Heatmap from "./Heatmap";
 import { useAtom } from "jotai";
 import { initVisAtom, insightAtom, isSubmittedAtom } from "../store";
 
@@ -180,7 +179,7 @@ export default function Explanation() {
       <Typography variant="h5" gutterBottom>
         Visual Explanation
       </Typography>
-      <svg className="swarm" width={1300} height="70vh">
+      <svg className="swarm" width={900} height="70vh">
         {initialVisualization}
 
         {isSubmitted && additionalVisualizations}

@@ -5,7 +5,6 @@ import time
 
 import numpy as np
 from sklearn.model_selection import train_test_split
-import matplotlib.pyplot as plt
 
 import shap
 import pandas as pd
@@ -45,7 +44,6 @@ explainer = shap.TreeExplainer(rforest)
 # explainer = shap.KernelExplainer(model.predict, X_train_summary)
 
 shap_values = explainer(X)
-explanation = explainer(X[:1000])
 
 #%%
 import json
