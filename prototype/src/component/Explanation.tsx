@@ -7,7 +7,7 @@ import {
 } from "../util/diabetesHeatmapData";
 import { useState } from "react";
 import React from "react";
-
+import Heatmap from "./Heatmap";
 import Swarm from "./Swarm";
 import Scatter from "./Scatter";
 import Bar from "./Bar";
