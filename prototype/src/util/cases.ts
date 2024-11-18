@@ -22,6 +22,11 @@ export const CASES: TCase[] = [
       type: "comparison",
       relation: "greater than",
       condition: undefined,
+      graph: {
+        graphType: "Bar",
+        xValues: "None",
+        yValues: "None",
+      },
     },
   },
   {
@@ -37,11 +42,20 @@ export const CASES: TCase[] = [
           type: "contribution of",
           transform: undefined,
         },
-        0,
+        0 as number,
       ],
       type: "read",
       relation: "greater than",
       condition: undefined,
+      graph: {
+        graphType: "Swarm",
+        xValues: "BMI",
+        yValues: "BMI",
+        annotation: {
+          type: "verticalLine",
+          value: 0,
+        },
+      },
     },
   },
   {
@@ -62,7 +76,19 @@ export const CASES: TCase[] = [
       type: "correlation",
       relation: "positively",
       condition: undefined,
+      graph: {
+        graphType: "Scatter",
+        xValues: "Age",
+        yValues: "Age",
+      },
     },
+  },
+  {
+    pageName: "Case 4",
+    href: "/case4",
+    userText: "bp contributes more to the prediction than age.",
+    initVis: "heatmap",
+    insight: undefined,
   },
   {
     pageName: "Free Exploration",

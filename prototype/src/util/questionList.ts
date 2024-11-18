@@ -1,4 +1,4 @@
-import { TQuestion } from "./types";
+import { TQuestion, TVariable, TInsight, TGraph, TAnnotation} from "./types";
 
 export const QuestionList: TQuestion[] = [
   {
@@ -23,6 +23,11 @@ export const QuestionList: TQuestion[] = [
       type: "comparison",
       relation: "greater than",
       condition: undefined,
+      graph: {
+        graphType: "Bar",
+        xValues: "none",
+        yValues: "none",
+      },
     },
     testCondition: "no vis",
     groundTruth: true,
@@ -31,7 +36,7 @@ export const QuestionList: TQuestion[] = [
     index: 1,
     pageName: "question",
     userText:
-      "Blood Sugar level always contributes positively for predicting diabetes progression.",
+      "BMI always contributes positively for predicting diabetes progression.",
     initVis: "bar",
     insight: {
       variables: [
@@ -45,6 +50,15 @@ export const QuestionList: TQuestion[] = [
       type: "read",
       relation: "greater than",
       condition: undefined,
+      graph: {
+        graphType: "Swarm",
+        xValues: "BMI",
+        yValues: "BMI",
+        annotation: {
+          type: "verticalLine",
+          value: 0,
+        },
+      }
     },
     testCondition: "random vis",
     groundTruth: true,
@@ -67,6 +81,11 @@ export const QuestionList: TQuestion[] = [
       type: "correlation",
       relation: "positively",
       condition: undefined,
+      graph: {
+        graphType: "Scatter",
+        xValues: "Age",
+        yValues: "Age",
+      },
     },
     testCondition: "ours",
     groundTruth: true,

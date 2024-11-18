@@ -4,16 +4,13 @@ import { TInsight } from "./types";
 export const generatePrompt = (
   feature_names: string[],
   prediction_name: string
-) => `You are a bot that extracts the content from User Interpretations (“insight” ) of Graphs and formats them in a structured way. The graphs in question are centered around the way that a machine learning system treats certain features/variables.  You will return a JSON object containing specific information from the structured sentence. 
+) => `
+You are a bot that extracts structured content from User Interpretations (“insight”) of graphs related to how a machine learning system treats certain features. You will output a JSON object with specific information. 
 
-You are a bot that extracts the content from User Interpretations (“insight” ) of Graphs and formats them in a structured way. The graphs in question are centered around the way that a machine learning system treats certain features/variables.  You will return a JSON object containing specific information from the structured sentence. 
+First, ensure that all features mentioned in the insight are in this list: ${feature_names.join(", ")}. If a feature is not in the list, set Variables to ["ERROR"]. Abbreviations (like "BMI" for "Body Mass Index") are fine.
 
-Before you start, you need to make sure that any features/variables that are present are in this list: ${feature_names.join(", ")}. 
-It's fine if they use abbreviations/the full form of an abbreviation (ie Body Mass Index for BMI and vice versa), but if the user's interpretation describes a feature that is not present in the list, set the Variables value to ["ERROR"]. This is very important, do not forget about this!
+Next, determine the Category of the insight based on these descriptions: 
 
-Assuming that all works out, the first thing I need you to determine is the Category that a particular “insight” belongs to. 
-
-Here’s some information about the categories: 
     Category 1:
     Attribution (DV) by Feature (IV), univariate. 
     Possible Examples: The <feature> values contribute at least <constant> to the <attribution>, The average contribution of F_i to the prediction is larger than <constant>
@@ -37,37 +34,39 @@ Here’s some information about the categories:
 The first value in the JSON file you provide will be the category that the given insight belongs to (1,2,3,4). This will determine how we parse the rest of the insight going forward. 
 
 
-The remaining details we care about are as follows:
-Variables
-Variable Types (“value of”, “contribution of”, or "number of instances <restriction> of")
-Note: For the "number of instances of", there would be a restriction that you should include in the value. for example, you might suggest "number of instances above 5 of" or "number of instances below 3 of". 
-Variable Transformations ("average" or "deviations to the ")
-In the case of "correlation" (category 3), there might be two different variables with the same Feature Name. 
+Once the category is determined, the JSON should contain: 
+Variables: An array of variables with the format: 
+{
+  featureName: string,
+  transform: "average" | "deviations to the" | ""
+  type: "value of" | "contribution of" | "number of instances of <restriction> for" 
+}
+
+Note: For the "number of instances of <restriction> of", there would be a restriction that you should include in the value. for example, you might suggest "number of instances above 5 of" or "number of instances below 3 of". 
+For Category 2, you may have "number of instances <condition> for" -- for example, for the input prompt "age has more instances above 3 than s2", type would be "number of instances above 3 for".
+
+If "correlation" (category 3) involves both value and contribution of the same feature, include both in the array. 
 For example: "There is correlation between the contribution of bp to predictions and the bp values"
 In this case, there are two variables: contribution of BP and BP values. 
-So the variables array should have length 2.
-In the case of "comparison" (Category 2), there is a special third option for variable types: "number of instances <condition> for " would be the value you should use in the Variable Types field if this is similar to what you find in the insight statement.
-For example, suppose the input prompt was as follows: "age has more instances above 3 than s2". Then, your Variable Type value would be "number of instances above 3 for". This is vital to make sure that the resulting program runs smoothly. 
 
-Numbers: If there are any constants in the core part of the insight statement, they go here (in an array). If not, this will be an empty array. This array will *usually* have length 1, but not necessarily.
-It is important to note that this only applies to numbers that are part of the main insight statement - if there are numbers in a condition/restriction (described below), those should not go in this array. 
+Numbers: Any constants in the core part of the insight statement should be included in an array. If none, leave it empty.  It is important to note that this only applies to numbers that are part of the main insight statement - if there are numbers in a condition/restriction (described below), those should not go in this array. 
 
-Type (options are “read”, “comparison”, “correlation”, or “featureInteraction”) - note that these are the same as the four categories. So if category 1, type=”read”, if category 2, type=”comparison” and so on
-Relationship (this depends on the category). Here are the options for each category:
+Type - this will match the category. Options are “read”, “comparison”, “correlation”, or “featureInteraction”) for categories 1-4 respectively.
+Relationship: Based on the category
 Category 1 (“read”): options are “greater than”, “less than”, “equal to”
 Category 2 (“comparison”): options are “greater than”, “less than”, “equal to”
 Category 3 (“correlation”): options are “positively” or “negatively”
 Category 4 (“featureInteraction”): options are “same” or “different”
-The last value in the JSON will be Condition. 
-Condition refers to a restriction on a range for a given variable. For example, in the statement “BMI is the most important feature in predicting diabetes risk when the value is above 25”, the variable being restricted is BMI and the range of the restriction is 25 to infinity. 
-In the JSON, this should be represented as follows: a nested JSON object that contains a featureName (string) and ‘range’ (array of two numbers). In this example, the Condition value would look like this:
+
+Condition: refers to restrictions on variable values. 
+Example: “BMI is the most important feature in predicting diabetes risk when the value is above 25”
 Condition: {
 	featureName: “BMI”,
 	range: [25, infinity]
 }
-In the case of Category 4, there will be TWO ranges included in the condition, formatted as an array. 
-Here's an example: Suppose we have the following statement
-"The correlation between bmi and its feature values is stronger when the feature value for age is in the range 0.05 to 0.1 compared to -0.01 to 0"
+If no condition, this will be an empty object.
+For Category 4, there will be TWO ranges in the condition. 
+Example: "The correlation between bmi and its feature values is stronger when the feature value for age is in the range 0.05 to 0.1 compared to -0.01 to 0"
 
 Then condition would look like this:
 Condition: {
@@ -75,14 +74,51 @@ Condition: {
   range: [[0.05, 0.1], [-0.01, 0]]
 }
 
-If there is no condition, just include an empty JSON object: {}
+
+GraphType: This will have four options: "Swarm", "Scatter", "Bar", "Heatmap". 
+Here are the situations in which each one is most optimal:
+Swarm: for comparisons of distributions, instances, or multiple features. Shows individual data points.
+Scatter: for correlations.
+Bar: For average values
+Heatmap (note: shows how each feature contributes to the output for individual samples):
+When you want to see how different features impact the prediction for individual instances 
+
+XValues and YValues: This depends on the GraphType
+Swarm and Scatter: XValues and YValues are the name of one of the features we are looking at
+Bar and Heatmap: Set both to "None".
+
+Annotation: Possible Values:
+Vertical Line: When comparing to a single value,
+Highlight X Range: Highlighting a feature range,
+Highlight XY Range: Highlighting an X and Y range,
+Highlight Specific Data Points: For conditions that don't fit a range. 
+The optimal annotation to use will be based on constants/conditions included in the insight statement.
+Heatmaps will have no annotations.
+
+AnnotationParams will contain the number (or range) we are highlighting, or "None" if no annotation is required.
+This would either be a single number (for vertical line), an array of two numbers ([x_min, x_max] for X range), two arrays [[x_min, x_max], [y_min, y_max]] for XY Range, or a string "Specific Data Points" for Data Points. 
+
+Vertical line is more useful when we are comparing against a single value, Highlight X Range is more useful when we want to highlight data points within a range (so it will not be used for Bar Graphs), Highlight XY Range is most useful for Scatter plots with both X and Y restrictions, and Highlight Specific Data Points is more useful when we are examining a condition that does not fit neatly into a range. 
+For Heatmaps, there will be no annotations, so if the GraphType is Heatmap then both Annotation and AnnotationParams will be "None".
+
+
+For example, suppose the user input statement was "The average contribution of the bmi to the prediction is larger than 20". Since we are looking at the average contribution of each feature, the GraphType value would be "Bar".
+Then, XValues and YValues would both be "None". Annotation would be "Vertical Line" and AnnotationParams would be 20.
+Here's another example: 
+Suppose the user input statement was "bmi has more instances above 5 than sex". Since we are looking at individual data points (and comparing features), the GraphType value would be "Swarm".
+In this case, the XValues field should be "BMI", and the YValues field would just be "BMI". Once again, Annotation would be "Vertical Line" and AnnotationParams would be 5.
+
+One last example: Suppose the user input statement was "There is a negative correlation between the contribution of age to predictions and the age values when the feature value is between -0.10 and 0.00". 
+In this case, since we are looking at correlation, GraphType would be "Scatter". Then the XValues field would be "Age" and the YValues field would be "Age".  The Annotation field would be "Highlight Range", and AnnotationParams would be [-0.10, 0.00].
 
 
 Here’s an example of the full JSON:
 Suppose that the user input statement was “BMI is more important than age for predicting diabetes progression.” 
+In this case, since we are looking at a bivariate comparison between features, this would belong to Category 2.
 
-In this case, there are two variables: BMI and Age. Even though it is not specified, it is clear that this statement is referring to these on “average” (since we are not looking at specific values). Furthermore, we are looking at the contribution of BMI and age to diabetes progression (as opposed to the feature values themselves), so the variable type for both of these would be “contribution of”. So the Variables array (which will be in the JSON) will look like this: 
-variables: [
+There are two variables: BMI and Age. Even though it is not specified, it is clear that this statement is referring to these on “average”. We want contributions rather than feature values, so variable type for both of these would be “contribution of”.
+ 
+Variables: [
         {
           featureName: "bmi",
           transform: "average",
@@ -94,17 +130,46 @@ variables: [
           type: "contribution of",
         },
       ]
-Numbers, in this case, would be an empty array: []
-The relationship in this case is a comparison of two variables (category 2), so the type value will be “comparison” while the relation value will be “greater than”. 
-Condition would also be empty: {}
-
-
-So your final JSON should have the following structure:
-Category: (In this case, value would be 2)
-Variables: (in this case, value would be the array displayed above)
-Type (in this case, value would be “comparison”)
-Relationship: (In this case, value would be “greater than”)
+Numbers: []
+Type: Comparison
+Relationship: “greater than”. 
 Condition: {}
+GraphType: "Bar" - since we are comparing the average values of two different features.
+XValues would be "None".
+YValues would be "None".
+Annotation would be "None".
+AnnotationParams would be "None".
+
+
+Here is another full example:
+Suppose the user input statement was "There is a positive correlation between the contribution of bmi to predictions and the bmi values when the feature value is between 0.05 and 0.10".
+The final JSON would look like this:
+Category: 3
+Variables: [
+  {
+    featureName: "bmi",
+    transform: undefined,
+    type: "value of",
+  },
+  {
+    featureName: "bmi",
+    transform: undefined,
+    type: "contribution of",
+  },
+]
+Numbers: []
+Type: "correlation" 
+Relationship: "positively"
+Condition: {
+  featureName: "bmi",
+  range: [0.05, 0.10]
+}
+GraphType: "Scatter",
+XValues: "bmi",
+YValues: "bmi",
+Annotation: "Highlight X Range", 
+AnnotationParams: [0.05, 0.10]
+
 
 One thing that is important to note: Sometimes, constants (numbers) are implicitly present in the statement even if they are not explicitly stated. For example, in the sentence "bmi always contributes positively for predicting diabetes progression", the implied number is 0, since the sentence can be rewritten as "the contribution of bmi is always greater than 0".
 In these cases, make sure you include the implied constant in the numbers array.
@@ -186,28 +251,57 @@ export const parseInput = async (
       ) {
         console.error("Improper feature/prediction detected");
       } else {
-        console.log("JSON!!");
+        console.log("JSON from GPT!!");
         console.log(jsonObject);
         let variableArray = jsonObject.Variables;
-        if (jsonObject.Numbers && jsonObject.Numbers.length > 0){
+        if (jsonObject.Numbers && jsonObject.Numbers.length > 0) {
           variableArray.push(jsonObject.Numbers[0]);
-
         }
+
         return {
           variables: variableArray,
           type: jsonObject.Type,
           relation: jsonObject.Relationship,
-          condition: jsonObject.Condition
+          condition: jsonObject.Condition,
+          graph: {
+            graphType: jsonObject.GraphType,
+            xValues: jsonObject.XValues,
+            yValues: jsonObject.YValues,
+            ...(jsonObject.Annotation !== "None" && {
+              annotation: (() => {
+                switch (jsonObject.Annotation) {
+                  case "Highlight X Range":
+                    return {
+                      type: "highlightXRange",
+                      range: jsonObject.AnnotationParams, // A tuple of [min, max]
+                    };
+                  case "Highlight XY Range":
+                    return {
+                      type: "highlightXYRange",
+                      ranges: jsonObject.AnnotationParams,
+                    }
+                  case "Vertical Line":
+                    return {
+                      type: "verticalLine",
+                      value: jsonObject.AnnotationParams, // X value for the vertical line
+                    };
+                  case "Highlight Specific Data Points":
+                    return {
+                      type: "highlightDataPoints",
+                      dataPoints: [0,1,2,3,4,5,6],
+                    };
+                  default:
+                    return null; // Return null if there's no valid annotation type
+                }
+              })(),
+            }),
+          },
         } as TInsight;
-         
-
       }
     } catch (error) {
       console.error("Error parsing JSON:", error);
-      
     }
   } else {
     console.error("JSON string is null");
-    
   }
 };
