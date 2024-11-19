@@ -91,6 +91,7 @@ export const CASES: TCase[] = [
     href: "/case4",
     userText: "bp contributes more to the prediction than age.",
     initVis: "heatmap",
+    secondVis: undefined,
     insight: undefined,
   },
   {
