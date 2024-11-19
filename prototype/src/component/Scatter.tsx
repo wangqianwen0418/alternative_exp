@@ -155,19 +155,19 @@ export default function Scatter(props: ScatterProps) {
       let xHighlighted = true;
       let yHighlighted = true;
 
-      if (annotation.xValueRange) {
-        const [xMin, xMax] = annotation.xValueRange;
+      if (annotation.xRange) {
+        const [xMin, xMax] = annotation.xRange;
         xHighlighted = x >= xMin && x <= xMax;
       }
 
-      if (annotation.yValueRange) {
-        const [yMin, yMax] = annotation.yValueRange;
+      if (annotation.yRange) {
+        const [yMin, yMax] = annotation.yRange;
         yHighlighted = y >= yMin && y <= yMax;
       }
 
       return xHighlighted && yHighlighted;
-    } else if (annotation.type === "highlightPoints") {
-      return annotation.xValues.includes(x);
+    } else if (annotation.type === "highlightDataPoints") {
+      return annotation.dataPoints.includes(x);
     } else {
       return true;
     }
@@ -272,14 +272,14 @@ export default function Scatter(props: ScatterProps) {
           );
         }
       } else if (annotation.type === "highlightRange") {
-        const hasXRange = annotation.xValueRange !== undefined;
-        const hasYRange = annotation.yValueRange !== undefined;
+        const hasXRange = annotation.xRange !== undefined;
+        const hasYRange = annotation.yRange !== undefined;
 
         if (hasXRange && hasYRange) {
-          const [xMin, xMax] = annotation.xValueRange!;
+          const [xMin, xMax] = annotation.xRange!;
           const xStart = xScale(xMin);
           const xEnd = xScale(xMax);
-          const [yMin, yMax] = annotation.yValueRange!;
+          const [yMin, yMax] = annotation.yRange!;
           const yStart = yScale(yMin);
           const yEnd = yScale(yMax);
 
@@ -296,7 +296,7 @@ export default function Scatter(props: ScatterProps) {
             />
           );
         } else if (hasXRange) {
-          const [xMin, xMax] = annotation.xValueRange!;
+          const [xMin, xMax] = annotation.xRange!;
           const xStart = xScale(xMin);
           const xEnd = xScale(xMax);
 
@@ -321,7 +321,7 @@ export default function Scatter(props: ScatterProps) {
             />
           );
         } else if (hasYRange) {
-          const [yMin, yMax] = annotation.yValueRange!;
+          const [yMin, yMax] = annotation.yRange!;
           const yStart = yScale(yMin);
           const yEnd = yScale(yMax);
 

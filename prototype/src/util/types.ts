@@ -20,9 +20,9 @@ export type TQuestion = TPageBase & {
 
 export type TAnnotation = 
   | { type: "highlightDataPoints"; dataPoints: number[] } // An array of data points to highlight
-  | { type: "highlightXRange"; range: [number, number] } // A range along X axis
-  | { type: "highlightXYRange"; ranges: [[number, number], [number, number]]} // An X,Y range ([[x_min, x_max], [y_min, y_max]])
-  | { type: "verticalLine"; value: number }; // A vertical line at a specific X value
+  | { type: "highlightRange"; xRange?: [number, number], yRange?: [number, number] } // A range along X axis
+  | { type: "singleLine"; xValue?: number, yValue?: number } // A vertical line at a specific X value
+  | { type: "highlightBars"; labels: string[] };
 
 
 export type TGraph = {

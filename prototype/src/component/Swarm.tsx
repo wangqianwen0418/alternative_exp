@@ -17,9 +17,9 @@ export default function Swarm(props: SwarmProps) {
   let margin = [10, 40, 40, 10],
     radius = 2,
     leftTitleMargin = 40;
-    const [selectedPoints, setSelectedPoints] = useState<number[]>([]);
-    const [brushSelection, setBrushSelection] = useState<[number, number] | null>(
-      null
+  const [selectedPoints, setSelectedPoints] = useState<number[]>([]);
+  const [brushSelection, setBrushSelection] = useState<[number, number] | null>(
+    null
   );
 
   const {
@@ -227,11 +227,14 @@ export default function Swarm(props: SwarmProps) {
 
     if (annotation.type === "highlightRange") {
       const x = xValues[i];
-      const [minRange, maxRange] = annotation.shapRange;
+      const [minRange, maxRange] =
+        annotation.xRange && annotation.xRange.length === 2
+          ? annotation.xRange
+          : [0, 0];
       return x >= minRange && x <= maxRange;
-    } else if (annotation.type === "highlightPoints") {
+    } else if (annotation.type === "highlightDataPoints") {
       const x = xValues[i];
-      return annotation.shapValues.includes(x);
+      return annotation.dataPoints.includes(x);
     } else {
       return true;
     }
@@ -332,7 +335,10 @@ export default function Swarm(props: SwarmProps) {
           );
         }
       } else if (annotation.type === "highlightRange") {
-        const [minRange, maxRange] = annotation.shapRange;
+        const [minRange, maxRange] =
+          annotation.xRange && annotation.xRange.length === 2
+            ? annotation.xRange
+            : [0, 0];
         const xStart = xScale(minRange);
         const xEnd = xScale(maxRange);
 

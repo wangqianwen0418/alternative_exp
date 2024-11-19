@@ -203,24 +203,24 @@ export default function Bar(props: BarProps) {
         Average contribution to the prediction
       </text>
 
-      {annotation?.type === "verticalLine" && (
+      {annotation?.type === "singleLine" && (
         <>
           <line
-            x1={xScale(annotation.value)}
+            x1={xScale(annotation.xValue ?? 0)}
             y1={margin[1]}
-            x2={xScale(annotation.value)}
+            x2={xScale(annotation.xValue ?? 0)}
             y2={height - margin[3]}
             stroke="black"
             strokeDasharray="4,2"
           />
 
           <text
-            x={xScale(annotation.value) + 5} // Position slightly to the right of the line
+            x={xScale(annotation.xValue ?? 0) + 5} // Position slightly to the right of the line
             y={margin[1] + 75} // Position slightly below the top
             fill="black"
             fontSize="12px"
           >
-            {`val=${annotation.value.toFixed(2)}`} {/* Add the label */}
+            {`val=${(annotation.xValue ?? 0).toFixed(2)}`} {/* Add the label */}
           </text>
         </>
       )}
