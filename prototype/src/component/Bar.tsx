@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 import { useEffect, useState } from "react";
+import { TAnnotation } from "../util/types";
 
 interface BarProps {
   allShapValues: number[][];
@@ -8,12 +9,8 @@ interface BarProps {
   height: number;
   id: string;
   offsets: number[];
-  annotation?: Annotation;
+  annotation?: TAnnotation;
 }
-
-type Annotation =
-  | { type: "verticalLine"; xValue: number }
-  | { type: "highlightBars"; labels: string[] };
 
 export default function Bar(props: BarProps) {
   const margin = [200, 10, 100, 40];
@@ -52,6 +49,7 @@ export default function Bar(props: BarProps) {
     .domain([0, Math.max(...allShapValues.flat().map((d) => Math.abs(d)))])
     .range([margin[0], width - margin[2]]);
 
+    // Calculate the 95% confidence interval for each feature
   const confidenceIntervals: { [key: string]: [number, number] } = {};
   featureNames.forEach((featureName, index) => {
     const values = allShapValues.map((val) => Math.abs(val[index]));
@@ -205,15 +203,26 @@ export default function Bar(props: BarProps) {
         Average contribution to the prediction
       </text>
 
-      {annotation?.type === "verticalLine" && (
-        <line
-          x1={xScale(annotation.xValue)}
-          y1={margin[1]}
-          x2={xScale(annotation.xValue)}
-          y2={height - margin[3]}
-          stroke="black"
-          strokeDasharray="4,2"
-        />
+      {annotation?.type === "singleLine" && (
+        <>
+          <line
+            x1={xScale(annotation.xValue ?? 0)}
+            y1={margin[1]}
+            x2={xScale(annotation.xValue ?? 0)}
+            y2={height - margin[3]}
+            stroke="black"
+            strokeDasharray="4,2"
+          />
+
+          <text
+            x={xScale(annotation.xValue ?? 0) + 5} // Position slightly to the right of the line
+            y={margin[1] + 75} // Position slightly below the top
+            fill="black"
+            fontSize="12px"
+          >
+            {`val=${(annotation.xValue ?? 0).toFixed(2)}`} {/* Add the label */}
+          </text>
+        </>
       )}
     </g>
   );

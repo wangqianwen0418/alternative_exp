@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 import { useEffect, useState, useMemo } from "react";
+import { TAnnotation } from "../util/types";
 
 interface SwarmProps {
   xValues: number[];
@@ -9,18 +10,17 @@ interface SwarmProps {
   id: string;
   selectedIndices: number[];
   setSelectedIndices: (index: number[]) => void;
-  annotation?: Annotation;
+  annotation?: TAnnotation;
 }
 
-type Annotation =
-  | { type: "highlightPoints"; shapValues: number[] }
-  | { type: "highlightRange"; shapRange: [number, number] }
-  | { type: "singleLine"; xValue?: number; yValue?: number };
-
 export default function Swarm(props: SwarmProps) {
-  const margin = [10, 40, 40, 10],
+  let margin = [10, 40, 40, 10],
     radius = 2,
     leftTitleMargin = 40;
+  const [selectedPoints, setSelectedPoints] = useState<number[]>([]);
+  const [brushSelection, setBrushSelection] = useState<[number, number] | null>(
+    null
+  );
 
   const {
     xValues,
@@ -227,11 +227,14 @@ export default function Swarm(props: SwarmProps) {
 
     if (annotation.type === "highlightRange") {
       const x = xValues[i];
-      const [minRange, maxRange] = annotation.shapRange;
+      const [minRange, maxRange] =
+        annotation.xRange && annotation.xRange.length === 2
+          ? annotation.xRange
+          : [0, 0];
       return x >= minRange && x <= maxRange;
-    } else if (annotation.type === "highlightPoints") {
+    } else if (annotation.type === "highlightDataPoints") {
       const x = xValues[i];
-      return annotation.shapValues.includes(x);
+      return annotation.dataPoints.includes(x);
     } else {
       return true;
     }
@@ -332,7 +335,10 @@ export default function Swarm(props: SwarmProps) {
           );
         }
       } else if (annotation.type === "highlightRange") {
-        const [minRange, maxRange] = annotation.shapRange;
+        const [minRange, maxRange] =
+          annotation.xRange && annotation.xRange.length === 2
+            ? annotation.xRange
+            : [0, 0];
         const xStart = xScale(minRange);
         const xEnd = xScale(maxRange);
 

@@ -18,7 +18,7 @@ export default function Heatmap({
   height,
   title,
 }: HeatmapProps) {
-  const svgRef = useRef<SVGSVGElement>(null);
+  const svgRef = useRef(null);
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
   const [leftMargin, setLeftMargin] = useState<number>(100);
   const groupRef = useRef<SVGGElement>(null);
@@ -66,7 +66,7 @@ export default function Heatmap({
       [datasets]
     );
 
-  const [minShap, maxShap] = useMemo(() => [-50, 50], []);
+  const [minShap, maxShap] = useMemo(() => [-2, 2], []);
 
   const colorScale = useMemo(
     () =>

@@ -1,4 +1,4 @@
-import { TQuestion } from "./types";
+import { TQuestion, TVariable, TInsight, TGraph, TAnnotation} from "./types";
 
 export const QuestionList: TQuestion[] = [
   {
@@ -110,11 +110,17 @@ export const QuestionList: TQuestion[] = [
           featureName: "age",
           type: "contribution of",
           transform: "average",
+          type: "contribution of",
         },
       ],
       type: "comparison",
       relation: "greater than",
       condition: undefined,
+      graph: {
+        graphType: "Bar",
+        xValues: "none",
+        yValues: "none",
+      },
     },
     testCondition: "random vis",
     groundTruth: true,
@@ -194,6 +200,15 @@ export const QuestionList: TQuestion[] = [
       type: "comparison",
       relation: "greater than",
       condition: undefined,
+      graph: {
+        graphType: "Swarm",
+        xValues: "BMI",
+        yValues: "BMI",
+        annotation: {
+          type: "verticalLine",
+          value: 0,
+        },
+      }
     },
     testCondition: "random vis",
     groundTruth: true,
@@ -275,6 +290,11 @@ export const QuestionList: TQuestion[] = [
       type: "correlation",
       relation: "positively",
       condition: undefined,
+      graph: {
+        graphType: "Scatter",
+        xValues: "Age",
+        yValues: "Age",
+      },
     },
     testCondition: "ours",
     groundTruth: true,

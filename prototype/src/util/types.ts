@@ -17,6 +17,22 @@ export type TQuestion = TPageBase & {
   groundTruth: boolean;
 };
 
+
+export type TAnnotation = 
+  | { type: "highlightDataPoints"; dataPoints: number[] } // An array of data points to highlight
+  | { type: "highlightRange"; xRange?: [number, number], yRange?: [number, number] } // A range along X axis
+  | { type: "singleLine"; xValue?: number, yValue?: number } // A vertical line at a specific X value
+  | { type: "highlightBars"; labels: string[] };
+
+
+export type TGraph = {
+  graphType: string;
+  xValues: string;
+  yValues: string;
+  annotation?: TAnnotation;
+};
+
+
 export type TInsight =
   | TInsight1
   | TInsight2
@@ -29,6 +45,8 @@ export type TInsight1 = {
   type: "read";
   relation: "greater than" | "less than" | "equal to";
   condition: { featureName: string; range: [number, number] } | undefined;
+  graph: TGraph;
+
 };
 
 export type TInsight2 = {
@@ -36,6 +54,7 @@ export type TInsight2 = {
   type: "comparison";
   relation: "greater than" | "less than" | "equal to";
   condition: { featureName: string; range: [number, number] } | undefined;
+  graph: TGraph;
 };
 
 export type TInsight3 = {
@@ -43,6 +62,7 @@ export type TInsight3 = {
   type: "correlation";
   relation: "positively" | "negatively" | "no correlation";
   condition: { featureName: string; range: [number, number] } | undefined;
+  graph: TGraph;
 };
 
 export type TInsight4 = {
@@ -50,10 +70,13 @@ export type TInsight4 = {
   type: "featureInteraction";
   relation: "same" | "different";
   condition: { featureName: string; range: [number, number][] } | undefined;
+  graph: TGraph;
 };
 
 export type TVariable = {
   featureName: string;
-  transform: "average" | "deviation" | undefined;
-  type: "value of" | "contribution of" | "number of instances";
+  transform: "average" | "deviation" | "" | undefined; //relax
+  type: "value of" | "contribution of" | `number of instances ${string} of`;
 };
+
+
