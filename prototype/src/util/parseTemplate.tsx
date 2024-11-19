@@ -47,7 +47,6 @@ export const GenerateTextTemplates = (insight: TInsight) => {
         <span className="label transform">
           {var2.transform} {var1.type}{" "}
         </span>{" "}
-        
         <span className="label featureName">{var2.featureName}</span>.{" "}
         {/* Add condition to check if insight.condition is not empty */}
         {insight.condition && Object.keys(insight.condition).length > 0 && (
@@ -116,7 +115,7 @@ export const GenerateTextTemplates = (insight: TInsight) => {
             <span className="label condition-range range-1">
               [{insight.condition.range[0][0]}, {insight.condition.range[0][1]}]
             </span>{" "}
-            compared to {" "}
+            compared to{" "}
             <span className="label condition-range range-2">
               [{insight.condition.range[1][0]}, {insight.condition.range[1][1]}]
             </span>

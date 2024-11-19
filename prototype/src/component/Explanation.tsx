@@ -1,12 +1,13 @@
 import { Paper, Typography } from "@mui/material";
 import shap_diabetes from "../assets/shap_diabetes.json";
-import { useState } from "react";
-import React from "react";
 import {
   diabetesShapValues,
   diabetesFeatureValues,
   diabetesLabels,
 } from "../util/diabetesHeatmapData";
+import { useState } from "react";
+import React from "react";
+
 import Swarm from "./Swarm";
 import Scatter from "./Scatter";
 import Bar from "./Bar";
@@ -61,10 +62,13 @@ export default function Explanation() {
           xValues={featureShapValues}
           colorValues={featureValues}
           width={500}
-          height={100}
+          height={300}
           id="bmi"
           selectedIndices={selectedIndices}
           setSelectedIndices={setSelectedIndices}
+          // annotation={{ type: "highlightRange", shapRange: [-20, 30] }}
+          // annotation={{ type: "singleLine", xValue: 15 }}
+          // annotation={{ type: "highlightPoints", shapValues: test_random_shap }}
         />
       );
       break;
@@ -79,6 +83,16 @@ export default function Explanation() {
           offsets={[0, 0]}
           selectedIndices={selectedIndices}
           setSelectedIndices={setSelectedIndices}
+          // annotation={{
+          //   type: "highlightRange",
+          //   xValueRange: [-0.04, 0.08],
+          //   yValueRange: [-20, 30],
+          // }}
+          // annotation={{ type: "singleLine", xValue: 0.04 }}
+          // annotation={{
+          //   type: "highlightPoints",
+          //   xValues: test_random_feature,
+          // }}
         />
       );
       break;
