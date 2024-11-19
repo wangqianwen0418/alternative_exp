@@ -1,4 +1,7 @@
-import { TQuestion, TVariable, TInsight, TGraph, TAnnotation} from "./types";
+//NOTE: The Graph object in each insight is currently just a placeholder. Populating it based on the specific question is a TODO.
+
+
+import { TQuestion, TVariable, TInsight, TGraph, TAnnotation } from "./types";
 
 export const QuestionList: TQuestion[] = [
   {
@@ -20,6 +23,11 @@ export const QuestionList: TQuestion[] = [
       type: "read",
       relation: "greater than",
       condition: undefined,
+      graph: {
+        graphType: "Bar",
+        xValues: "None",
+        yValues: "None",
+      },
     },
     testCondition: "random vis",
     groundTruth: true,
@@ -43,6 +51,11 @@ export const QuestionList: TQuestion[] = [
       type: "read",
       relation: "greater than",
       condition: undefined,
+      graph: {
+        graphType: "Bar",
+        xValues: "None",
+        yValues: "None",
+      },
     },
     testCondition: "ours",
     groundTruth: true,
@@ -66,6 +79,11 @@ export const QuestionList: TQuestion[] = [
       type: "read",
       relation: "greater than",
       condition: undefined,
+      graph: {
+        graphType: "Bar",
+        xValues: "None",
+        yValues: "None",
+      },
     },
     testCondition: "random vis",
     groundTruth: false,
@@ -89,6 +107,11 @@ export const QuestionList: TQuestion[] = [
       type: "read",
       relation: "greater than",
       condition: undefined,
+      graph: {
+        graphType: "Bar",
+        xValues: "None",
+        yValues: "None",
+      },
     },
     testCondition: "ours",
     groundTruth: false,
@@ -110,7 +133,6 @@ export const QuestionList: TQuestion[] = [
           featureName: "age",
           type: "contribution of",
           transform: "average",
-          type: "contribution of",
         },
       ],
       type: "comparison",
@@ -135,18 +157,23 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "bmi",
-          type: "number of instances",
+          type: "number of instances above 5 of",
           transform: "average",
         },
         {
           featureName: "sex",
-          type: "number of instances",
+          type: "number of instances above 5 of",
           transform: "average",
         },
       ],
       type: "comparison",
       relation: "greater than",
       condition: undefined,
+      graph: {
+        graphType: "Bar",
+        xValues: "None",
+        yValues: "None",
+      },
     },
     testCondition: "random vis",
     groundTruth: true,
@@ -161,18 +188,23 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "age",
-          type: "number of instances",
+          type: "number of instances above 3 of",
           transform: "average",
         },
         {
           featureName: "low-density lipoproteins",
-          type: "number of instances",
+          type: "number of instances above 3 of",
           transform: "average",
         },
       ],
       type: "comparison",
       relation: "greater than",
       condition: undefined,
+      graph: {
+        graphType: "Bar",
+        xValues: "None",
+        yValues: "None",
+      },
     },
     testCondition: "ours",
     groundTruth: true,
@@ -205,10 +237,10 @@ export const QuestionList: TQuestion[] = [
         xValues: "BMI",
         yValues: "BMI",
         annotation: {
-          type: "verticalLine",
-          value: 0,
+          type: "singleLine",
+          xValue: 0,
         },
-      }
+      },
     },
     testCondition: "random vis",
     groundTruth: true,
@@ -236,6 +268,11 @@ export const QuestionList: TQuestion[] = [
       type: "correlation",
       relation: "positively",
       condition: undefined,
+      graph: {
+        graphType: "Bar",
+        xValues: "None",
+        yValues: "None",
+      },
     },
     testCondition: "ours",
     groundTruth: true,
@@ -263,6 +300,11 @@ export const QuestionList: TQuestion[] = [
       type: "correlation",
       relation: "negatively",
       condition: undefined,
+      graph: {
+        graphType: "Bar",
+        xValues: "None",
+        yValues: "None",
+      },
     },
     testCondition: "random vis",
     groundTruth: true,
@@ -322,6 +364,11 @@ export const QuestionList: TQuestion[] = [
       type: "featureInteraction",
       relation: "same",
       condition: undefined,
+      graph: {
+        graphType: "Bar",
+        xValues: "None",
+        yValues: "None",
+      },
     },
     testCondition: "ours",
     groundTruth: false,
