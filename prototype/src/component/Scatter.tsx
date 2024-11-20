@@ -118,7 +118,7 @@ export default function Scatter(props: ScatterProps) {
           const selection = event.selection;
           if (!selection) {
             setSelectedIndices([]);
-            d3.selectAll(`g.scatter#${id} .points circle`).attr("opacity", 1);
+            d3.selectAll(`g.scatter#${id} .points circle`).attr("opacity", 0.8);
             return;
           }
           const brushedIndices: number[] = [];
