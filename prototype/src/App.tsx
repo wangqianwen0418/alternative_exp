@@ -106,7 +106,7 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
           </ListItem>
         )).concat(
           <ListItem key="questions" disablePadding>
-            <ListItemButton href="/questions">
+            <ListItemButton href="#/questions">
               <ListItemIcon>
                 <TroubleShootIcon />
               </ListItemIcon>
