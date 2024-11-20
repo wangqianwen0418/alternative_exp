@@ -18,9 +18,9 @@ type Annotation =
   | { type: "singleLine"; xValue?: number; yValue?: number };
 
 export default function Swarm(props: SwarmProps) {
-  const margin = [10, 40, 40, 10],
-    radius = 2,
-    leftTitleMargin = 40;
+  const margin = useMemo(() => [10, 40, 40, 10], []);
+  const radius = 2;
+  const leftTitleMargin = 40;
 
   const {
     xValues,
@@ -45,7 +45,7 @@ export default function Swarm(props: SwarmProps) {
         .scaleLinear()
         .domain(d3.extent(xValues) as [number, number])
         .range([margin[3] + leftTitleMargin, width - margin[1] - 40]),
-    [xValues, width]
+    [xValues, width, margin]
   );
 
   const colorScale = useMemo(
@@ -175,12 +175,12 @@ export default function Swarm(props: SwarmProps) {
           const [x0, x1] = selection;
 
           d3.selectAll(`g.swarm#${id} .points circle`)
-            .attr("opacity", (d: any, i: number) => {
+            .attr("opacity", (d, i) => {
               const x = xScale(xValues[i]);
               const isInBrush = x0 <= x && x <= x1;
               return isInBrush ? 1 : 0.3;
             })
-            .each(function (d: any, i: number) {
+            .each(function (d, i) {
               const x = xScale(xValues[i]);
               if (x0 <= x && x <= x1) {
                 brushedIndices.push(i);
@@ -190,13 +190,28 @@ export default function Swarm(props: SwarmProps) {
           setSelectedIndices(brushedIndices);
         });
 
-      brushGroup.call(brush);
+      brushGroup
+        .call(brush)
+        .selectAll(".selection")
+        .style("fill", "rgba(128, 128, 128, 0.2)")
+        .style("stroke", "rgba(128, 128, 128, 0.2)");
     }
 
     return () => {
       d3.select(`g.swarm#${id} .brush`).remove();
     };
-  }, [xValues, colorValues, height, width, annotation]);
+  }, [
+    xValues,
+    colorValues,
+    height,
+    width,
+    annotation,
+    colorScale,
+    id,
+    margin,
+    setSelectedIndices,
+    xScale,
+  ]);
 
   const bucketWidth = 1;
   const buckets: { [key: number]: { value: number; index: number }[] } = {};
@@ -228,7 +243,10 @@ export default function Swarm(props: SwarmProps) {
     if (annotation.type === "highlightRange") {
       const x = xValues[i];
       const [minRange, maxRange] = annotation.shapRange;
-      return x >= minRange && x <= maxRange;
+      return (
+        (isFinite(minRange) ? x >= minRange : true) &&
+        (isFinite(maxRange) ? x <= maxRange : true)
+      );
     } else if (annotation.type === "highlightPoints") {
       const x = xValues[i];
       return annotation.shapValues.includes(x);
@@ -333,29 +351,41 @@ export default function Swarm(props: SwarmProps) {
         }
       } else if (annotation.type === "highlightRange") {
         const [minRange, maxRange] = annotation.shapRange;
-        const xStart = xScale(minRange);
-        const xEnd = xScale(maxRange);
+        const isMinFinite = isFinite(minRange);
+        const isMaxFinite = isFinite(maxRange);
 
-        elements.push(
-          <line
-            key="xMinLine"
-            x1={xStart}
-            y1={lineStartY}
-            x2={xStart}
-            y2={lineEndY}
-            stroke="black"
-            strokeDasharray="4, 2"
-          />,
-          <line
-            key="xMaxLine"
-            x1={xEnd}
-            y1={lineStartY}
-            x2={xEnd}
-            y2={lineEndY}
-            stroke="black"
-            strokeDasharray="4, 2"
-          />
-        );
+        if (!isMinFinite && !isMaxFinite) {
+          // Do nothing if both are infinite
+        } else {
+          if (isMinFinite) {
+            const xStart = xScale(minRange);
+            elements.push(
+              <line
+                key="xMinLine"
+                x1={xStart}
+                y1={lineStartY}
+                x2={xStart}
+                y2={lineEndY}
+                stroke="black"
+                strokeDasharray="4, 2"
+              />
+            );
+          }
+          if (isMaxFinite) {
+            const xEnd = xScale(maxRange);
+            elements.push(
+              <line
+                key="xMaxLine"
+                x1={xEnd}
+                y1={lineStartY}
+                x2={xEnd}
+                y2={lineEndY}
+                stroke="black"
+                strokeDasharray="4, 2"
+              />
+            );
+          }
+        }
       }
     }
 

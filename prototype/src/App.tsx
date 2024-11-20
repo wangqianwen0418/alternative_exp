@@ -24,7 +24,6 @@ import IconButton from "@mui/material/IconButton";
 import {
   Menu as MenuIcon,
   TroubleshootOutlined as TroubleShootIcon,
-  Sync as SyncIcon,
 } from "@mui/icons-material";
 import {
   Toolbar,
@@ -66,7 +65,7 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
     const questionIndexesArray = generateQuestionOrder(uuid!);
     console.log(questionIndexesArray);
     setQuestionOrder(questionIndexesArray);
-  }, []);
+  }, [setUUID, setQuestionOrder, uuid]);
 
   useEffect(() => {
     setFreetext(appProps.userText);
@@ -74,7 +73,18 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
     setInitVis(appProps.initVis);
     setName(appProps.pageName);
     setQuestionIndex(appProps.questionIndex);
-  }, [appProps.pageName]);
+  }, [
+    appProps.userText,
+    appProps.insight,
+    appProps.initVis,
+    appProps.pageName,
+    appProps.questionIndex,
+    setFreetext,
+    setInsight,
+    setInitVis,
+    setName,
+    setQuestionIndex,
+  ]);
 
   const DrawerList = (
     <Box sx={{ width: 250 }} role="presentation" onClick={() => setOpen(false)}>
