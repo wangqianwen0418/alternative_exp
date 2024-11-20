@@ -1,5 +1,4 @@
-import React from "react";
-import { TCase, TInsight } from "./types";
+import { TInsight } from "./types";
 
 export const GenerateTextTemplates = (insight: TInsight) => {
   if (!insight) return "";

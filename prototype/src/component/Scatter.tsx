@@ -35,7 +35,7 @@ export default function Scatter(props: ScatterProps) {
     annotation,
   } = props;
 
-  const margin = [30, 10, 40, 10];
+  const margin = useMemo(() => [30, 10, 40, 10], []);
 
   const xScale = useMemo(
     () =>
@@ -43,7 +43,7 @@ export default function Scatter(props: ScatterProps) {
         .scaleLinear()
         .domain(d3.extent(xValues) as [number, number])
         .range([margin[3], width - margin[1]]),
-    [xValues, width]
+    [xValues, width, margin]
   );
 
   const yScale = useMemo(
@@ -52,7 +52,7 @@ export default function Scatter(props: ScatterProps) {
         .scaleLinear()
         .domain(d3.extent(yValues) as [number, number])
         .range([height - margin[2], margin[0]]),
-    [yValues, height]
+    [yValues, height, margin]
   );
 
   const [tooltip, setTooltip] = useState<{
@@ -116,7 +116,6 @@ export default function Scatter(props: ScatterProps) {
         })
         .on("end", function (event) {
           const selection = event.selection;
-          console.log(selection);
           if (!selection) {
             setSelectedIndices([]);
             d3.selectAll(`g.scatter#${id} .points circle`).attr("opacity", 1);
@@ -143,13 +142,28 @@ export default function Scatter(props: ScatterProps) {
           setSelectedIndices(brushedIndices);
         });
 
-      brushGroup.call(brush);
+      brushGroup
+        .call(brush)
+        .selectAll(".selection")
+        .style("fill", "rgba(128, 128, 128, 0.2)")
+        .style("stroke", "rgba(128, 128, 128, 0.2)");
 
       return () => {
         d3.select(`g.scatter#${id} .brush`).remove();
       };
     }
-  }, [xValues, yValues, height, width, annotation]);
+  }, [
+    xValues,
+    yValues,
+    height,
+    width,
+    annotation,
+    id,
+    setSelectedIndices,
+    xScale,
+    yScale,
+    margin,
+  ]);
 
   function isPointHighlighted(i: number): boolean {
     if (!annotation) {
@@ -165,12 +179,16 @@ export default function Scatter(props: ScatterProps) {
 
       if (annotation.xValueRange) {
         const [xMin, xMax] = annotation.xValueRange;
-        xHighlighted = x >= xMin && x <= xMax;
+        xHighlighted =
+          (isFinite(xMin) ? x >= xMin : true) &&
+          (isFinite(xMax) ? x <= xMax : true);
       }
 
       if (annotation.yValueRange) {
         const [yMin, yMax] = annotation.yValueRange;
-        yHighlighted = y >= yMin && y <= yMax;
+        yHighlighted =
+          (isFinite(yMin) ? y >= yMin : true) &&
+          (isFinite(yMax) ? y <= yMax : true);
       }
 
       return xHighlighted && yHighlighted;
@@ -280,79 +298,100 @@ export default function Scatter(props: ScatterProps) {
           );
         }
       } else if (annotation.type === "highlightRange") {
-        const hasXRange = annotation.xValueRange !== undefined;
-        const hasYRange = annotation.yValueRange !== undefined;
+        let hasXRange = annotation.xValueRange !== undefined;
+        let hasYRange = annotation.yValueRange !== undefined;
+
+        if (hasXRange && annotation.xValueRange) {
+          const [xMin, xMax] = annotation.xValueRange;
+          if (!isFinite(xMin) && !isFinite(xMax)) {
+            hasXRange = false;
+          }
+        }
+
+        if (hasYRange && annotation.yValueRange) {
+          const [yMin, yMax] = annotation.yValueRange;
+          if (!isFinite(yMin) && !isFinite(yMax)) {
+            hasYRange = false;
+          }
+        }
 
         if (hasXRange && hasYRange) {
-          const [xMin, xMax] = annotation.xValueRange!;
-          const xStart = xScale(xMin);
-          const xEnd = xScale(xMax);
-          const [yMin, yMax] = annotation.yValueRange!;
-          const yStart = yScale(yMin);
-          const yEnd = yScale(yMax);
+          if (hasXRange && hasYRange) {
+            const [xMin, xMax] = annotation.xValueRange!;
+            const [yMin, yMax] = annotation.yValueRange!;
 
-          elements.push(
-            <rect
-              key="highlightRect"
-              x={Math.min(xStart, xEnd)}
-              y={Math.min(yStart, yEnd)}
-              width={Math.abs(xEnd - xStart)}
-              height={Math.abs(yEnd - yStart)}
-              fill="none"
-              stroke="black"
-              strokeDasharray="4,2"
-            />
-          );
-        } else if (hasXRange) {
-          const [xMin, xMax] = annotation.xValueRange!;
-          const xStart = xScale(xMin);
-          const xEnd = xScale(xMax);
+            const xStart = isFinite(xMin) ? xScale(xMin) : 0;
+            const xEnd = isFinite(xMax) ? xScale(xMax) : width;
+            const yStart = isFinite(yMin) ? yScale(yMin) : height;
+            const yEnd = isFinite(yMax) ? yScale(yMax) : 0;
 
-          elements.push(
-            <line
-              key="xMinLine"
-              x1={xStart}
-              y1={0}
-              x2={xStart}
-              y2={height}
-              stroke="black"
-              strokeDasharray="4, 2"
-            />,
-            <line
-              key="xMaxLine"
-              x1={xEnd}
-              y1={0}
-              x2={xEnd}
-              y2={height}
-              stroke="black"
-              strokeDasharray="4, 2"
-            />
-          );
-        } else if (hasYRange) {
-          const [yMin, yMax] = annotation.yValueRange!;
-          const yStart = yScale(yMin);
-          const yEnd = yScale(yMax);
+            elements.push(
+              <rect
+                key="highlightRect"
+                x={Math.min(xStart, xEnd)}
+                y={Math.min(yStart, yEnd)}
+                width={Math.abs(xEnd - xStart)}
+                height={Math.abs(yEnd - yStart)}
+                fill="none"
+                stroke="black"
+                strokeDasharray="4,2"
+              />
+            );
+          } else if (hasXRange) {
+            const [xMin, xMax] = annotation.xValueRange!;
+            const xStart = isFinite(xMin) ? xScale(xMin) : 0;
+            const xEnd = isFinite(xMax) ? xScale(xMax) : width;
 
-          elements.push(
-            <line
-              key="yMinLine"
-              x1={0}
-              y1={yStart}
-              x2={width}
-              y2={yStart}
-              stroke="black"
-              strokeDasharray="4, 2"
-            />,
-            <line
-              key="yMaxLine"
-              x1={0}
-              y1={yEnd}
-              x2={width}
-              y2={yEnd}
-              stroke="black"
-              strokeDasharray="4, 2"
-            />
-          );
+            elements.push(
+              <line
+                key="xMinLine"
+                x1={xStart}
+                y1={0}
+                x2={xStart}
+                y2={height}
+                stroke="black"
+                strokeDasharray="4, 2"
+              />
+            );
+            elements.push(
+              <line
+                key="xMaxLine"
+                x1={xEnd}
+                y1={0}
+                x2={xEnd}
+                y2={height}
+                stroke="black"
+                strokeDasharray="4, 2"
+              />
+            );
+          } else if (hasYRange) {
+            const [yMin, yMax] = annotation.yValueRange!;
+            const yStart = isFinite(yMin) ? yScale(yMin) : height;
+            const yEnd = isFinite(yMax) ? yScale(yMax) : 0;
+
+            elements.push(
+              <line
+                key="yMinLine"
+                x1={0}
+                y1={yStart}
+                x2={width}
+                y2={yStart}
+                stroke="black"
+                strokeDasharray="4, 2"
+              />
+            );
+            elements.push(
+              <line
+                key="yMaxLine"
+                x1={0}
+                y1={yEnd}
+                x2={width}
+                y2={yEnd}
+                stroke="black"
+                strokeDasharray="4, 2"
+              />
+            );
+          }
         }
       }
     }
