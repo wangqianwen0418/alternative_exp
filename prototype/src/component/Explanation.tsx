@@ -8,7 +8,12 @@ import {
   // test_random_shap,
   diabetes_bmi_featureValues,
   diabetes_bmi_shapValues,
-} from "../util/diabetesHeatmapData";
+  test_swarm_featureValues,
+  test_swarm_shapValues,
+  test_swarm_labels,
+  diabetes_s5_shapValues,
+  diabetes_s5_featureValues,
+} from "../util/diabetesData";
 import { useState } from "react";
 import Heatmap from "./Heatmap";
 import Swarm from "./Swarm";
@@ -32,16 +37,26 @@ export default function Explanation() {
     case "beeswarm":
       initialVisualization = (
         <Swarm
-          xValues={diabetes_bmi_shapValues}
-          colorValues={diabetes_bmi_featureValues}
+          // xValues={diabetesShapValues}
+          // colorValues={diabetesFeatureValues}
+          // ids={diabetesLabels}
+          xValues={test_swarm_shapValues}
+          colorValues={test_swarm_featureValues}
+          ids={test_swarm_labels}
+          // xValues={[diabetes_s5_shapValues]}
+          // colorValues={[diabetes_s5_featureValues]}
+          // ids={["s5"]}
           width={500}
           height={300}
-          id="bmi"
           selectedIndices={selectedIndices}
           setSelectedIndices={setSelectedIndices}
-          // annotation={{ type: "highlightRange", shapRange: [-20, 30] }}
+          // annotation={{
+          //   type: "highlightRange",
+          //   shapRange: [-20, 30],
+          //   label: "serum triglycerides level",
+          // }}
           // annotation={{ type: "highlightRange", shapRange: [30, Infinity] }}
-          // annotation={{ type: "singleLine", xValue: 15 }}
+          // annotation={{ type: "singleLine", xValue: 15, label: "bmi" }}
           // annotation={{ type: "highlightPoints", shapValues: test_random_shap }}
         />
       );

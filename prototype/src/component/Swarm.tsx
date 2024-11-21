@@ -1,37 +1,73 @@
 import * as d3 from "d3";
 import { useEffect, useState, useMemo } from "react";
 
+type Annotation =
+  | { type: "highlightPoints"; shapValues: number[]; label: string }
+  | { type: "highlightRange"; shapRange: [number, number]; label: string }
+  | { type: "singleLine"; xValue?: number; yValue?: number; label: string };
+
 interface SwarmProps {
-  xValues: number[];
-  colorValues: number[];
+  xValues: number[][];
+  colorValues: number[][];
   width: number;
   height: number;
-  id: string;
+  ids: string[];
   selectedIndices: number[];
-  setSelectedIndices: (index: number[]) => void;
+  setSelectedIndices: (indices: number[]) => void;
   annotation?: Annotation;
 }
 
-type Annotation =
-  | { type: "highlightPoints"; shapValues: number[] }
-  | { type: "highlightRange"; shapRange: [number, number] }
-  | { type: "singleLine"; xValue?: number; yValue?: number };
-
 export default function Swarm(props: SwarmProps) {
-  const margin = useMemo(() => [10, 40, 40, 10], []);
-  const radius = 2;
-  const leftTitleMargin = 40;
-
   const {
     xValues,
     colorValues,
-    height,
     width,
-    id,
+    height,
+    ids,
     selectedIndices,
     setSelectedIndices,
     annotation,
   } = props;
+
+  const labelFontSize = 10;
+  const maxLabelWidth = 30;
+
+  const canvasContext = useMemo(() => {
+    if (typeof document !== "undefined") {
+      return document.createElement("canvas").getContext("2d");
+    }
+    return null;
+  }, []);
+
+  const truncatedLabels = useMemo(() => {
+    if (!canvasContext) {
+      return ids.map((id) => (id.length > 5 ? id.slice(0, 5) + "..." : id));
+    }
+
+    canvasContext.font = `${labelFontSize}px sans-serif`;
+    return ids.map((id) => {
+      let label = id;
+      while (
+        canvasContext.measureText(label).width > maxLabelWidth &&
+        label.length > 1
+      ) {
+        label = label.slice(0, -1);
+      }
+      if (label !== id) {
+        label = label.slice(0, -3) + "...";
+      }
+      return label;
+    });
+  }, [ids, canvasContext, labelFontSize, maxLabelWidth]);
+
+  const leftTitleMargin = maxLabelWidth + 5;
+  const margin = useMemo(
+    () => [40, 100, 40, leftTitleMargin],
+    [leftTitleMargin]
+  );
+
+  const baseRadius = 3;
+  const radius = useMemo(() => Math.max(1.5, baseRadius), [baseRadius]);
 
   const [tooltip, setTooltip] = useState<{
     x: number;
@@ -39,57 +75,167 @@ export default function Swarm(props: SwarmProps) {
     dataX: number;
   } | null>(null);
 
+  const flatXValues = useMemo(() => xValues.flat(), [xValues]);
+  const flatColorValues = useMemo(() => colorValues.flat(), [colorValues]);
+
   const xScale = useMemo(
     () =>
       d3
         .scaleLinear()
-        .domain(d3.extent(xValues) as [number, number])
-        .range([margin[3] + leftTitleMargin, width - margin[1] - 40]),
-    [xValues, width, margin]
+        .domain(d3.extent(flatXValues) as [number, number])
+        .range([margin[3], width - margin[1]]),
+    [flatXValues, width, margin]
   );
 
   const colorScale = useMemo(
     () =>
       d3
         .scaleSequential()
-        .domain(d3.extent(colorValues) as [number, number])
+        .domain(d3.extent(flatColorValues) as [number, number])
         .interpolator(
           d3.interpolateHcl(
             d3.hcl((4.6588 * 180) / Math.PI, 70, 54),
             d3.hcl((0.35470565 * 180) / Math.PI, 90, 54)
           )
         ),
-    [colorValues]
+    [flatColorValues]
   );
 
-  const yScale = useMemo(
+  const sortedDatasetIndices = useMemo(() => {
+    const datasetIndices = d3.range(xValues.length);
+    return datasetIndices.sort((a, b) => {
+      const avgA = d3.mean(xValues[a], (d) => Math.abs(d)) || 0;
+      const avgB = d3.mean(xValues[b], (d) => Math.abs(d)) || 0;
+      return avgB - avgA;
+    });
+  }, [xValues]);
+
+  const numDatasets = xValues.length;
+
+  const maxPlotHeight = 50;
+  const plotHeight = useMemo(() => {
+    const calculatedPlotHeight = (height - margin[0] - margin[2]) / numDatasets;
+    return Math.min(calculatedPlotHeight, maxPlotHeight);
+  }, [height, margin, numDatasets]);
+
+  const totalPlotHeight = plotHeight * numDatasets + margin[0] + margin[2];
+
+  const yCenters = useMemo(
     () =>
-      d3
-        .scaleLinear()
-        .range([
-          (height / 2 - radius) * 0.7 + 14,
-          (height / 2 + radius) * 0.7 + 14,
-        ]),
-    [height]
+      sortedDatasetIndices.map((_, datasetIndex) => {
+        return margin[0] + plotHeight * datasetIndex + plotHeight / 2;
+      }),
+    [sortedDatasetIndices, margin, plotHeight]
   );
+
+  const bucketWidth = 1;
+  const yValsArray = useMemo(
+    () =>
+      xValues.map((datasetXValues) => {
+        let yVals = new Array(datasetXValues.length);
+        const buckets: {
+          [key: string]: { value: number; index: number }[];
+        } = {};
+        datasetXValues.forEach((val, index) => {
+          const bucketKey = Math.floor(val / bucketWidth);
+          if (!buckets[bucketKey]) {
+            buckets[bucketKey] = [];
+          }
+          buckets[bucketKey].push({ value: val, index: index });
+        });
+        for (const key in buckets) {
+          const bucket = buckets[key];
+          bucket.sort((a, b) => a.value - b.value);
+          bucket.forEach((item, height) => {
+            const half = Math.floor(bucket.length / 2);
+            const position = height - half;
+            yVals[item.index] = position;
+          });
+        }
+        return yVals;
+      }),
+    [xValues, bucketWidth]
+  );
+
+  const yScales = useMemo(
+    () =>
+      sortedDatasetIndices.map((dataIndex, datasetIndex) => {
+        const yVals = yValsArray[dataIndex];
+        const yExtent = d3.extent(yVals) as [number, number];
+
+        if (yExtent[0] === yExtent[1]) {
+          yExtent[0] -= 1;
+          yExtent[1] += 1;
+        }
+
+        return d3
+          .scaleLinear()
+          .domain(yExtent)
+          .range([
+            yCenters[datasetIndex] + plotHeight / 2 - radius - 2,
+            yCenters[datasetIndex] - plotHeight / 2 + radius + 2,
+          ]);
+      }),
+    [sortedDatasetIndices, yValsArray, yCenters, plotHeight, radius]
+  );
+
+  function handleMouseOver(event: any, datasetIndex: number, i: number) {
+    const dataIndex = sortedDatasetIndices[datasetIndex];
+    const xPos = xScale(xValues[dataIndex][i]);
+    const yPos = yScales[datasetIndex](yValsArray[dataIndex][i]);
+    setTooltip({
+      x: xPos,
+      y: yPos,
+      dataX: xValues[dataIndex][i],
+    });
+  }
+
+  function handleMouseOut() {
+    setTooltip(null);
+  }
+
+  function formatValue(value: number | undefined): string {
+    if (value === undefined || isNaN(value)) {
+      return "";
+    }
+    if (Math.abs(value) < 0.005) {
+      value = 0;
+    }
+    return value.toFixed(2);
+  }
+
+  const [datasetStats, setDatasetStats] = useState<{
+    min: number;
+    max: number;
+    avg: number;
+  } | null>(null);
+
+  const [selectedDatasetIndex, setSelectedDatasetIndex] = useState<
+    number | null
+  >(null);
 
   useEffect(() => {
-    d3.select(`g.swarm#${id} g.x-axis`).remove();
-    d3.select(`g.swarm#${id} g.brush`).remove();
+    d3.select(`g.swarm g.x-axis`).remove();
+    d3.selectAll(`g.swarm .brush`).remove();
+
+    const svg = d3.select(`svg`);
+    if (totalPlotHeight + 60 > height) {
+      svg.attr("height", totalPlotHeight + 60);
+    }
 
     const xAxis = d3.axisBottom(xScale);
-    d3.select(`g.swarm#${id}`)
+    d3.select(`g.swarm`)
       .append("g")
       .attr("class", "x-axis")
-      .attr("transform", `translate(0,${height / 2 + radius * 2 + 5})`)
+      .attr("transform", `translate(0,${totalPlotHeight - margin[2] + 5})`)
       .call(xAxis);
 
-    const defs = d3.select(`g.swarm#${id}`).select("defs");
+    const defs = d3.select(`g.swarm`).select("defs");
     if (defs.empty()) {
-      const newDefs = d3.select(`g.swarm#${id}`).append("defs");
+      const newDefs = d3.select(`g.swarm`).append("defs");
       const gradient = newDefs
         .append("linearGradient")
-        .attr("id", `color-legend-gradient-${id}`)
+        .attr("id", `color-legend-gradient`)
         .attr("x1", "0%")
         .attr("x2", "0%")
         .attr("y1", "100%")
@@ -106,340 +252,406 @@ export default function Swarm(props: SwarmProps) {
     }
 
     const legendWidth = 20;
-    const legendHeight = 50;
-    const legendX = width - legendWidth - 30;
-    const legendY = height / 2 - 60;
+    const legendHeight = totalPlotHeight - margin[0] - margin[2] - 20;
+    const legendX = width - margin[1] + 30;
+    const middleY = margin[0] + (totalPlotHeight - margin[0] - margin[2]) / 2;
+    const legendY = middleY - legendHeight / 2;
     const xAxisTextSize = 12;
 
-    if (d3.select(`g.swarm#${id} .legend`).empty()) {
-      d3.select(`g.swarm#${id}`)
-        .append("rect")
-        .attr("class", "legend")
-        .attr("x", legendX)
-        .attr("y", legendY)
-        .attr("width", legendWidth)
-        .attr("height", legendHeight)
-        .attr("fill", `url(#color-legend-gradient-${id})`);
+    d3.select(`g.swarm .legend`).remove();
+    d3.select(`g.swarm .legend-title`).remove();
+    d3.select(`g.swarm .legend-label`).remove();
 
-      d3.select(`g.swarm#${id}`)
-        .append("text")
-        .attr("class", "legend-title")
-        .attr("x", legendX + legendWidth / 2)
-        .attr("y", legendY - 25)
-        .attr("text-anchor", "middle")
-        .attr("font-size", xAxisTextSize)
-        .text("Feature Value");
+    d3.select(`g.swarm`)
+      .append("rect")
+      .attr("class", "legend")
+      .attr("x", legendX)
+      .attr("y", legendY)
+      .attr("width", legendWidth)
+      .attr("height", legendHeight)
+      .attr("fill", `url(#color-legend-gradient)`);
 
-      d3.select(`g.swarm#${id}`)
-        .append("text")
-        .attr("class", "legend-label")
-        .attr("x", legendX + legendWidth / 2)
-        .attr("y", legendY + legendHeight + 15)
-        .attr("text-anchor", "middle")
-        .attr("font-size", xAxisTextSize)
-        .text(colorScale.domain()[0].toFixed(2));
+    d3.select(`g.swarm`)
+      .append("text")
+      .attr("class", "legend-title")
+      .attr("x", legendX + legendWidth / 2)
+      .attr("y", legendY - 25)
+      .attr("text-anchor", "middle")
+      .attr("font-size", xAxisTextSize)
+      .text("Feature Value");
 
-      d3.select(`g.swarm#${id}`)
-        .append("text")
-        .attr("class", "legend-label")
-        .attr("x", legendX + legendWidth / 2)
-        .attr("y", legendY - 5)
-        .attr("text-anchor", "middle")
-        .attr("font-size", xAxisTextSize)
-        .text(colorScale.domain()[1].toFixed(2));
-    }
+    d3.select(`g.swarm`)
+      .append("text")
+      .attr("class", "legend-label")
+      .attr("x", legendX + legendWidth / 2)
+      .attr("y", legendY + legendHeight + 15)
+      .attr("text-anchor", "middle")
+      .attr("font-size", xAxisTextSize)
+      .text(formatValue(colorScale.domain()[0]));
 
-    if (!annotation) {
-      const brushGroup = d3
-        .select(`g.swarm#${id}`)
-        .append("g")
-        .attr("class", "brush");
+    d3.select(`g.swarm`)
+      .append("text")
+      .attr("class", "legend-label")
+      .attr("x", legendX + legendWidth / 2)
+      .attr("y", legendY - 5)
+      .attr("text-anchor", "middle")
+      .attr("font-size", xAxisTextSize)
+      .text(formatValue(colorScale.domain()[1]));
+
+    const brushes: any[] = [];
+
+    sortedDatasetIndices.forEach((dataIndex, datasetIndex) => {
+      const yCenter = yCenters[datasetIndex];
+      const yStart = yCenter - plotHeight / 2;
+      const yEnd = yCenter + plotHeight / 2;
 
       const brush = d3
         .brushX()
         .extent([
-          [margin[3] + leftTitleMargin, 0],
-          [width - margin[1] - 40, height],
+          [margin[3], yStart],
+          [width - margin[1], yEnd],
         ])
         .on("start", function (event) {
-          brushGroup.call(brush.move, null);
+          brushes.forEach((b, i) => {
+            if (i !== datasetIndex) {
+              d3.select(`g.swarm .brush-${i}`).call(b.move, null);
+            }
+          });
         })
         .on("end", function (event) {
-          const selection = event.selection;
-          if (!selection) {
-            setSelectedIndices([]);
-            d3.selectAll(`g.swarm#${id} .points circle`).attr("opacity", 1);
-            return;
-          }
-          const brushedIndices: number[] = [];
-          const [x0, x1] = selection;
-
-          d3.selectAll(`g.swarm#${id} .points circle`)
-            .attr("opacity", (d, i) => {
-              const x = xScale(xValues[i]);
-              const isInBrush = x0 <= x && x <= x1;
-              return isInBrush ? 1 : 0.3;
-            })
-            .each(function (d, i) {
-              const x = xScale(xValues[i]);
+          try {
+            const selection = event.selection;
+            if (!selection) {
+              setSelectedIndices([]);
+              setSelectedDatasetIndex(null);
+              d3.selectAll(`g.swarm .points circle`).attr("opacity", 1);
+              setDatasetStats(null);
+              return;
+            }
+            const [x0, x1] = selection;
+            const brushedIndices: number[] = [];
+            const brushedValues: number[] = [];
+            xValues[dataIndex].forEach((val, i) => {
+              const x = xScale(val);
               if (x0 <= x && x <= x1) {
                 brushedIndices.push(i);
+                brushedValues.push(val);
               }
             });
+            setSelectedIndices(brushedIndices);
+            setSelectedDatasetIndex(datasetIndex);
 
-          setSelectedIndices(brushedIndices);
+            const min = d3.min(brushedValues) ?? 0;
+            const max = d3.max(brushedValues) ?? 0;
+            const avg = d3.mean(brushedValues) ?? 0;
+            setDatasetStats({
+              min,
+              max,
+              avg,
+            });
+
+            sortedDatasetIndices.forEach((dataIdx, idx) => {
+              d3.selectAll(`g.swarm .points-${idx} circle`).attr(
+                "opacity",
+                (d, i) => {
+                  return brushedIndices.includes(i) ? 1 : 0.3;
+                }
+              );
+            });
+          } catch (error) {
+            console.error("Brush event error:", error);
+          }
         });
+
+      brushes.push(brush);
+
+      const brushGroup = d3
+        .select(`g.swarm`)
+        .append("g")
+        .attr("class", `brush brush-${datasetIndex}`);
 
       brushGroup
         .call(brush)
         .selectAll(".selection")
         .style("fill", "rgba(128, 128, 128, 0.2)")
         .style("stroke", "rgba(128, 128, 128, 0.2)");
-    }
+    });
 
     return () => {
-      d3.select(`g.swarm#${id} .brush`).remove();
+      d3.selectAll(`g.swarm .brush`).remove();
     };
   }, [
     xValues,
     colorValues,
     height,
     width,
-    annotation,
     colorScale,
-    id,
     margin,
     setSelectedIndices,
     xScale,
+    plotHeight,
+    yCenters,
+    sortedDatasetIndices,
+    totalPlotHeight,
+    numDatasets,
   ]);
 
-  const bucketWidth = 1;
-  const buckets: { [key: number]: { value: number; index: number }[] } = {};
-
-  xValues.forEach((val, index) => {
-    const bucketKey = Math.floor(val / bucketWidth);
-    if (!buckets[bucketKey]) {
-      buckets[bucketKey] = [];
-    }
-    buckets[bucketKey].push({ value: val, index: index });
-  });
-  const yVals = new Array(xValues.length);
-
-  for (const key in buckets) {
-    const bucket = buckets[key];
-    bucket.sort((a, b) => a.value - b.value);
-    bucket.forEach((item, height) => {
-      const half = Math.floor(bucket.length / 2);
-      const position = height < half ? height : height - bucket.length;
-      yVals[item.index] = position;
-    });
-  }
-
-  function isPointHighlighted(i: number): boolean {
-    if (!annotation) {
-      return true;
-    }
-
-    if (annotation.type === "highlightRange") {
-      const x = xValues[i];
-      const [minRange, maxRange] = annotation.shapRange;
-      return (
-        (isFinite(minRange) ? x >= minRange : true) &&
-        (isFinite(maxRange) ? x <= maxRange : true)
-      );
-    } else if (annotation.type === "highlightPoints") {
-      const x = xValues[i];
-      return annotation.shapValues.includes(x);
-    } else {
-      return true;
-    }
-  }
-
-  function formatValue(value: number | undefined): string {
-    if (value === undefined || isNaN(value)) {
-      return "";
-    }
-    if (Math.abs(value) < 0.005) {
-      value = 0;
-    }
-    return value.toFixed(2);
-  }
-
-  function renderAnnotations() {
-    const elements = [];
-    const lineStartY = height / 2 + radius * 2 + 5;
-    const lineEndY = 65;
-
-    let highlightedIndices: number[] = [];
-
+  useEffect(() => {
     if (annotation) {
-      highlightedIndices = xValues
-        .map((x, i) => (isPointHighlighted(i) ? i : -1))
-        .filter((i) => i !== -1);
-    }
-
-    if (selectedIndices.length > 0) {
-      highlightedIndices = selectedIndices;
-    }
-
-    if (highlightedIndices.length > 0) {
-      const xHighlightedValues = highlightedIndices.map((i) => xValues[i]);
-
-      const xMinVal = d3.min(xHighlightedValues);
-      const xMaxVal = d3.max(xHighlightedValues);
-      const xAvgVal = d3.mean(xHighlightedValues);
-
-      const statsText = `X - Avg: ${formatValue(xAvgVal)}, Min: ${formatValue(
-        xMinVal
-      )}, Max: ${formatValue(xMaxVal)}`;
-
-      elements.push(
-        <text
-          key="highlightStats"
-          x={width / 2}
-          y={15}
-          fill="black"
-          fontSize="10px"
-          textAnchor="middle"
-        >
-          {statsText}
-        </text>
-      );
-    } else {
-      elements.push(
-        <text
-          key="noDataStats"
-          x={width / 2}
-          y={15}
-          fill="black"
-          fontSize="10px"
-          textAnchor="middle"
-        >
-          No data selected
-        </text>
-      );
-    }
-
-    if (annotation) {
-      if (annotation.type === "singleLine") {
-        if (annotation.xValue !== undefined) {
-          const xPos = xScale(annotation.xValue);
-          elements.push(
-            <line
-              key="xSingleLine"
-              x1={xPos}
-              y1={lineStartY}
-              x2={xPos}
-              y2={lineEndY}
-              stroke="black"
-              strokeDasharray="4, 2"
-            />
-          );
-        } else if (annotation.yValue !== undefined) {
-          const yPos = yScale(annotation.yValue);
-          elements.push(
-            <line
-              key="ySingleLine"
-              x1={margin[3] + leftTitleMargin}
-              y1={yPos}
-              x2={width - margin[1] - 40}
-              y2={yPos}
-              stroke="black"
-              strokeDasharray="4, 2"
-            />
-          );
+      const dataIndex = ids.indexOf(annotation.label);
+      if (dataIndex !== -1) {
+        const datasetXValues = xValues[dataIndex];
+        let highlightedIndices: number[] = [];
+        if (annotation.type === "highlightPoints") {
+          highlightedIndices = datasetXValues
+            .map((x, i) => (annotation.shapValues.includes(x) ? i : -1))
+            .filter((i) => i !== -1);
+        } else if (annotation.type === "highlightRange") {
+          const [minRange, maxRange] = annotation.shapRange;
+          if (minRange === Infinity && maxRange === Infinity) {
+            highlightedIndices = datasetXValues.map((_, i) => i);
+          } else {
+            let minR = minRange;
+            let maxR = maxRange;
+            if (minRange === -Infinity) minR = xScale.domain()[0];
+            if (maxRange === Infinity) maxR = xScale.domain()[1];
+            highlightedIndices = datasetXValues
+              .map((x, i) => {
+                const inRange =
+                  (isFinite(minR) ? x >= minR : true) &&
+                  (isFinite(maxR) ? x <= maxR : true);
+                return inRange ? i : -1;
+              })
+              .filter((i) => i !== -1);
+          }
+        } else if (annotation.type === "singleLine") {
+          if (
+            annotation.xValue === undefined &&
+            annotation.yValue === undefined
+          ) {
+            highlightedIndices = datasetXValues.map((_, i) => i);
+          }
         }
-      } else if (annotation.type === "highlightRange") {
-        const [minRange, maxRange] = annotation.shapRange;
-        const isMinFinite = isFinite(minRange);
-        const isMaxFinite = isFinite(maxRange);
+        if (highlightedIndices.length > 0) {
+          const xHighlightedValues = highlightedIndices.map(
+            (i) => datasetXValues[i]
+          );
+          const min = d3.min(xHighlightedValues) ?? 0;
+          const max = d3.max(xHighlightedValues) ?? 0;
+          const avg = d3.mean(xHighlightedValues) ?? 0;
+          setDatasetStats({
+            min,
+            max,
+            avg,
+          });
 
-        if (!isMinFinite && !isMaxFinite) {
-          // Do nothing if both are infinite
+          sortedDatasetIndices.forEach((dataIdx, idx) => {
+            d3.selectAll(`g.swarm .points-${idx} circle`).attr(
+              "opacity",
+              (d, i) => {
+                return highlightedIndices.includes(i) ? 1 : 0.3;
+              }
+            );
+          });
         } else {
-          if (isMinFinite) {
-            const xStart = xScale(minRange);
-            elements.push(
-              <line
-                key="xMinLine"
-                x1={xStart}
-                y1={lineStartY}
-                x2={xStart}
-                y2={lineEndY}
-                stroke="black"
-                strokeDasharray="4, 2"
-              />
-            );
-          }
-          if (isMaxFinite) {
-            const xEnd = xScale(maxRange);
-            elements.push(
-              <line
-                key="xMaxLine"
-                x1={xEnd}
-                y1={lineStartY}
-                x2={xEnd}
-                y2={lineEndY}
-                stroke="black"
-                strokeDasharray="4, 2"
-              />
-            );
-          }
+          setDatasetStats(null);
         }
+      } else {
+        setDatasetStats(null);
       }
+    } else {
+      setDatasetStats(null);
     }
-
-    return elements;
-  }
-
-  function handleMouseOver(event: any, i: number) {
-    const xPos = xScale(xValues[i]);
-    const yPos = yScale(yVals[i]);
-    setTooltip({
-      x: xPos,
-      y: yPos,
-      dataX: xValues[i],
-    });
-  }
-
-  function handleMouseOut() {
-    setTooltip(null);
-  }
-
-  const avgYPosition = (Math.min(...yVals) + Math.max(...yVals)) / 2;
+  }, [annotation, ids, xValues, sortedDatasetIndices, xScale]);
 
   return (
-    <g className="swarm" id={id}>
+    <g className="swarm">
       <rect
         className="background"
         width={width}
-        height={height}
+        height={totalPlotHeight}
         fill="white"
         stroke="black"
       />
-      <g className="points">
-        <text
-          x={leftTitleMargin - 10}
-          y={yScale(avgYPosition)}
-          textAnchor="end"
-          alignmentBaseline="middle"
-        >
-          {id}
-        </text>
-        {xValues.map((x, i) => (
-          <circle
-            key={i}
-            cx={xScale(x)}
-            cy={yScale(yVals[i])}
-            r={3}
-            fill={colorScale(colorValues[i])}
-            opacity={isPointHighlighted(i) ? 1 : 0.3}
-            onMouseOver={(event) => handleMouseOver(event, i)}
-            onMouseOut={handleMouseOut}
-          />
-        ))}
+
+      <g className="annotations">
+        {datasetStats ? (
+          <text
+            x={width / 2}
+            y={margin[0] - 15}
+            textAnchor="middle"
+            fontSize={12}
+            fill="black"
+          >
+            {`X - Avg: ${formatValue(datasetStats.avg)}, Min: ${formatValue(
+              datasetStats.min
+            )}, Max: ${formatValue(datasetStats.max)}`}
+          </text>
+        ) : (
+          <text
+            x={width / 2}
+            y={margin[0] - 15}
+            textAnchor="middle"
+            fontSize={12}
+            fill="black"
+          >
+            No data selected
+          </text>
+        )}
       </g>
-      {renderAnnotations()}
+
+      {sortedDatasetIndices.map((dataIndex, datasetIndex) => {
+        const datasetXValues = xValues[dataIndex];
+        const datasetYVals = yValsArray[dataIndex];
+        const datasetColorValues = colorValues[dataIndex];
+        const datasetID = ids[dataIndex];
+        const truncatedLabel = truncatedLabels[dataIndex];
+
+        const yScale = yScales[datasetIndex];
+
+        const isAnnotationForDataset =
+          annotation && annotation.label === datasetID;
+
+        let highlightedIndices: number[] = [];
+
+        if (annotation) {
+          if (annotation.type === "highlightPoints") {
+            highlightedIndices = datasetXValues
+              .map((x, i) => (annotation.shapValues.includes(x) ? i : -1))
+              .filter((i) => i !== -1);
+          } else if (annotation.type === "highlightRange") {
+            const [minRange, maxRange] = annotation.shapRange;
+            if (minRange === Infinity && maxRange === Infinity) {
+              highlightedIndices = datasetXValues.map((_, i) => i);
+            } else {
+              let minR = minRange;
+              let maxR = maxRange;
+              if (minRange === -Infinity) minR = xScale.domain()[0];
+              if (maxRange === Infinity) maxR = xScale.domain()[1];
+              highlightedIndices = datasetXValues
+                .map((x, i) => {
+                  const inRange =
+                    (isFinite(minR) ? x >= minR : true) &&
+                    (isFinite(maxR) ? x <= maxR : true);
+                  return inRange ? i : -1;
+                })
+                .filter((i) => i !== -1);
+            }
+          } else if (annotation.type === "singleLine") {
+            if (
+              annotation.xValue === undefined &&
+              annotation.yValue === undefined
+            ) {
+              highlightedIndices = datasetXValues.map((_, i) => i);
+            }
+          }
+        }
+
+        return (
+          <g
+            className={`points points-${datasetIndex}`}
+            key={`dataset-${datasetIndex}`}
+          >
+            <text
+              x={margin[3] - 2}
+              y={yCenters[datasetIndex]}
+              textAnchor="end"
+              alignmentBaseline="middle"
+              fontSize={labelFontSize}
+            >
+              {truncatedLabel}
+            </text>
+
+            {isAnnotationForDataset && annotation && (
+              <>
+                {annotation.type === "singleLine" &&
+                  annotation.xValue !== undefined && (
+                    <line
+                      x1={xScale(annotation.xValue!)}
+                      x2={xScale(annotation.xValue!)}
+                      y1={yCenters[datasetIndex] - plotHeight / 2}
+                      y2={yCenters[datasetIndex] + plotHeight / 2}
+                      stroke="black"
+                      strokeDasharray="4,2"
+                    />
+                  )}
+                {annotation.type === "highlightRange" &&
+                  !(
+                    annotation.shapRange[0] === Infinity &&
+                    annotation.shapRange[1] === Infinity
+                  ) && (
+                    <>
+                      {(isFinite(annotation.shapRange[0]) ||
+                        annotation.shapRange[0] === -Infinity) && (
+                        <line
+                          x1={xScale(
+                            annotation.shapRange[0] === -Infinity
+                              ? xScale.domain()[0]
+                              : annotation.shapRange[0]
+                          )}
+                          x2={xScale(
+                            annotation.shapRange[0] === -Infinity
+                              ? xScale.domain()[0]
+                              : annotation.shapRange[0]
+                          )}
+                          y1={yCenters[datasetIndex] - plotHeight / 2}
+                          y2={yCenters[datasetIndex] + plotHeight / 2}
+                          stroke="black"
+                          strokeDasharray="4,2"
+                        />
+                      )}
+                      {(isFinite(annotation.shapRange[1]) ||
+                        annotation.shapRange[1] === Infinity) && (
+                        <line
+                          x1={xScale(
+                            annotation.shapRange[1] === Infinity
+                              ? xScale.domain()[1]
+                              : annotation.shapRange[1]
+                          )}
+                          x2={xScale(
+                            annotation.shapRange[1] === Infinity
+                              ? xScale.domain()[1]
+                              : annotation.shapRange[1]
+                          )}
+                          y1={yCenters[datasetIndex] - plotHeight / 2}
+                          y2={yCenters[datasetIndex] + plotHeight / 2}
+                          stroke="black"
+                          strokeDasharray="4,2"
+                        />
+                      )}
+                    </>
+                  )}
+              </>
+            )}
+
+            {datasetXValues.map((x, i) => {
+              let isHighlighted = true;
+
+              if (selectedIndices.length > 0 && selectedDatasetIndex !== null) {
+                isHighlighted = selectedIndices.includes(i);
+              } else if (annotation) {
+                isHighlighted = highlightedIndices.includes(i);
+              }
+
+              return (
+                <circle
+                  key={i}
+                  cx={xScale(x)}
+                  cy={yScale(datasetYVals[i])}
+                  r={radius}
+                  fill={colorScale(datasetColorValues[i])}
+                  opacity={isHighlighted ? 1 : 0.3}
+                  onMouseOver={(event) =>
+                    handleMouseOver(event, datasetIndex, i)
+                  }
+                  onMouseOut={handleMouseOut}
+                />
+              );
+            })}
+          </g>
+        );
+      })}
+
       {tooltip && (
         <g
           className="tooltip"
