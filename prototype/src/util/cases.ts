@@ -54,8 +54,8 @@ export const CASES: TCase[] = [
         xValues: "BMI",
         yValues: "BMI",
         annotation: {
-          type: "verticalLine",
-          value: 0,
+          type: "singleLine",
+          xValue: 0,
         },
       },
     },

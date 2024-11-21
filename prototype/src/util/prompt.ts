@@ -92,13 +92,14 @@ Annotation and AnnotationParams are the next two values in the JSON. Here are th
 SingleLine: When comparing to a single value (in either X or Y direction). AnnotationParams would be an array of two elements. The first element will be "X" or "Y", (depending on if the line is vertical or horizontal). The second element will be a number (the value the line should be drawn at).
 HighlightRange: When highlighting a range in the X,Y, or both directions. AnnotationParams would be an array [[x_min, x_max], [y_min, y_max]]. If the range is only in one direction, the other array will be empty.  In the case where one end of the range is infinity/neg. infity, please use "100" (or -100) for the value. 
 HighlightDataPoints: When highlighting specific datapoints that may not fit a range. AnnotationParams would be an string "Specific Data Points".
+HighlightBars: When highlighting specific features/bars in a Swarm or BarPlot. AnnotationParams would be a string array ["Feature 1", "Feature 2",...] of the features to highlight. 
 
 The optimal annotation to use will be based on constants/conditions included in the insight statement.
 
 
 Lines are more useful when we are comparing against a single value, HighlightRange is more useful when we want to highlight data points within a range (so it will not be used for Bar Graphs), and HighlightDataPoints is useful when examining a condition that does not fit neatly into a range. 
 For Heatmaps, there will be no annotations, so if the GraphType is Heatmap then both Annotation and AnnotationParams will be "None".
-For Barplots, the only annotation that is allowed is vertical lines. 
+For Barplots, the only annotations that are allowed are vertical lines and HighlightBars. 
 For Swarms, there can be no range in the Y direction, only in the X direction.
 
 For example, suppose the user input statement was "The average contribution of the bmi to the prediction is larger than 20". Since we are looking at the average contribution of each feature, the GraphType value would be "Bar".
