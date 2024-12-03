@@ -1,6 +1,6 @@
 import shap_diabetes from "../assets/shap_diabetes.json";
 
-const diabetes_s5 = "serum triglycerides level",
+export const diabetes_s5 = "serum triglycerides level",
   diabetes_s5_featureIndex =
     shap_diabetes["feature_names"].indexOf(diabetes_s5),
   diabetes_s5_featureValues = shap_diabetes["feature_values"].map(
@@ -10,7 +10,7 @@ const diabetes_s5 = "serum triglycerides level",
     (row) => row[diabetes_s5_featureIndex]
   );
 
-const diabetes_bmi = "bmi",
+export const diabetes_bmi = "bmi",
   diabetes_bmi_featureIndex =
     shap_diabetes["feature_names"].indexOf(diabetes_bmi),
   diabetes_bmi_featureValues = shap_diabetes["feature_values"].map(
@@ -20,7 +20,7 @@ const diabetes_bmi = "bmi",
     (row) => row[diabetes_bmi_featureIndex]
   );
 
-const diabetes_bp = "blood pressure",
+export const diabetes_bp = "blood pressure",
   diabetes_bp_featureIndex =
     shap_diabetes["feature_names"].indexOf(diabetes_bp),
   diabetes_bp_featureValues = shap_diabetes["feature_values"].map(
@@ -30,7 +30,7 @@ const diabetes_bp = "blood pressure",
     (row) => row[diabetes_bp_featureIndex]
   );
 
-const diabetes_s3 = "high-density lipoproteins",
+export const diabetes_s3 = "high-density lipoproteins",
   diabetes_s3_featureIndex =
     shap_diabetes["feature_names"].indexOf(diabetes_s3),
   diabetes_s3_featureValues = shap_diabetes["feature_values"].map(
@@ -40,7 +40,7 @@ const diabetes_s3 = "high-density lipoproteins",
     (row) => row[diabetes_s3_featureIndex]
   );
 
-const diabetes_s6 = "blood sugar level",
+export const diabetes_s6 = "blood sugar level",
   diabetes_s6_featureIndex =
     shap_diabetes["feature_names"].indexOf(diabetes_s6),
   diabetes_s6_featureValues = shap_diabetes["feature_values"].map(
@@ -50,7 +50,7 @@ const diabetes_s6 = "blood sugar level",
     (row) => row[diabetes_s6_featureIndex]
   );
 
-const diabetes_age = "age",
+export const diabetes_age = "age",
   diabetes_age_featureIndex =
     shap_diabetes["feature_names"].indexOf(diabetes_age),
   diabetes_age_featureValues = shap_diabetes["feature_values"].map(
@@ -60,7 +60,7 @@ const diabetes_age = "age",
     (row) => row[diabetes_age_featureIndex]
   );
 
-const diabetes_s2 = "low-density lipoproteins",
+export const diabetes_s2 = "low-density lipoproteins",
   diabetes_s2_featureIndex =
     shap_diabetes["feature_names"].indexOf(diabetes_s2),
   diabetes_s2_featureValues = shap_diabetes["feature_values"].map(
@@ -70,7 +70,7 @@ const diabetes_s2 = "low-density lipoproteins",
     (row) => row[diabetes_s2_featureIndex]
   );
 
-const diabetes_sex = "sex",
+export const diabetes_sex = "sex",
   diabetes_sex_featureIndex =
     shap_diabetes["feature_names"].indexOf(diabetes_s2),
   diabetes_sex_featureValues = shap_diabetes["feature_values"].map(
@@ -80,7 +80,7 @@ const diabetes_sex = "sex",
     (row) => row[diabetes_sex_featureIndex]
   );
 
-const diabetes_s1 = "serum cholesterol",
+export const diabetes_s1 = "serum cholesterol",
   diabetes_s1_featureIndex =
     shap_diabetes["feature_names"].indexOf(diabetes_s2),
   diabetes_s1_featureValues = shap_diabetes["feature_values"].map(
@@ -90,7 +90,7 @@ const diabetes_s1 = "serum cholesterol",
     (row) => row[diabetes_s1_featureIndex]
   );
 
-const diabetes_s4 = "total/HDL cholesterol ratio",
+export const diabetes_s4 = "total/HDL cholesterol ratio",
   diabetes_s4_featureIndex =
     shap_diabetes["feature_names"].indexOf(diabetes_s2),
   diabetes_s4_featureValues = shap_diabetes["feature_values"].map(
@@ -138,3 +138,25 @@ export const diabetesLabels = [
   diabetes_s1,
   diabetes_s4,
 ];
+
+function getRandomPoints(arr: number[]) {
+  if (arr.length < 25) {
+    throw new Error("Array has fewer than 25 points.");
+  }
+
+  const randomPoints = [];
+  const randomIndices = new Set();
+
+  while (randomIndices.size < 25) {
+    const randomIndex = Math.floor(Math.random() * arr.length);
+    if (!randomIndices.has(randomIndex)) {
+      randomIndices.add(randomIndex);
+      randomPoints.push(arr[randomIndex]);
+    }
+  }
+
+  return randomPoints;
+}
+
+export const test_random_shap = getRandomPoints(diabetes_bmi_shapValues);
+export const test_random_feature = getRandomPoints(diabetes_bmi_featureValues);

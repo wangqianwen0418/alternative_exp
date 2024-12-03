@@ -27,7 +27,7 @@ export default function Scatter(props: ScatterProps) {
     annotation,
   } = props;
 
-  const margin = [30, 10, 40, 10];
+  const margin = useMemo(() => [30, 10, 40, 10], []);
 
   const xScale = useMemo(
     () =>
@@ -35,7 +35,7 @@ export default function Scatter(props: ScatterProps) {
         .scaleLinear()
         .domain(d3.extent(xValues) as [number, number])
         .range([margin[3], width - margin[1]]),
-    [xValues, width]
+    [xValues, width, margin]
   );
 
   const yScale = useMemo(
@@ -44,7 +44,7 @@ export default function Scatter(props: ScatterProps) {
         .scaleLinear()
         .domain(d3.extent(yValues) as [number, number])
         .range([height - margin[2], margin[0]]),
-    [yValues, height]
+    [yValues, height, margin]
   );
 
   const [tooltip, setTooltip] = useState<{
@@ -108,10 +108,9 @@ export default function Scatter(props: ScatterProps) {
         })
         .on("end", function (event) {
           const selection = event.selection;
-          console.log(selection);
           if (!selection) {
             setSelectedIndices([]);
-            d3.selectAll(`g.scatter#${id} .points circle`).attr("opacity", 1);
+            d3.selectAll(`g.scatter#${id} .points circle`).attr("opacity", 0.8);
             return;
           }
           const brushedIndices: number[] = [];
@@ -135,13 +134,28 @@ export default function Scatter(props: ScatterProps) {
           setSelectedIndices(brushedIndices);
         });
 
-      brushGroup.call(brush);
+      brushGroup
+        .call(brush)
+        .selectAll(".selection")
+        .style("fill", "rgba(128, 128, 128, 0.2)")
+        .style("stroke", "rgba(128, 128, 128, 0.2)");
 
       return () => {
         d3.select(`g.scatter#${id} .brush`).remove();
       };
     }
-  }, [xValues, yValues, height, width, annotation]);
+  }, [
+    xValues,
+    yValues,
+    height,
+    width,
+    annotation,
+    id,
+    setSelectedIndices,
+    xScale,
+    yScale,
+    margin,
+  ]);
 
   function isPointHighlighted(i: number): boolean {
     if (!annotation) {
@@ -275,13 +289,29 @@ export default function Scatter(props: ScatterProps) {
         const hasXRange = annotation.xRange !== undefined;
         const hasYRange = annotation.yRange !== undefined;
 
+        if (hasXRange && annotation.xValueRange) {
+          const [xMin, xMax] = annotation.xValueRange;
+          if (!isFinite(xMin) && !isFinite(xMax)) {
+            hasXRange = false;
+          }
+        }
+
+        if (hasYRange && annotation.yValueRange) {
+          const [yMin, yMax] = annotation.yValueRange;
+          if (!isFinite(yMin) && !isFinite(yMax)) {
+            hasYRange = false;
+          }
+        }
+
         if (hasXRange && hasYRange) {
-          const [xMin, xMax] = annotation.xRange!;
-          const xStart = xScale(xMin);
-          const xEnd = xScale(xMax);
-          const [yMin, yMax] = annotation.yRange!;
-          const yStart = yScale(yMin);
-          const yEnd = yScale(yMax);
+          if (hasXRange && hasYRange) {
+            const [xMin, xMax] = annotation.xValueRange!;
+            const [yMin, yMax] = annotation.yValueRange!;
+
+            const xStart = isFinite(xMin) ? xScale(xMin) : 0;
+            const xEnd = isFinite(xMax) ? xScale(xMax) : width;
+            const yStart = isFinite(yMin) ? yScale(yMin) : height;
+            const yEnd = isFinite(yMax) ? yScale(yMax) : 0;
 
           elements.push(
             <rect
@@ -300,51 +330,56 @@ export default function Scatter(props: ScatterProps) {
           const xStart = xScale(xMin);
           const xEnd = xScale(xMax);
 
-          elements.push(
-            <line
-              key="xMinLine"
-              x1={xStart}
-              y1={0}
-              x2={xStart}
-              y2={height}
-              stroke="black"
-              strokeDasharray="4, 2"
-            />,
-            <line
-              key="xMaxLine"
-              x1={xEnd}
-              y1={0}
-              x2={xEnd}
-              y2={height}
-              stroke="black"
-              strokeDasharray="4, 2"
-            />
-          );
-        } else if (hasYRange) {
-          const [yMin, yMax] = annotation.yRange!;
-          const yStart = yScale(yMin);
-          const yEnd = yScale(yMax);
+            elements.push(
+              <line
+                key="xMinLine"
+                x1={xStart}
+                y1={0}
+                x2={xStart}
+                y2={height}
+                stroke="black"
+                strokeDasharray="4, 2"
+              />
+            );
+            elements.push(
+              <line
+                key="xMaxLine"
+                x1={xEnd}
+                y1={0}
+                x2={xEnd}
+                y2={height}
+                stroke="black"
+                strokeDasharray="4, 2"
+              />
+            );
+          } else if (hasYRange) {
+            const [yMin, yMax] = annotation.yValueRange!;
+            const yStart = isFinite(yMin) ? yScale(yMin) : height;
+            const yEnd = isFinite(yMax) ? yScale(yMax) : 0;
 
-          elements.push(
-            <line
-              key="yMinLine"
-              x1={0}
-              y1={yStart}
-              x2={width}
-              y2={yStart}
-              stroke="black"
-              strokeDasharray="4, 2"
-            />,
-            <line
-              key="yMaxLine"
-              x1={0}
-              y1={yEnd}
-              x2={width}
-              y2={yEnd}
-              stroke="black"
-              strokeDasharray="4, 2"
-            />
-          );
+            elements.push(
+              <line
+                key="yMinLine"
+                x1={0}
+                y1={yStart}
+                x2={width}
+                y2={yStart}
+                stroke="black"
+                strokeDasharray="4, 2"
+              />
+            );
+            elements.push(
+              <line
+                key="yMaxLine"
+                x1={0}
+                y1={yEnd}
+                x2={width}
+                y2={yEnd}
+                stroke="black"
+                strokeDasharray="4, 2"
+              />
+            );
+          }
         }
       }
     }

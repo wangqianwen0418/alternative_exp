@@ -4,14 +4,16 @@ import {
   diabetesShapValues,
   diabetesFeatureValues,
   diabetesLabels,
+  // test_random_feature,
+  // test_random_shap,
+  diabetes_bmi_featureValues,
+  diabetes_bmi_shapValues,
 } from "../util/diabetesHeatmapData";
 import { useState } from "react";
-import React from "react";
-
+import Heatmap from "./Heatmap";
 import Swarm from "./Swarm";
 import Scatter from "./Scatter";
 import Bar from "./Bar";
-import Heatmap from "./Heatmap";
 import { useAtom } from "jotai";
 import { initVisAtom, insightAtom, isSubmittedAtom } from "../store";
 
@@ -38,7 +40,7 @@ function getRandomPoints(arr: number[]) {
 
 export default function Explanation() {
   const [isSubmitted] = useAtom(isSubmittedAtom);
-  const [insight, setInsight] = useAtom(insightAtom);
+  // const [insight, setInsight] = useAtom(insightAtom);
   const [initVis] = useAtom(initVisAtom);
   const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
 
@@ -59,14 +61,15 @@ export default function Explanation() {
     case "beeswarm":
       initialVisualization = (
         <Swarm
-          xValues={featureShapValues}
-          colorValues={featureValues}
+          xValues={diabetes_bmi_shapValues}
+          colorValues={diabetes_bmi_featureValues}
           width={500}
           height={300}
           id="bmi"
           selectedIndices={selectedIndices}
           setSelectedIndices={setSelectedIndices}
           // annotation={{ type: "highlightRange", shapRange: [-20, 30] }}
+          // annotation={{ type: "highlightRange", shapRange: [30, Infinity] }}
           // annotation={{ type: "singleLine", xValue: 15 }}
           // annotation={{ type: "highlightPoints", shapValues: test_random_shap }}
         />
@@ -75,8 +78,8 @@ export default function Explanation() {
     case "scatter":
       initialVisualization = (
         <Scatter
-          yValues={featureShapValues}
-          xValues={featureValues}
+          yValues={diabetes_bmi_shapValues}
+          xValues={diabetes_bmi_featureValues}
           width={400}
           height={300}
           id="bmi-scatter"
@@ -85,8 +88,8 @@ export default function Explanation() {
           setSelectedIndices={setSelectedIndices}
           // annotation={{
           //   type: "highlightRange",
-          //   xValueRange: [-0.04, 0.08],
-          //   yValueRange: [-20, 30],
+          //   xValueRange: [-0.04, Infinity],
+          //   yValueRange: [Infinity, 30],
           // }}
           // annotation={{ type: "singleLine", xValue: 0.04 }}
           // annotation={{

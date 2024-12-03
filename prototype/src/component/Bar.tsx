@@ -1,5 +1,6 @@
+//Bar.tsx
 import * as d3 from "d3";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { TAnnotation } from "../util/types";
 
 interface BarProps {
@@ -13,7 +14,7 @@ interface BarProps {
 }
 
 export default function Bar(props: BarProps) {
-  const margin = [200, 10, 100, 40];
+  const margin = useMemo(() => [200, 10, 100, 40], []);
 
   const {
     allShapValues,
@@ -26,45 +27,63 @@ export default function Bar(props: BarProps) {
   } = props;
 
   const [selectedBars, setSelectedBars] = useState<string[]>([]);
+  const brushGroupRef = useRef<any>(null);
 
-  let avgShapeValues: { [featureName: string]: number } = {};
-  for (let i = 0; i < featureNames.length; i++) {
-    avgShapeValues[featureNames[i]] =
-      allShapValues.map((val) => Math.abs(val[i])).reduce((a, b) => a + b, 0) /
-      allShapValues.length;
-  }
+  // Memoize sortedAvgShapeValues
+  const sortedAvgShapeValues = useMemo(() => {
+    let avgShapeValues: { [featureName: string]: number } = {};
+    for (let i = 0; i < featureNames.length; i++) {
+      avgShapeValues[featureNames[i]] =
+        allShapValues
+          .map((val) => Math.abs(val[i]))
+          .reduce((a, b) => a + b, 0) / allShapValues.length;
+    }
 
-  let sortedAvgShapeValues = Object.entries(avgShapeValues)
-    .sort((a, b) => a[1] - b[1])
-    .reverse();
+    return Object.entries(avgShapeValues)
+      .sort((a, b) => a[1] - b[1])
+      .reverse();
+  }, [allShapValues, featureNames]);
 
-  const yScale = d3
-    .scaleBand()
-    .domain(sortedAvgShapeValues.map((d) => d[0]))
-    .range([margin[1], height - margin[3]])
-    .padding(0.1);
+  // Memoize yScale
+  const yScale = useMemo(
+    () =>
+      d3
+        .scaleBand()
+        .domain(sortedAvgShapeValues.map((d) => d[0]))
+        .range([margin[1], height - margin[3]])
+        .padding(0.1),
+    [sortedAvgShapeValues, margin, height]
+  );
 
-  const xScale = d3
-    .scaleLinear()
-    .domain([0, Math.max(...allShapValues.flat().map((d) => Math.abs(d)))])
-    .range([margin[0], width - margin[2]]);
+  // Memoize xScale
+  const xScale = useMemo(
+    () =>
+      d3
+        .scaleLinear()
+        .domain([0, Math.max(...allShapValues.flat().map((d) => Math.abs(d)))])
+        .range([margin[0], width - margin[2]]),
+    [allShapValues, margin, width]
+  );
 
-    // Calculate the 95% confidence interval for each feature
-  const confidenceIntervals: { [key: string]: [number, number] } = {};
-  featureNames.forEach((featureName, index) => {
-    const values = allShapValues.map((val) => Math.abs(val[index]));
-    const mean = d3.mean(values) as number;
-    const stdDev = d3.deviation(values) as number;
-    const n = values.length;
-    const t = 1.96;
-    const confidenceInterval = t * (stdDev / Math.sqrt(n));
-    confidenceIntervals[featureName] = [
-      mean - confidenceInterval,
-      mean + confidenceInterval,
-    ];
-  });
+  const confidenceIntervals = useMemo(() => {
+    const intervals: { [key: string]: [number, number] } = {};
+    featureNames.forEach((featureName, index) => {
+      const values = allShapValues.map((val) => Math.abs(val[index]));
+      const mean = d3.mean(values) as number;
+      const stdDev = d3.deviation(values) as number;
+      const n = values.length;
+      const t = 1.96;
+      const confidenceInterval = t * (stdDev / Math.sqrt(n));
+      intervals[featureName] = [
+        mean - confidenceInterval,
+        mean + confidenceInterval,
+      ];
+    });
+    return intervals;
+  }, [featureNames, allShapValues]);
 
   useEffect(() => {
+    // Remove and create x-axis only when necessary
     d3.select(`g.bar#${id}`).selectAll("g.x-axis").remove();
     const xAxisGroup = d3
       .select(`g.bar#${id}`)
@@ -73,77 +92,80 @@ export default function Bar(props: BarProps) {
       .attr("transform", `translate(0,${height - margin[3]})`);
 
     xAxisGroup.call(d3.axisBottom(xScale));
+  }, [xScale, id, height, margin]);
 
+  // Separate useEffect for the brush
+  useEffect(() => {
     if (!annotation || annotation.type !== "highlightBars") {
-      d3.select(`g.bar#${id}`).selectAll("g.brush").remove();
+      if (!brushGroupRef.current) {
+        const brushGroup = d3
+          .select(`g.bar#${id}`)
+          .append("g")
+          .attr("class", "brush");
 
-      const brushGroup = d3
-        .select(`g.bar#${id}`)
-        .append("g")
-        .attr("class", "brush");
+        brushGroupRef.current = brushGroup;
 
-      const brushEnd = (event: any) => {
-        const selection = event.selection;
+        const brushEnd = (event: any) => {
+          const selection = event.selection;
 
-        if (!selection) {
-          setSelectedBars([]);
-          d3.selectAll(`g.bar#${id} .bars g.bar-group`).attr("opacity", 1);
-          return;
-        }
+          if (!selection) {
+            setSelectedBars([]);
+            d3.selectAll(`g.bar#${id} .bars g.bar-group`).attr("opacity", 1);
+            return;
+          }
 
-        const [y0, y1] = selection;
+          const [y0, y1] = selection;
 
-        const brushedBars = sortedAvgShapeValues
-          .filter(([featureName]) => {
-            const yPos = yScale(featureName);
-            if (yPos === undefined) return false;
-            return (
-              y0 <= yPos + yScale.bandwidth() / 2 &&
-              yPos + yScale.bandwidth() / 2 <= y1
-            );
-          })
-          .map(([featureName]) => featureName);
+          const brushedBars = sortedAvgShapeValues
+            .filter(([featureName]) => {
+              const yPos = yScale(featureName);
+              if (yPos === undefined) return false;
+              return (
+                y0 <= yPos + yScale.bandwidth() / 2 &&
+                yPos + yScale.bandwidth() / 2 <= y1
+              );
+            })
+            .map(([featureName]) => featureName);
 
-        setSelectedBars(brushedBars);
+          setSelectedBars(brushedBars);
 
-        d3.selectAll(`g.bar#${id} .bars g.bar-group`).each(function () {
-          const featureName = d3.select(this).attr("data-feature-name");
-          if (brushedBars.length === 0) {
-            d3.select(this).attr("opacity", 1);
-          } else {
+          d3.selectAll(`g.bar#${id} .bars g.bar-group`).each(function () {
+            const featureName = d3.select(this).attr("data-feature-name");
             const isSelected = brushedBars.includes(featureName);
             d3.select(this).attr("opacity", isSelected ? 1 : 0.3);
-          }
-        });
-      };
+          });
+        };
 
-      const brush = d3
-        .brushY()
-        .extent([
-          [margin[0], margin[1]],
-          [width - margin[2], height - margin[3]],
-        ])
-        .on("end", brushEnd);
+        const brush = d3
+          .brushY()
+          .extent([
+            [margin[0], margin[1]],
+            [width - margin[2], height - margin[3]],
+          ])
+          .on("end", brushEnd);
 
-      brushGroup.call(brush);
-
-      return () => {
-        d3.select(`g.bar#${id} .brush`).remove();
-      };
+        brushGroup
+          .call(brush)
+          .selectAll(".selection")
+          .style("fill", "rgba(128, 128, 128, 0.2)")
+          .style("stroke", "rgba(128, 128, 128, 0.2)");
+      }
     } else if (annotation.type === "highlightBars") {
-      d3.select(`g.bar#${id}`).selectAll("g.brush").remove();
+      if (brushGroupRef.current) {
+        brushGroupRef.current.remove();
+        brushGroupRef.current = null;
+      }
       setSelectedBars(annotation.labels);
     }
   }, [
-    allShapValues,
-    featureNames,
-    height,
-    width,
     id,
-    offsets,
     annotation,
     sortedAvgShapeValues,
     yScale,
+    margin,
+    width,
+    height,
+    setSelectedBars,
   ]);
 
   return (
