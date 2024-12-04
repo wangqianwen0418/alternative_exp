@@ -117,7 +117,7 @@ export default function UserResponse() {
           Please Respond Here
         </Typography>
         <span>
-          <b>Q1:</b>{" "}
+          <b>Q{questionIndex + 1}.1:</b>{" "}
           {isSecondPart
             ? "Given the new visualization, is the above interpretation accurate?"
             : "Is the above interpretation accurate?"}
@@ -141,7 +141,7 @@ export default function UserResponse() {
 
         <div style={{ display: "flex" }}>
           <span style={{ margin: "auto 0" }}>
-            <b>Q2:</b>{" "}
+            <b>Q{questionIndex + 1}.2:</b>{" "}
             {isSecondPart
               ? "Given the new visualization, please rate your confidence"
               : "Please rate your confidence"}{" "}
