@@ -100,43 +100,67 @@ export const diabetes_s4 = "total/HDL cholesterol ratio",
     (row) => row[diabetes_s4_featureIndex]
   );
 
+// export const diabetesShapValues = [
+//   diabetes_s5_shapValues,
+//   diabetes_bmi_shapValues,
+//   diabetes_bp_shapValues,
+//   diabetes_s3_shapValues,
+//   diabetes_s6_shapValues,
+//   diabetes_age_shapValues,
+//   diabetes_s2_shapValues,
+//   diabetes_sex_shapValues,
+//   diabetes_s1_shapValues,
+//   diabetes_s4_shapValues,
+// ];
+
+// export const diabetesFeatureValues = [
+//   diabetes_s5_featureValues,
+//   diabetes_bmi_featureValues,
+//   diabetes_bp_featureValues,
+//   diabetes_s3_featureValues,
+//   diabetes_s6_featureValues,
+//   diabetes_age_featureValues,
+//   diabetes_s2_featureValues,
+//   diabetes_sex_featureValues,
+//   diabetes_s1_featureValues,
+//   diabetes_s4_featureValues,
+// ];
+
+// export const diabetesLabels = [
+//   diabetes_s5,
+//   diabetes_bmi,
+//   diabetes_bp,
+//   diabetes_s3,
+//   diabetes_s6,
+//   diabetes_age,
+//   diabetes_s2,
+//   diabetes_sex,
+//   diabetes_s1,
+//   diabetes_s4,
+// ];
+
 export const diabetesShapValues = [
   diabetes_s5_shapValues,
   diabetes_bmi_shapValues,
   diabetes_bp_shapValues,
-  diabetes_s3_shapValues,
-  diabetes_s6_shapValues,
   diabetes_age_shapValues,
-  diabetes_s2_shapValues,
   diabetes_sex_shapValues,
-  diabetes_s1_shapValues,
-  diabetes_s4_shapValues,
 ];
 
 export const diabetesFeatureValues = [
   diabetes_s5_featureValues,
   diabetes_bmi_featureValues,
   diabetes_bp_featureValues,
-  diabetes_s3_featureValues,
-  diabetes_s6_featureValues,
   diabetes_age_featureValues,
-  diabetes_s2_featureValues,
   diabetes_sex_featureValues,
-  diabetes_s1_featureValues,
-  diabetes_s4_featureValues,
 ];
 
 export const diabetesLabels = [
   diabetes_s5,
   diabetes_bmi,
   diabetes_bp,
-  diabetes_s3,
-  diabetes_s6,
   diabetes_age,
-  diabetes_s2,
   diabetes_sex,
-  diabetes_s1,
-  diabetes_s4,
 ];
 
 function getRandomPoints(arr: number[]) {
