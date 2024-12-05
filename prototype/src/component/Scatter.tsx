@@ -286,18 +286,18 @@ export default function Scatter(props: ScatterProps) {
           );
         }
       } else if (annotation.type === "highlightRange") {
-        const hasXRange = annotation.xRange !== undefined;
-        const hasYRange = annotation.yRange !== undefined;
+        let hasXRange = annotation.xRange !== undefined;
+        let hasYRange = annotation.yRange !== undefined;
 
-        if (hasXRange && annotation.xValueRange) {
-          const [xMin, xMax] = annotation.xValueRange;
+        if (hasXRange && annotation.xRange) {
+          const [xMin, xMax] = annotation.xRange;
           if (!isFinite(xMin) && !isFinite(xMax)) {
             hasXRange = false;
           }
         }
 
-        if (hasYRange && annotation.yValueRange) {
-          const [yMin, yMax] = annotation.yValueRange;
+        if (hasYRange && annotation.yRange) {
+          const [yMin, yMax] = annotation.yRange;
           if (!isFinite(yMin) && !isFinite(yMax)) {
             hasYRange = false;
           }
@@ -305,8 +305,8 @@ export default function Scatter(props: ScatterProps) {
 
         if (hasXRange && hasYRange) {
           if (hasXRange && hasYRange) {
-            const [xMin, xMax] = annotation.xValueRange!;
-            const [yMin, yMax] = annotation.yValueRange!;
+            const [xMin, xMax] = annotation.xRange!;
+            const [yMin, yMax] = annotation.yRange!;
 
             const xStart = isFinite(xMin) ? xScale(xMin) : 0;
             const xEnd = isFinite(xMax) ? xScale(xMax) : width;
@@ -353,7 +353,7 @@ export default function Scatter(props: ScatterProps) {
               />
             );
           } else if (hasYRange) {
-            const [yMin, yMax] = annotation.yValueRange!;
+            const [yMin, yMax] = annotation.yRange!;
             const yStart = isFinite(yMin) ? yScale(yMin) : height;
             const yEnd = isFinite(yMax) ? yScale(yMax) : 0;
 

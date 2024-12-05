@@ -9,14 +9,13 @@ import {
   diabetes_bmi_featureValues,
   diabetes_bmi_shapValues,
 } from "../util/diabetesHeatmapData";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Heatmap from "./Heatmap";
 import Swarm from "./Swarm";
 import Scatter from "./Scatter";
 import Bar from "./Bar";
 import { useAtom } from "jotai";
 import { initVisAtom, insightAtom, isSubmittedAtom } from "../store";
-
 
 function getRandomPoints(arr: number[]) {
   if (arr.length < 25) {
@@ -37,12 +36,17 @@ function getRandomPoints(arr: number[]) {
   return randomPoints;
 }
 
-
 export default function Explanation() {
   const [isSubmitted] = useAtom(isSubmittedAtom);
-  // const [insight, setInsight] = useAtom(insightAtom);
+  const [insight, setInsight] = useAtom(insightAtom);
   const [initVis] = useAtom(initVisAtom);
   const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
+  const [initialVisWidth, setInitialVisWidth] = useState(0);
+  const initialVisRef = useRef<SVGGElement>(null);
+  const additionalVisRef = useRef<SVGGElement>(null)
+
+  const [initialVisYPos, setInitialVisYPos] = useState(0);
+  const [additionalVisYPos, setAdditionalVisYPos] = useState(0); 
 
   let featureName = "bmi",
     featureIndex = shap_diabetes["feature_names"].indexOf(featureName),
@@ -111,18 +115,18 @@ export default function Explanation() {
         />
       );
       break;
-      case "heatmap":
-        initialVisualization = (
-          <Heatmap
-            shapValuesArray={diabetesShapValues}
-            featureValuesArray={diabetesFeatureValues}
-            labels={diabetesLabels}
-            width={800}
-            height={50}
-            title="Diabetes Heatmap"
-          />
-        );
-        break;
+    case "heatmap":
+      initialVisualization = (
+        <Heatmap
+          shapValuesArray={diabetesShapValues}
+          featureValuesArray={diabetesFeatureValues}
+          labels={diabetesLabels}
+          width={800}
+          height={50}
+          title="Diabetes Heatmap"
+        />
+      );
+      break;
     default:
       initialVisualization = (
         <text x={50} y={50}>
@@ -133,220 +137,153 @@ export default function Explanation() {
   }
 
   let additionalVisualizations;
-  if (insight?.graph.graphType){
+  if (insight?.graph.graphType) {
     switch (insight?.graph.graphType) {
       case "Bar":
         console.log("Bar");
         additionalVisualizations = isSubmitted && (
-        <>
-          <Bar
-          allShapValues={shap_diabetes["shap_values"].slice(0, 100)}
-          featureNames={shap_diabetes["feature_names"].slice(0, 100)}
-          width={600}
-          height={200}
-          id="bar"
-          offsets={[0, 150]}
-          annotation={insight?.graph.annotation ? insight?.graph.annotation : undefined}
-        />
-
-        <g>
-            <rect
-              x={550}
-              y={0}
-              width={300}
+          <>
+            <Bar
+              allShapValues={shap_diabetes["shap_values"].slice(0, 100)}
+              featureNames={shap_diabetes["feature_names"].slice(0, 100)}
+              width={600}
               height={200}
-              fill="white"
-              stroke="black"
+              id="bar"
+              offsets={[0, 150]}
+              annotation={
+                insight?.graph.annotation
+                  ? insight?.graph.annotation
+                  : undefined
+              }
             />
-            <text x={700} y={50} textAnchor="middle">
-              Other Explanations
-            </text>
-          </g>
-          <g>
-            <rect
-              x={450}
-              y={250}
-              width={400}
-              height={200}
-              fill="white"
-              stroke="black"
-            />
-            <text x={600} y={300} textAnchor="middle">
-              Other Explanations
-            </text>
-          </g>
-        </>
-
-        
-        )
+          </>
+        );
         break;
       case "Scatter":
         console.log("Scatter");
-        if (insight?.graph.xValues){
+        if (insight?.graph.xValues) {
           const featureName = insight?.graph.xValues;
-        }
-        else{
+        } else {
           const featureName = "bmi";
         }
         featureIndex = shap_diabetes["feature_names"].indexOf(featureName);
-        featureValues = shap_diabetes["feature_values"].map((row) => row[featureIndex]);
-        featureShapValues = shap_diabetes["shap_values"].map((row) => row[featureIndex]);
+        featureValues = shap_diabetes["feature_values"].map(
+          (row) => row[featureIndex]
+        );
+        featureShapValues = shap_diabetes["shap_values"].map(
+          (row) => row[featureIndex]
+        );
         additionalVisualizations = isSubmitted && (
-        <>
-          <Scatter
-            yValues={featureShapValues}
-            xValues={featureValues}
-            width={400}
-            height={300}
-            id="bmi-scatter"
-            offsets={[0, 150]}
-            selectedIndices={selectedIndices}
-            setSelectedIndices={setSelectedIndices}
-            annotation={insight?.graph.annotation ? insight?.graph.annotation : undefined}
-          />
-
-          <g>
-            <rect
-              x={550}
-              y={0}
-              width={300}
-              height={200}
-              fill="white"
-              stroke="black"
-            />
-            <text x={700} y={50} textAnchor="middle">
-              Other Explanations
-            </text>
-          </g>
-          <g>
-            <rect
-              x={450}
-              y={250}
+          <>
+            <Scatter
+              yValues={featureShapValues}
+              xValues={featureValues}
               width={400}
-              height={200}
-              fill="white"
-              stroke="black"
+              height={300}
+              id="bmi-scatter"
+              offsets={[0, 150]}
+              selectedIndices={selectedIndices}
+              setSelectedIndices={setSelectedIndices}
+              annotation={
+                insight?.graph.annotation
+                  ? insight?.graph.annotation
+                  : undefined
+              }
             />
-            <text x={600} y={300} textAnchor="middle">
-              Other Explanations
-            </text>
-          </g>
-        </>
-        )
+          </>
+        );
         break;
       case "Swarm":
         console.log("Swarm");
-        if (insight?.graph.xValues){
+        if (insight?.graph.xValues) {
           const featureName = insight?.graph.xValues;
-        }
-        else{
+        } else {
           const featureName = "bmi";
         }
         featureIndex = shap_diabetes["feature_names"].indexOf(featureName);
-        featureValues = shap_diabetes["feature_values"].map((row) => row[featureIndex]);
-        featureShapValues = shap_diabetes["shap_values"].map((row) => row[featureIndex]);
+        featureValues = shap_diabetes["feature_values"].map(
+          (row) => row[featureIndex]
+        );
+        featureShapValues = shap_diabetes["shap_values"].map(
+          (row) => row[featureIndex]
+        );
 
         additionalVisualizations = isSubmitted && (
-        <>
-          <Swarm
-            colorValues={featureValues}
-            xValues={featureShapValues}
-            width={400}
-            height={300}
-            id="bmi-scatter"
-            selectedIndices={selectedIndices}
-            setSelectedIndices={setSelectedIndices}
-            annotation={insight?.graph.annotation ? insight?.graph.annotation : undefined}
-          />
-
-          <g>
-            <rect
-              x={550}
-              y={0}
-              width={300}
-              height={200}
-              fill="white"
-              stroke="black"
-            />
-            <text x={700} y={50} textAnchor="middle">
-              Other Explanations
-            </text>
-          </g>
-          <g>
-            <rect
-              x={450}
-              y={250}
+          <>
+            <Swarm
+              colorValues={featureValues}
+              xValues={featureShapValues}
               width={400}
-              height={200}
-              fill="white"
-              stroke="black"
+              height={300}
+              id="bmi-scatter"
+              selectedIndices={selectedIndices}
+              setSelectedIndices={setSelectedIndices}
+              annotation={
+                insight?.graph.annotation
+                  ? insight?.graph.annotation
+                  : undefined
+              }
             />
-            <text x={600} y={300} textAnchor="middle">
-              Other Explanations
-            </text>
-          </g>
-        </>
-        )
+          </>
+        );
         break;
       case "Heatmap":
         console.log("Heatmap");
         additionalVisualizations = isSubmitted && (
           <>
-          <Heatmap
-            shapValuesArray={diabetesShapValues}
-            featureValuesArray={diabetesFeatureValues}
-            labels={diabetesLabels}
-            width={800}
-            height={50}
-            title="Diabetes Heatmap"
-          />
-          
-          <g>
-            <rect
-              x={550}
-              y={0}
-              width={300}
-              height={200}
-              fill="white"
-              stroke="black"
+            <Heatmap
+              shapValuesArray={diabetesShapValues}
+              featureValuesArray={diabetesFeatureValues}
+              labels={diabetesLabels}
+              width={800}
+              height={50}
+              title="Diabetes Heatmap"
             />
-            <text x={700} y={50} textAnchor="middle">
-              Other Explanations
-            </text>
-          </g>
-          <g>
-            <rect
-              x={450}
-              y={250}
-              width={400}
-              height={200}
-              fill="white"
-              stroke="black"
-            />
-            <text x={600} y={300} textAnchor="middle">
-              Other Explanations
-            </text>
-          </g>
-
           </>
-        )
+        );
         break;
-        
+
       default:
         console.log("UNKNOWN GRAPH TYPE");
     }
   }
-  
 
-  return (
+  useEffect(() => {
+    if (initialVisRef.current) {
+      const bbox = initialVisRef.current.getBBox();
+      setInitialVisWidth(bbox.width); // Set the measured width of the initial visualization
+      setInitialVisYPos(bbox.y); // Set Y position for alignment
+    }
+
+    // Also measure the Y position of the additional visualization
+    if (additionalVisRef.current) {
+      const bbox = additionalVisRef.current.getBBox();
+      setAdditionalVisYPos(bbox.y); // Set the Y position for the additional visualization
+    }
+  }, [initialVisualization, additionalVisualizations]);
+
+  const yOffsetDifference = initialVisYPos - additionalVisYPos;
+
+return (
     <Paper style={{ padding: "15px" }}>
       <Typography variant="h5" gutterBottom>
         Visual Explanation
       </Typography>
-      <svg className="swarm" width={900} height="70vh">
-        {initialVisualization}
+      <svg className="swarm" width="100%" height="70vh">
+        {/* Initial Visualization */}
+        <g ref={initialVisRef} transform="translate(0, 0)">
+          {initialVisualization}
+        </g>
 
-        {isSubmitted && additionalVisualizations}
+        {/* Dynamically position the additional visualization to the right of initialVisualization */}
+        {isSubmitted && (
+          <g
+            ref={additionalVisRef}
+            transform={`translate(${initialVisWidth + 20}, ${yOffsetDifference})`}
+          >
+            {additionalVisualizations}
+          </g>
+        )}
       </svg>
     </Paper>
   );

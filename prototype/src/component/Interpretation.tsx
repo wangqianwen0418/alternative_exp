@@ -160,14 +160,16 @@ export default function Interpretation() {
           )}
 
           {/* New Parse Button */}
-          <Button
-            variant="contained"
-            color="secondary"
-            style={{ margin: "10px 5px" }}
-            onClick={handleParseOnly}
-          >
-            Parse
-          </Button>
+          {!isUserStudy && (
+            <Button
+              variant="contained"
+              color="secondary"
+              style={{ margin: "10px 5px" }}
+              onClick={handleParseOnly}
+            >
+              Parse
+            </Button>
+          )}
         </div>
         {isLoading ? (
           <CircularProgress />
