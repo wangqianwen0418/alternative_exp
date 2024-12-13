@@ -46,7 +46,7 @@ export default function Explanation() {
           setSelectedIndices={setSelectedIndices}
           // annotation={{
           //   type: "highlightRange",
-          //   shapRange: [-20, 30],
+          //   xValueRange: [-20, 30],
           //   label: "serum triglycerides level",
           // }}
           // annotation={{
@@ -109,8 +109,8 @@ export default function Explanation() {
           shapValuesArray={diabetesShapValues}
           featureValuesArray={diabetesFeatureValues}
           labels={diabetesLabels}
-          width={800}
-          height={50}
+          width={600}
+          height={250}
           title="Diabetes Heatmap"
         />
       );

@@ -14,8 +14,8 @@ export default function Heatmap({
   shapValuesArray,
   featureValuesArray,
   labels,
-  width,
-  height,
+  width: totalWidth,
+  height: totalHeight,
   title,
 }: HeatmapProps) {
   const svgRef = useRef<SVGSVGElement>(null);
@@ -23,7 +23,22 @@ export default function Heatmap({
   const [leftMargin, setLeftMargin] = useState<number>(100);
   const groupRef = useRef<SVGGElement>(null);
 
-  const scaleFactor = 0.98;
+  const topMargin = 40;
+  const bottomMargin = 40;
+  const rowSpacing = 10;
+  const legendBarWidth = 10;
+  const fontSize = 10;
+
+  const [minShap, maxShap] = useMemo(() => [-50, 50], []);
+  const colorScale = useMemo(
+    () =>
+      d3
+        .scaleLinear<string>()
+        .domain([minShap, 0, maxShap])
+        .range(["#008bfc", "#ffffff", "#ff0051"])
+        .clamp(true),
+    [minShap, maxShap]
+  );
 
   const datasets = useMemo(() => {
     const averageShapValues = shapValuesArray.map(
@@ -56,57 +71,52 @@ export default function Heatmap({
     return combinedDatasets;
   }, [shapValuesArray, featureValuesArray, labels]);
 
-  const [sortedShapValuesArray, sortedFeatureValuesArray, sortedLabels] =
-    useMemo(
-      () => [
-        datasets.map((d) => d.shapValues),
-        datasets.map((d) => d.featureValues),
-        datasets.map((d) => d.label),
-      ],
-      [datasets]
-    );
-
-  const [minShap, maxShap] = useMemo(() => [-50, 50], []);
-
-  const colorScale = useMemo(
-    () =>
-      d3
-        .scaleLinear<string>()
-        .domain([minShap, 0, maxShap])
-        .range([
-          "#008bfc", // blue
-          "#ffffff", // white
-          "#ff0051", // red
-        ])
-        .clamp(true),
-    [minShap, maxShap]
+  const [sortedShapValuesArray, , sortedLabels] = useMemo(
+    () => [
+      datasets.map((d) => d.shapValues),
+      datasets.map((d) => d.featureValues),
+      datasets.map((d) => d.label),
+    ],
+    [datasets]
   );
 
-  const totalHeight = useMemo(
-    () =>
-      sortedShapValuesArray.length * height +
-      (sortedShapValuesArray.length - 1) * 10,
-    [sortedShapValuesArray, height]
-  );
+  const numRows = sortedShapValuesArray.length;
+  const numFeatures = numRows > 0 ? sortedShapValuesArray[0].length : 0;
 
-  const maxBarWidth = 25;
-  const barWidthScale = useMemo(
-    () => d3.scaleLinear().domain([minShap, maxShap]).range([0, maxBarWidth]),
-    [minShap, maxShap]
-  );
+  const plotWidth = numFeatures > 0 ? totalWidth * 0.6 : 0;
+  const rectHeight =
+    numRows > 0
+      ? (totalHeight - topMargin - bottomMargin - (numRows - 1) * rowSpacing) /
+        numRows
+      : 0;
+  const rectWidth = numFeatures > 0 ? plotWidth / numFeatures : 0;
+
+  const textXOffset = leftMargin + plotWidth + 10;
+
+  const totalBarAreaHeight = numRows * rectHeight + (numRows - 1) * rowSpacing;
+  const centerY = topMargin + totalBarAreaHeight / 2;
+
+  const legendHeight = totalBarAreaHeight;
+  const legendXOffset = textXOffset + 45;
+  const legendYStart = centerY - legendHeight / 2;
+
+  const legendTopLabelY = legendYStart - 5;
+  const legendBottomLabelY = legendYStart + legendHeight + 15;
+
+  const legendMidY = centerY;
+  const shapValuesLabelX = legendXOffset + 30;
 
   useEffect(() => {
     if (!svgRef.current) return;
-
     const svg = d3.select(svgRef.current);
 
     svg
       .selectAll(".label-text")
       .data(sortedLabels)
       .join("text")
-      .attr("class", "label-text") // Added class for selection
+      .attr("class", "label-text")
       .attr("font-size", "12px")
-      .attr("opacity", 0) // Hide it from view since it's just for measurement
+      .attr("opacity", 0)
       .text((d) => d)
       .each(function () {
         const labelWidth = (this as SVGTextElement).getBBox().width;
@@ -115,13 +125,13 @@ export default function Heatmap({
   }, [sortedLabels]);
 
   useEffect(() => {
-    if (!groupRef.current) return; // Changed from svgRef to groupRef
+    if (!groupRef.current) return;
 
     const brush = d3
       .brushX()
       .extent([
-        [leftMargin, 40],
-        [width + leftMargin, totalHeight + 40],
+        [leftMargin, topMargin],
+        [leftMargin + plotWidth, topMargin + totalBarAreaHeight],
       ])
       .on("brush end", ({ selection }) => {
         if (!selection) {
@@ -130,62 +140,74 @@ export default function Heatmap({
         }
 
         const [x0, x1] = selection;
-        const rectWidth = width / sortedShapValuesArray[0].length;
         const newSelectedIndexes = d3.range(
           Math.floor((x0 - leftMargin) / rectWidth),
           Math.ceil((x1 - leftMargin) / rectWidth)
         );
 
         setSelectedIndexes(newSelectedIndexes);
-        console.log("Selected Points:", newSelectedIndexes);
       });
 
     const group = d3.select(groupRef.current);
     group.selectAll(".brush").remove();
-    group.append("g").attr("class", "brush").call(brush);
+
+    const brushGroup = group.append("g").attr("class", "brush");
+    brushGroup.call(brush);
+
+    brushGroup
+      .selectAll(".selection")
+      .style("fill", "rgba(128, 128, 128, 0.2)")
+      .style("stroke", "rgba(128, 128, 128, 0.2)");
 
     return () => {
       group.select(".brush").remove();
     };
-  }, [width, leftMargin, totalHeight, sortedShapValuesArray, groupRef]);
+  }, [
+    leftMargin,
+    plotWidth,
+    rectWidth,
+    topMargin,
+    totalBarAreaHeight,
+    groupRef,
+  ]);
 
   return (
-    <svg
-      ref={svgRef}
-      width={(width + leftMargin + maxBarWidth + 100) * scaleFactor}
-      height={(totalHeight + 70) * scaleFactor}
-    >
-      <g ref={groupRef} transform={`scale(${scaleFactor})`}>
-        {" "}
+    <svg ref={svgRef} width={totalWidth} height={totalHeight}>
+      <rect
+        x={0}
+        y={0}
+        width={totalWidth}
+        height={totalHeight}
+        fill="none"
+        stroke="black"
+      />
+      <g ref={groupRef}>
         <text
           className="title"
-          x={(width + leftMargin + maxBarWidth + 100) / 2}
+          x={(leftMargin + (leftMargin + plotWidth)) / 2}
           y={20}
           textAnchor="middle"
           fontWeight="bold"
+          fontSize={12}
         >
           {title}
         </text>
-        {sortedShapValuesArray.map((shapValues, idx) => {
-          const featureValues = sortedFeatureValuesArray[idx];
-          const numFeatures = featureValues.length;
-          const rectWidth = width / numFeatures;
-          const rectHeight = height;
-          const yOffset = idx * (rectHeight + 10) + 40;
 
+        {sortedShapValuesArray.map((shapValues, idx) => {
           const averageShap = datasets[idx].averageShap;
-          const normalizedBarWidth = barWidthScale(averageShap);
+          const yOffset = topMargin + idx * (rectHeight + rowSpacing);
+          const textY = yOffset + rectHeight / 2 + 3;
 
           return (
-            <g key={idx} transform={`translate(${leftMargin}, ${yOffset})`}>
+            <g key={idx}>
               {shapValues.map((shapValue, i) => {
                 const isSelected =
                   selectedIndexes.length === 0 || selectedIndexes.includes(i);
                 return (
                   <rect
                     key={i}
-                    x={i * rectWidth}
-                    y={0}
+                    x={leftMargin + i * rectWidth}
+                    y={yOffset}
                     width={rectWidth}
                     height={rectHeight}
                     fill={colorScale(shapValue)}
@@ -193,26 +215,19 @@ export default function Heatmap({
                   />
                 );
               })}
-
-              <rect
-                x={width}
-                y={rectHeight / 2 - 5}
-                width={normalizedBarWidth + 3}
-                height={15}
-                fill="black"
-              />
-
               <text
-                x={width + 15}
-                y={rectHeight / 2 - 15}
-                textAnchor="middle"
-                fontSize="12"
+                x={textXOffset}
+                y={textY}
+                textAnchor="start"
+                fontSize={fontSize}
+                fill="black"
               >
                 {averageShap.toFixed(2)}
               </text>
             </g>
           );
         })}
+
         <defs>
           <linearGradient id="legend-gradient" x1="0" x2="0" y1="0" y2="1">
             <stop offset="0%" stopColor={colorScale(maxShap)} />
@@ -220,56 +235,56 @@ export default function Heatmap({
             <stop offset="100%" stopColor={colorScale(minShap)} />
           </linearGradient>
         </defs>
-        <rect
-          x={width + leftMargin + maxBarWidth + 30}
-          y={40}
-          width={10}
-          height={totalHeight}
-          fill="url(#legend-gradient)"
-        />
+
         <text
-          x={width + leftMargin + maxBarWidth + 50}
-          y={40}
+          x={legendXOffset}
+          y={legendTopLabelY}
+          fontSize={fontSize}
           textAnchor="start"
-          fontSize="12"
         >
           {maxShap.toFixed(2)}+
         </text>
+        <rect
+          x={legendXOffset}
+          y={legendYStart}
+          width={legendBarWidth}
+          height={legendHeight}
+          fill="url(#legend-gradient)"
+        />
         <text
-          x={width + leftMargin + maxBarWidth + 50}
-          y={totalHeight + 40}
+          x={legendXOffset}
+          y={legendBottomLabelY}
+          fontSize={fontSize}
           textAnchor="start"
-          fontSize="12"
         >
           {minShap.toFixed(2)}+
         </text>
         <text
-          x={width + leftMargin + 15}
-          y={totalHeight + height + 10}
+          x={shapValuesLabelX}
+          y={legendMidY}
+          fontSize={fontSize}
           textAnchor="middle"
-          fontSize="12"
-        >
-          |Avg. SHAP|
-        </text>
-        <text
-          x={width + leftMargin + maxBarWidth + 50 + 10}
-          y={totalHeight / 2 + 40}
-          textAnchor="middle"
-          fontSize="13"
-          transform={`rotate(-90, ${width + leftMargin + maxBarWidth + 70}, ${
-            totalHeight / 2 + 40
-          })`}
+          transform={`rotate(-90, ${shapValuesLabelX}, ${legendMidY})`}
         >
           SHAP Values
         </text>
+        <text
+          x={10 + textXOffset}
+          y={topMargin + totalBarAreaHeight + 20}
+          textAnchor="middle"
+          fontSize={fontSize}
+        >
+          |Avg. SHAP|
+        </text>
+
         {sortedLabels.map((label, idx) => (
           <text
             key={idx}
             x={leftMargin / 2}
-            y={idx * (height + 10) + height / 2 + 40}
+            y={topMargin + idx * (rectHeight + rowSpacing) + rectHeight / 2}
             textAnchor="middle"
             alignmentBaseline="middle"
-            fontSize="12"
+            fontSize={12}
           >
             {label}
           </text>

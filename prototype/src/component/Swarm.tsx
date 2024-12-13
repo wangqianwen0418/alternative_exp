@@ -1,10 +1,6 @@
 import * as d3 from "d3";
 import { useEffect, useState, useMemo } from "react";
-
-type Annotation =
-  | { type: "highlightPoints"; shapValues: number[]; label: string }
-  | { type: "highlightRange"; shapRange: [number, number]; label: string }
-  | { type: "singleLine"; xValue?: number; yValue?: number; label: string };
+import { TAnnotation } from "../util/types";
 
 interface SwarmProps {
   xValues: number[][];
@@ -14,7 +10,7 @@ interface SwarmProps {
   ids: string[];
   selectedIndices: number[];
   setSelectedIndices: (indices: number[]) => void;
-  annotation?: Annotation;
+  annotation?: TAnnotation;
 }
 
 export default function Swarm(props: SwarmProps) {
@@ -216,16 +212,21 @@ export default function Swarm(props: SwarmProps) {
 
   const highlightedIndices = useMemo(() => {
     if (annotation) {
-      const dataIndex = ids.indexOf(annotation.label);
+      const dataIndex = ids.indexOf(annotation.label!);
       if (dataIndex !== -1) {
         const datasetXValues = xValues[dataIndex];
         let indices: number[] = [];
         if (annotation.type === "highlightPoints") {
           indices = datasetXValues
-            .map((x, i) => (annotation.shapValues.includes(x) ? i : -1))
+            .map((x, i) => (annotation.xValues.includes(x) ? i : -1))
             .filter((i) => i !== -1);
         } else if (annotation.type === "highlightRange") {
-          const [minRange, maxRange] = annotation.shapRange;
+          if (annotation.yValueRange) {
+            throw new Error(
+              "yValueRange is not supported in the Swarm plot. Use xValueRange instead."
+            );
+          }
+          const [minRange, maxRange] = annotation.xValueRange!;
           let minR = minRange;
           let maxR = maxRange;
           if (minRange === -Infinity) minR = xScale.domain()[0];
@@ -250,7 +251,7 @@ export default function Swarm(props: SwarmProps) {
   useEffect(() => {
     if (annotation) {
       if (highlightedIndices.length > 0) {
-        const dataIndex = ids.indexOf(annotation.label);
+        const dataIndex = ids.indexOf(annotation.label!);
         if (dataIndex !== -1) {
           const datasetXValues = xValues[dataIndex];
           const xHighlightedValues = highlightedIndices.map(
@@ -564,20 +565,20 @@ export default function Swarm(props: SwarmProps) {
                   )}
                 {annotation.type === "highlightRange" && (
                   <>
-                    {isFinite(annotation.shapRange[0]) && (
+                    {isFinite(annotation.xValueRange![0]) && (
                       <line
-                        x1={xScale(annotation.shapRange[0])}
-                        x2={xScale(annotation.shapRange[0])}
+                        x1={xScale(annotation.xValueRange![0])}
+                        x2={xScale(annotation.xValueRange![0])}
                         y1={yCenters[datasetIndex] - plotHeight / 2}
                         y2={yCenters[datasetIndex] + plotHeight / 2}
                         stroke="black"
                         strokeDasharray="4,2"
                       />
                     )}
-                    {isFinite(annotation.shapRange[1]) && (
+                    {isFinite(annotation.xValueRange![1]) && (
                       <line
-                        x1={xScale(annotation.shapRange[1])}
-                        x2={xScale(annotation.shapRange[1])}
+                        x1={xScale(annotation.xValueRange![1])}
+                        x2={xScale(annotation.xValueRange![1])}
                         y1={yCenters[datasetIndex] - plotHeight / 2}
                         y2={yCenters[datasetIndex] + plotHeight / 2}
                         stroke="black"
