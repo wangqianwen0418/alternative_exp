@@ -11,6 +11,7 @@ interface BarProps {
   id: string;
   offsets: number[];
   annotation?: TAnnotation;
+  highlightedFeatures?: string[];
 }
 
 export default function Bar(props: BarProps) {
@@ -24,6 +25,7 @@ export default function Bar(props: BarProps) {
     id,
     offsets,
     annotation,
+    highlightedFeatures,
   } = props;
 
   const [selectedBars, setSelectedBars] = useState<string[]>([]);
@@ -150,13 +152,14 @@ export default function Bar(props: BarProps) {
           .style("fill", "rgba(128, 128, 128, 0.2)")
           .style("stroke", "rgba(128, 128, 128, 0.2)");
       }
-    } else if (annotation.type === "highlightBars") {
-      if (brushGroupRef.current) {
-        brushGroupRef.current.remove();
-        brushGroupRef.current = null;
-      }
-      setSelectedBars(annotation.labels);
     }
+    // else if (annotation.type === "highlightBars") {
+    //   if (brushGroupRef.current) {
+    //     brushGroupRef.current.remove();
+    //     brushGroupRef.current = null;
+    //   }
+    //   setSelectedBars(annotation.labels);
+    // }
   }, [
     id,
     annotation,
@@ -167,6 +170,23 @@ export default function Bar(props: BarProps) {
     height,
     setSelectedBars,
   ]);
+
+  useEffect(() => {
+    // If there are highlighted features, set them as selected bars
+    if (highlightedFeatures && highlightedFeatures.length > 0) {
+      console.log("FEATURES TO HIGHLIGHT: " + highlightedFeatures);
+      setSelectedBars(highlightedFeatures);
+      d3.selectAll(`g.bar#${id} .bars g.bar-group`).each(function () {
+        const featureName = d3.select(this).attr("data-feature-name");
+        const isSelected = highlightedFeatures.includes(featureName);
+        d3.select(this).attr("opacity", isSelected ? 1 : 0.3);
+      });
+    } else {
+      // If no highlighted features, reset the selection
+      setSelectedBars([]);
+      d3.selectAll(`g.bar#${id} .bars g.bar-group`).attr("opacity", 1);
+    }
+  }, [highlightedFeatures, id]);
 
   return (
     <g
@@ -186,6 +206,8 @@ export default function Bar(props: BarProps) {
         {sortedAvgShapeValues.map(([featureName, value], index) => {
           const isSelected =
             selectedBars.length > 0 ? selectedBars.includes(featureName) : true;
+          console.log(featureName);
+          console.log(isSelected);
           return (
             <g
               key={featureName}

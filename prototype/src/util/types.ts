@@ -30,6 +30,7 @@ export type TGraph = {
   xValues: string;
   yValues: string;
   annotation?: TAnnotation;
+  features?: string[];
 };
 
 

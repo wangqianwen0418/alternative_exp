@@ -8,7 +8,9 @@ export const generatePrompt = (
 ) => `
 You are a bot that extracts structured content from User Interpretations (“insight”) of graphs related to how a machine learning system treats certain features. You will output a JSON object with specific information. 
 
-First, ensure that all features mentioned in the insight are in this list: ${feature_names.join(", ")}. If a feature is not in the list, set Variables to ["ERROR"]. Abbreviations (like "BMI" for "Body Mass Index") are fine.
+First, ensure that all features mentioned in the insight are in this list: ${feature_names.join(
+  ", "
+)}. If a feature is not in the list, set Variables to ["ERROR"]. Abbreviations (like "BMI" for "Body Mass Index") are fine.
 
 Next, determine the Category of the insight based on these descriptions: 
 
@@ -87,29 +89,30 @@ When you want to see how different features impact the prediction for individual
 XValues and YValues: This depends on the GraphType
 Swarm and Scatter: XValues and YValues are the name of one of the features we are looking at
 Bar and Heatmap: Set both to "None".
+Features: A string array ["Feature 1", "Feature 2",...] of the names of the features to highlight. This should be be populated for Bar and Swarm Plots - otherwise, the value will be "None". Whenever you provide a feature name, make sure it is provided in Lower Case.
 
 Annotation and AnnotationParams are the next two values in the JSON. Here are the options for Annotation:
-SingleLine: When comparing to a single value (in either X or Y direction). AnnotationParams would be an array of two elements. The first element will be "X" or "Y", (depending on if the line is vertical or horizontal). The second element will be a number (the value the line should be drawn at).
+SingleLine: When comparing to a single value (in either X or Y direction). AnnotationParams would be an array of two elements. The first element will be "X" or "Y", (If the line is vertical, use 'X' - if the line is horizontal, use 'Y'.). The second element will be a number (the value the line should be drawn at).
 HighlightRange: When highlighting a range in the X,Y, or both directions. AnnotationParams would be an array [[x_min, x_max], [y_min, y_max]]. If the range is only in one direction, the other array will be empty.  In the case where one end of the range is infinity/neg. infity, please use "100" (or -100) for the value. 
 HighlightDataPoints: When highlighting specific datapoints that may not fit a range. AnnotationParams would be an string "Specific Data Points".
-HighlightBars: When highlighting specific features/bars in a Swarm or BarPlot. AnnotationParams would be a string array ["Feature 1", "Feature 2",...] of the features to highlight. 
+
 
 The optimal annotation to use will be based on constants/conditions included in the insight statement.
 
 
 Lines are more useful when we are comparing against a single value, HighlightRange is more useful when we want to highlight data points within a range (so it will not be used for Bar Graphs), and HighlightDataPoints is useful when examining a condition that does not fit neatly into a range. 
 For Heatmaps, there will be no annotations, so if the GraphType is Heatmap then both Annotation and AnnotationParams will be "None".
-For Barplots, the only annotations that are allowed are vertical lines and HighlightBars. 
+For Barplots, the only annotations that are allowed are vertical lines (so make sure to use 'X' for the first value). 
 For Swarms, there can be no range in the Y direction, only in the X direction.
 
 For example, suppose the user input statement was "The average contribution of the bmi to the prediction is larger than 20". Since we are looking at the average contribution of each feature, the GraphType value would be "Bar".
-Then, XValues and YValues would both be "None". Annotation would be "SingleLine" and AnnotationParams would be ["X", 20].
+Then, XValues and YValues would both be "None". Features would be ["BMI"]. Annotation would be "SingleLine" and AnnotationParams would be ["X", 20].
 Here's another example: 
 Suppose the user input statement was "bmi has more instances above 5 than sex". Since we are looking at individual data points (and comparing features), the GraphType value would be "Swarm".
-In this case, the XValues field should be "BMI", and the YValues field would just be "BMI". Since we want to see the data points that satisfy this criteria, Annotation would be "HighlightRange" and AnnotationParams would be [[5, 100], []].
+In this case, the XValues field should be "BMI", and the YValues field would just be "BMI". Features would be ["BMI", "sex"].  Since we want to see the data points that satisfy this criteria, Annotation would be "HighlightRange" and AnnotationParams would be [[5, 100], []].
 
 One last example: Suppose the user input statement was "There is a negative correlation between the contribution of age to predictions and the age values when the feature value is between -0.10 and 0.00". 
-In this case, since we are looking at correlation, GraphType would be "Scatter". Then the XValues field would be "Age" and the YValues field would be "Age".  The Annotation field would be "HighlightRange", and AnnotationParams would be [[-0.10, 0.00], []].
+In this case, since we are looking at correlation, GraphType would be "Scatter". Then the XValues field would be "Age" and the YValues field would be "Age".  Since it is a scatter plot, Features would be "None". The Annotation field would be "HighlightRange", and AnnotationParams would be [[-0.10, 0.00], []].
 
 
 Here’s an example of the full JSON:
@@ -137,6 +140,7 @@ Condition: {}
 GraphType: "Bar" - since we are comparing the average values of two different features.
 XValues would be "None".
 YValues would be "None".
+Features would be ["BMI", "Age"]
 Annotation would be "None".
 AnnotationParams would be "None".
 
@@ -167,6 +171,7 @@ Condition: {
 GraphType: "Scatter",
 XValues: "bmi",
 YValues: "bmi",
+Features: "None",
 Annotation: "HighlightRange", 
 AnnotationParams: [[0.05, 0.10], []]
 
@@ -267,6 +272,10 @@ export const parseInput = async (
             graphType: jsonObject.GraphType,
             xValues: jsonObject.XValues,
             yValues: jsonObject.YValues,
+            ...(jsonObject.Features &&
+              jsonObject.Features !== "None" && {
+                features: jsonObject.Features,
+              }),
             ...(jsonObject.Annotation !== "None" && {
               annotation: (() => {
                 switch (jsonObject.Annotation) {
@@ -274,32 +283,39 @@ export const parseInput = async (
                     const xRange = jsonObject.AnnotationParams[0];
                     const yRange = jsonObject.AnnotationParams[1];
 
-                    const range: { type: string, xRange?: number[], yRange?: number[] } = {
+                    const range: {
+                      type: string;
+                      xRange?: number[];
+                      yRange?: number[];
+                    } = {
                       type: "HighlightRange",
                     };
-                    if (xRange && xRange.length > 0){
+                    if (xRange && xRange.length > 0) {
                       range.xRange = xRange;
                     }
-                    if (yRange && yRange.length > 0){
+                    if (yRange && yRange.length > 0) {
                       range.yRange = yRange;
                     }
                     return range;
                   case "SingleLine":
                     const [axis, value] = jsonObject.AnnotationParams;
-                    const line: { type: string, xValue?: number, yValue?: number } = {
+                    const line: {
+                      type: string;
+                      xValue?: number;
+                      yValue?: number;
+                    } = {
                       type: "singleLine",
                     };
-                    if (axis === "X"){
+                    if (axis === "X" || jsonObject.GraphType == "Bar") {
                       line.xValue = value;
-                    }
-                    else if (axis === "Y"){
+                    } else if (axis === "Y") {
                       line.yValue = value;
-                    } 
+                    }
                     return line;
                   case "Highlight Specific Data Points":
                     return {
                       type: "highlightDataPoints",
-                      dataPoints: [0,1,2,3,4,5,6],
+                      dataPoints: [0, 1, 2, 3, 4, 5, 6],
                     };
                   default:
                     return null; // Return null if there's no valid annotation type

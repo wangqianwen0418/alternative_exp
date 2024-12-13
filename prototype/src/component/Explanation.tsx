@@ -42,11 +42,14 @@ export default function Explanation() {
   const [initVis] = useAtom(initVisAtom);
   const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
   const [initialVisWidth, setInitialVisWidth] = useState(0);
+  const [initialVisHeight, setInitialVisHeight] = useState(0); // State to store initial vis height
+  const [additionalVisHeight, setAdditionalVisHeight] = useState(0); // State to store additional vis height
   const initialVisRef = useRef<SVGGElement>(null);
   const additionalVisRef = useRef<SVGGElement>(null)
 
   const [initialVisYPos, setInitialVisYPos] = useState(0);
   const [additionalVisYPos, setAdditionalVisYPos] = useState(0); 
+
 
   let featureName = "bmi",
     featureIndex = shap_diabetes["feature_names"].indexOf(featureName),
@@ -155,6 +158,7 @@ export default function Explanation() {
                   ? insight?.graph.annotation
                   : undefined
               }
+              highlightedFeatures={insight?.graph.features}
             />
           </>
         );
@@ -251,35 +255,33 @@ export default function Explanation() {
   useEffect(() => {
     if (initialVisRef.current) {
       const bbox = initialVisRef.current.getBBox();
-      setInitialVisWidth(bbox.width); // Set the measured width of the initial visualization
-      setInitialVisYPos(bbox.y); // Set Y position for alignment
+      setInitialVisHeight(bbox.height); // Set the height of the initial visualization
     }
 
-    // Also measure the Y position of the additional visualization
     if (additionalVisRef.current) {
       const bbox = additionalVisRef.current.getBBox();
-      setAdditionalVisYPos(bbox.y); // Set the Y position for the additional visualization
+      setAdditionalVisHeight(bbox.height); // Set the height of the additional visualization
     }
   }, [initialVisualization, additionalVisualizations]);
 
   const yOffsetDifference = initialVisYPos - additionalVisYPos;
 
-return (
+  return (
     <Paper style={{ padding: "15px" }}>
       <Typography variant="h5" gutterBottom>
         Visual Explanation
       </Typography>
-      <svg className="swarm" width="100%" height="70vh">
+      <svg className="swarm" width="100%" height="100vh">
         {/* Initial Visualization */}
         <g ref={initialVisRef} transform="translate(0, 0)">
           {initialVisualization}
         </g>
 
-        {/* Dynamically position the additional visualization to the right of initialVisualization */}
+        {/* Additional Visualization BELOW the initialVisualization */}
         {isSubmitted && (
           <g
             ref={additionalVisRef}
-            transform={`translate(${initialVisWidth + 20}, ${yOffsetDifference})`}
+            transform={`translate(0, ${initialVisHeight + 20})`}
           >
             {additionalVisualizations}
           </g>

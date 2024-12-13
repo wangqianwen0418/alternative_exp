@@ -79,6 +79,9 @@ export default function Interpretation() {
           prompt
         );
         setInsight(parsedInput);
+        console.log("PARSED INPUT: ");
+        console.log(parsedInput);
+
       } catch (error) {
         console.error("Error parsing input: ", error);
       }
@@ -99,6 +102,8 @@ export default function Interpretation() {
     try {
       const parsedInput: TInsight = await parseInput(freeText, apiKey, prompt);
       setInsight(parsedInput); // Update insight to reflect the newly parsed input
+      console.log("PARSED INPUT: ");
+      console.log(parsedInput);
     } catch (error) {
       console.error("Error parsing input: ", error);
     }
