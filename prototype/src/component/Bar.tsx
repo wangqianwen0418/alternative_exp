@@ -98,7 +98,7 @@ export default function Bar(props: BarProps) {
 
   // Separate useEffect for the brush
   useEffect(() => {
-    if (!annotation || annotation.type !== "highlightBars") {
+    if (!annotation) {
       if (!brushGroupRef.current) {
         const brushGroup = d3
           .select(`g.bar#${id}`)

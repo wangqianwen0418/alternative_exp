@@ -231,11 +231,11 @@ export default function Explanation() {
         additionalVisualizations = isSubmitted && (
           <>
             <Swarm
-              colorValues={featureValues}
-              xValues={featureShapValues}
+              colorValues={[featureValues]}
+              xValues={[featureShapValues]}
               width={400}
               height={300}
-              id="bmi-scatter"
+              ids={["bmi-scatter"]}
               selectedIndices={selectedIndices}
               setSelectedIndices={setSelectedIndices}
               annotation={

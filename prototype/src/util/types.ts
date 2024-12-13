@@ -19,10 +19,9 @@ export type TQuestion = TPageBase & {
 
 
 export type TAnnotation = 
-  | { type: "highlightDataPoints"; dataPoints: number[] } // An array of data points to highlight
-  | { type: "highlightRange"; xRange?: [number, number], yRange?: [number, number] } // A range along X axis
-  | { type: "singleLine"; xValue?: number, yValue?: number } // A vertical line at a specific X value
-  | { type: "highlightBars"; labels: string[] };
+  | { type: "highlightDataPoints"; dataPoints: number[], label?: string} // An array of data points to highlight
+  | { type: "highlightRange"; xRange?: [number, number], yRange?: [number, number], label?: string} // A range along X axis
+  | { type: "singleLine"; xValue?: number, yValue?: number, label?: string}; // A vertical line at a specific X value
 
 
 export type TGraph = {
@@ -80,12 +79,4 @@ export type TVariable = {
   type: "value of" | "contribution of" | `number of instances ${string} of`;
 };
 
-export type TAnnotation =
-  | { type: "highlightPoints"; xValues: number[]; label?: string }
-  | {
-      type: "highlightRange";
-      xValueRange?: [number, number];
-      yValueRange?: [number, number];
-      label?: string;
-    }
-  | { type: "singleLine"; xValue?: number; yValue?: number; label?: string };
+

@@ -14,9 +14,9 @@ interface SwarmProps {
 }
 
 export default function Swarm(props: SwarmProps) {
-  let margin = useMemo(() => [10, 40, 40, 10], []);
-  const radius = 2;
-  const leftTitleMargin = 40;
+  // let margin = useMemo(() => [10, 40, 40, 10], []);
+  // const radius = 2;
+  // const leftTitleMargin = 40;
   const [selectedPoints, setSelectedPoints] = useState<number[]>([]);
   const [brushSelection, setBrushSelection] = useState<[number, number] | null>(
     null
@@ -224,17 +224,17 @@ export default function Swarm(props: SwarmProps) {
       if (dataIndex !== -1) {
         const datasetXValues = xValues[dataIndex];
         let indices: number[] = [];
-        if (annotation.type === "highlightPoints") {
+        if (annotation.type === "highlightDataPoints") {
           indices = datasetXValues
-            .map((x, i) => (annotation.xValues.includes(x) ? i : -1))
+            .map((x, i) => (annotation.dataPoints.includes(x) ? i : -1))
             .filter((i) => i !== -1);
         } else if (annotation.type === "highlightRange") {
-          if (annotation.yValueRange) {
+          if (annotation.yRange) {
             throw new Error(
               "yValueRange is not supported in the Swarm plot. Use xValueRange instead."
             );
           }
-          const [minRange, maxRange] = annotation.xValueRange!;
+          const [minRange, maxRange] = annotation.xRange!;
           let minR = minRange;
           let maxR = maxRange;
           if (minRange === -Infinity) minR = xScale.domain()[0];
@@ -573,20 +573,20 @@ export default function Swarm(props: SwarmProps) {
                   )}
                 {annotation.type === "highlightRange" && (
                   <>
-                    {isFinite(annotation.xValueRange![0]) && (
+                    {isFinite(annotation.xRange![0]) && (
                       <line
-                        x1={xScale(annotation.xValueRange![0])}
-                        x2={xScale(annotation.xValueRange![0])}
+                        x1={xScale(annotation.xRange![0])}
+                        x2={xScale(annotation.xRange![0])}
                         y1={yCenters[datasetIndex] - plotHeight / 2}
                         y2={yCenters[datasetIndex] + plotHeight / 2}
                         stroke="black"
                         strokeDasharray="4,2"
                       />
                     )}
-                    {isFinite(annotation.xValueRange![1]) && (
+                    {isFinite(annotation.xRange![1]) && (
                       <line
-                        x1={xScale(annotation.xValueRange![1])}
-                        x2={xScale(annotation.xValueRange![1])}
+                        x1={xScale(annotation.xRange![1])}
+                        x2={xScale(annotation.xRange![1])}
                         y1={yCenters[datasetIndex] - plotHeight / 2}
                         y2={yCenters[datasetIndex] + plotHeight / 2}
                         stroke="black"
