@@ -45,7 +45,7 @@ export default function UserResponse() {
 
   const [modalVisible, setModalVisible] = React.useState(false);
   const [userAnswer, setUserAnswer] = React.useState<
-    "yes" | "no" | undefined
+    "yes" | "no" | "unsure" | undefined
   >();
   const [confidence, setConfidence] = React.useState(confidenceOptions[0]);
   const [isSecondPart, setIsSecondPart] = React.useState(false);
@@ -87,7 +87,6 @@ export default function UserResponse() {
         moveToNextQuestion();
       }
     } else {
-      // Switch to second visualization
       setInitVis(QuestionList[currentQuestionIndex].secondVis);
       setUserAnswer(undefined);
       setConfidence(confidenceOptions[0]);
@@ -114,10 +113,10 @@ export default function UserResponse() {
     <>
       <Paper style={{ padding: "15px 20px", marginTop: "10px" }}>
         <Typography variant="h5" gutterBottom sx={{ fontWeight: 800 }}>
-          Please Respond Here
+          Q{questionIndex + 1} - Please Respond Here
         </Typography>
         <span>
-          <b>Q{questionIndex + 1}.1:</b>{" "}
+          <b>Part 1:</b>{" "}
           {isSecondPart
             ? "Given the new visualization, is the above interpretation accurate?"
             : "Is the above interpretation accurate?"}
@@ -127,21 +126,54 @@ export default function UserResponse() {
           aria-labelledby="demo-row-radio-buttons-group-label"
           name="row-radio-buttons-group"
         >
-          <Radio
-            checked={userAnswer === "yes"}
-            onChange={() => setUserAnswer("yes")}
-          />{" "}
-          <span style={{ margin: "auto 0" }}>Yes, accurate</span>
-          <Radio
-            checked={userAnswer === "no"}
-            onChange={() => setUserAnswer("no")}
-          />{" "}
-          <span style={{ margin: "auto 0" }}>No, inaccurate </span>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              marginRight: "16px",
+            }}
+          >
+            <Radio
+              checked={userAnswer === "yes"}
+              onChange={() => setUserAnswer("yes")}
+            />
+            <span>
+              Yes, the statement is correct/accurate based on the visualization
+            </span>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              marginRight: "16px",
+            }}
+          >
+            <Radio
+              checked={userAnswer === "no"}
+              onChange={() => setUserAnswer("no")}
+            />
+            <span>
+              No, the statement is incorrect - I see the opposite/a different
+              trend/pattern
+            </span>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <Radio
+              checked={userAnswer === "unsure"}
+              onChange={() => setUserAnswer("unsure")}
+            />
+            <span>
+              Unsure - the visualization does not make it clear if this
+              statement is true or false
+            </span>
+          </div>
         </RadioGroup>
 
         <div style={{ display: "flex" }}>
           <span style={{ margin: "auto 0" }}>
-            <b>Q{questionIndex + 1}.2:</b>{" "}
+            <b>Part 2:</b>{" "}
             {isSecondPart
               ? "Given the new visualization, please rate your confidence"
               : "Please rate your confidence"}{" "}

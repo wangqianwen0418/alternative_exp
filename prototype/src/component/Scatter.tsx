@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 import { useEffect, useState, useMemo } from "react";
+import { TAnnotation } from "../util/types";
 
 interface ScatterProps {
   offsets: number[];
@@ -10,17 +11,8 @@ interface ScatterProps {
   id: string;
   selectedIndices: number[];
   setSelectedIndices: (indices: number[]) => void;
-  annotation?: Annotation;
+  annotation?: TAnnotation;
 }
-
-type Annotation =
-  | { type: "highlightPoints"; xValues: number[] }
-  | {
-      type: "highlightRange";
-      xValueRange?: [number, number];
-      yValueRange?: [number, number];
-    }
-  | { type: "singleLine"; xValue?: number; yValue?: number };
 
 export default function Scatter(props: ScatterProps) {
   const {
