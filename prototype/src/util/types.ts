@@ -80,4 +80,12 @@ export type TVariable = {
   type: "value of" | "contribution of" | `number of instances ${string} of`;
 };
 
-
+export type TAnnotation =
+  | { type: "highlightPoints"; xValues: number[]; label?: string }
+  | {
+      type: "highlightRange";
+      xValueRange?: [number, number];
+      yValueRange?: [number, number];
+      label?: string;
+    }
+  | { type: "singleLine"; xValue?: number; yValue?: number; label?: string };

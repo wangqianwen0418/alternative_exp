@@ -8,7 +8,9 @@ import {
   // test_random_shap,
   diabetes_bmi_featureValues,
   diabetes_bmi_shapValues,
-} from "../util/diabetesHeatmapData";
+  // diabetes_s5_shapValues,
+  // diabetes_s5_featureValues,
+} from "../util/diabetesData";
 import { useState, useEffect, useRef } from "react";
 import Heatmap from "./Heatmap";
 import Swarm from "./Swarm";
@@ -68,17 +70,31 @@ export default function Explanation() {
     case "beeswarm":
       initialVisualization = (
         <Swarm
-          xValues={diabetes_bmi_shapValues}
-          colorValues={diabetes_bmi_featureValues}
+          xValues={diabetesShapValues}
+          colorValues={diabetesFeatureValues}
+          ids={diabetesLabels}
+          // xValues={[diabetes_s5_shapValues]}
+          // colorValues={[diabetes_s5_featureValues]}
+          // ids={["serum triglycerides level"]}
           width={500}
           height={300}
-          id="bmi"
           selectedIndices={selectedIndices}
           setSelectedIndices={setSelectedIndices}
-          // annotation={{ type: "highlightRange", shapRange: [-20, 30] }}
-          // annotation={{ type: "highlightRange", shapRange: [30, Infinity] }}
-          // annotation={{ type: "singleLine", xValue: 15 }}
-          // annotation={{ type: "highlightPoints", shapValues: test_random_shap }}
+          // annotation={{
+          //   type: "highlightRange",
+          //   xValueRange: [-20, 30],
+          //   label: "serum triglycerides level",
+          // }}
+          // annotation={{
+          //   type: "singleLine",
+          //   xValue: 15,
+          //   label: "serum triglycerides level",
+          // }}
+          // annotation={{
+          //   type: "highlightPoints",
+          //   shapValues: test_random_shap,
+          //   label: "bmi",
+          // }}
         />
       );
       break;
@@ -124,8 +140,8 @@ export default function Explanation() {
           shapValuesArray={diabetesShapValues}
           featureValuesArray={diabetesFeatureValues}
           labels={diabetesLabels}
-          width={800}
-          height={50}
+          width={600}
+          height={250}
           title="Diabetes Heatmap"
         />
       );

@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { useEffect , useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { TAnnotation } from "../util/types";
 
 interface ScatterProps {
