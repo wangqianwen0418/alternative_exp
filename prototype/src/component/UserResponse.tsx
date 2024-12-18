@@ -144,7 +144,8 @@ export default function UserResponse() {
               onChange={() => setUserAnswer("yes")}
             />
             <span>
-              Yes, the statement is correct/accurate based on the visualization
+              <b>Correct</b>: the visualization(s) clearly supports this
+              statement.
             </span>
           </div>
 
@@ -160,8 +161,7 @@ export default function UserResponse() {
               onChange={() => setUserAnswer("no")}
             />
             <span>
-              No, the statement is incorrect - I see the opposite/a different
-              trend/pattern
+              <b>Incorrect</b> - the visualization contradict this statement.
             </span>
           </div>
 
@@ -171,8 +171,8 @@ export default function UserResponse() {
               onChange={() => setUserAnswer("unsure")}
             />
             <span>
-              Unsure - the visualization does not make it clear if this
-              statement is true or false
+              <b>Irrelevant</b> - the visualization does not provide enough
+              information to confirm or refute this statement.
             </span>
           </div>
         </RadioGroup>
