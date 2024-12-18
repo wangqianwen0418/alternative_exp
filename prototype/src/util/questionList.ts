@@ -1,6 +1,3 @@
-//NOTE: The Graph object in each insight is currently just a placeholder. Populating it based on the specific question is a TODO.
-
-
 import { TQuestion, TVariable, TInsight, TGraph, TAnnotation } from "./types";
 
 export const QuestionList: TQuestion[] = [

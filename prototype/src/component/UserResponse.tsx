@@ -15,6 +15,7 @@ import {
   insightAtom,
   freeTextAtom,
   initVisAtom,
+  secondVisAtom,
   pageNameAtom,
   isSubmittedAtom,
   uuidAtom,
@@ -35,9 +36,10 @@ const confidenceOptions = [
 
 export default function UserResponse() {
   const [questionIndex, setQuestionIndex] = useAtom(questionIndexAtom);
-  const [, setInsight] = useAtom(insightAtom);
+  const [insight, setInsight] = useAtom(insightAtom);
   const [freeText, setFreetext] = useAtom(freeTextAtom);
   const [initVis, setInitVis] = useAtom(initVisAtom);
+  const [secondVis, setSecondVis] = useAtom(secondVisAtom);
   const [, setName] = useAtom(pageNameAtom);
   const [, setIsSubmitted] = useAtom(isSubmittedAtom);
   const [uuid] = useAtom(uuidAtom);
@@ -61,6 +63,7 @@ export default function UserResponse() {
       questionOrder: questionIndexesArray.toString(),
       freeText,
       currentVis: initVis,
+      optimalVis: secondVis,
       isSecondPart: isSecondPart ? "Yes" : "No",
       userAnswer,
       confidence,
@@ -87,10 +90,12 @@ export default function UserResponse() {
         moveToNextQuestion();
       }
     } else {
-      setInitVis(QuestionList[currentQuestionIndex].secondVis);
+      //setInitVis(QuestionList[currentQuestionIndex].secondVis);
+      setSecondVis(QuestionList[currentQuestionIndex].secondVis);
       setUserAnswer(undefined);
       setConfidence(confidenceOptions[0]);
       setIsSecondPart(true);
+      setIsSubmitted(true);
     }
   };
 
@@ -100,6 +105,7 @@ export default function UserResponse() {
     setFreetext(QuestionList[nextQuestionIndex].userText);
     setInsight(QuestionList[nextQuestionIndex].insight);
     setInitVis(QuestionList[nextQuestionIndex].initVis);
+    setSecondVis(QuestionList[nextQuestionIndex].secondVis);
     setName(QuestionList[nextQuestionIndex].pageName);
 
     setUserAnswer(undefined);
