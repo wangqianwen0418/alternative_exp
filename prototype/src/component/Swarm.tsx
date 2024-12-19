@@ -25,8 +25,8 @@ export default function Swarm(props: SwarmProps) {
     annotation,
   } = props;
 
-  const labelFontSize = 10;
-  const maxLabelWidth = 30;
+  const labelFontSize = 11;
+  const maxLabelWidth = 50;
 
   const canvasContext = useMemo(() => {
     if (typeof document !== "undefined") {
@@ -58,7 +58,7 @@ export default function Swarm(props: SwarmProps) {
 
   const leftTitleMargin = maxLabelWidth + 5;
   const margin = useMemo(
-    () => [40, 100, 40, leftTitleMargin],
+    () => [35, 80, 45, leftTitleMargin],
     [leftTitleMargin]
   );
 
@@ -288,6 +288,15 @@ export default function Swarm(props: SwarmProps) {
       .attr("transform", `translate(0,${totalPlotHeight - margin[2] + 5})`)
       .call(xAxis);
 
+    d3.select("g.swarm")
+      .append("text")
+      .attr("class", "x-axis-label")
+      .attr("x", (width - margin[1] - margin[3]) / 2 + margin[3])
+      .attr("y", totalPlotHeight - margin[2] + 35)
+      .attr("text-anchor", "middle")
+      .attr("font-size", labelFontSize)
+      .text("SHAP Value");
+
     const defs = d3.select("g.swarm").select("defs");
     if (defs.empty()) {
       const newDefs = d3.select("g.swarm").append("defs");
@@ -314,7 +323,6 @@ export default function Swarm(props: SwarmProps) {
     const legendX = width - margin[1] + 30;
     const middleY = margin[0] + (totalPlotHeight - margin[0] - margin[2]) / 2;
     const legendY = middleY - legendHeight / 2;
-    const xAxisTextSize = 12;
 
     d3.select("g.swarm .legend").remove();
     d3.select("g.swarm .legend-title").remove();
@@ -333,9 +341,10 @@ export default function Swarm(props: SwarmProps) {
       .append("text")
       .attr("class", "legend-title")
       .attr("x", legendX + legendWidth / 2)
-      .attr("y", legendY - 25)
+      .attr("y", middleY - 20)
       .attr("text-anchor", "middle")
-      .attr("font-size", xAxisTextSize)
+      .attr("font-size", labelFontSize)
+      .attr("transform", `rotate(90, ${legendX + legendWidth / 2}, ${middleY})`)
       .text("Feature Value");
 
     d3.select("g.swarm")
@@ -344,7 +353,7 @@ export default function Swarm(props: SwarmProps) {
       .attr("x", legendX + legendWidth / 2)
       .attr("y", legendY + legendHeight + 15)
       .attr("text-anchor", "middle")
-      .attr("font-size", xAxisTextSize)
+      .attr("font-size", labelFontSize)
       .text(formatValue(colorScale.domain()[0]));
 
     d3.select("g.swarm")
@@ -353,7 +362,7 @@ export default function Swarm(props: SwarmProps) {
       .attr("x", legendX + legendWidth / 2)
       .attr("y", legendY - 5)
       .attr("text-anchor", "middle")
-      .attr("font-size", xAxisTextSize)
+      .attr("font-size", labelFontSize)
       .text(formatValue(colorScale.domain()[1]));
 
     if (!annotation) {
@@ -501,9 +510,9 @@ export default function Swarm(props: SwarmProps) {
         {datasetStats ? (
           <text
             x={width / 2}
-            y={margin[0] - 15}
+            y={margin[0] - 10}
             textAnchor="middle"
-            fontSize={12}
+            fontSize={labelFontSize}
             fill="black"
           >
             {`X - Avg: ${formatValue(datasetStats.avg)}, Min: ${formatValue(
@@ -513,9 +522,9 @@ export default function Swarm(props: SwarmProps) {
         ) : (
           <text
             x={width / 2}
-            y={margin[0] - 15}
+            y={margin[0] - 10}
             textAnchor="middle"
-            fontSize={12}
+            fontSize={labelFontSize}
             fill="black"
           >
             No data selected
