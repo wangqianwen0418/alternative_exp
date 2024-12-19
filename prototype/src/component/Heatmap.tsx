@@ -91,7 +91,7 @@ export default function Heatmap({
     ctx.font = `${labelFontSizePx}px sans-serif`;
 
     return [top, right, bottom, left, rowSpace];
-  }, [sortedLabels]);
+  }, []);
 
   const numRows = sortedShapValuesArray.length;
   const numFeatures = numRows > 0 ? sortedShapValuesArray[0].length : 0;
