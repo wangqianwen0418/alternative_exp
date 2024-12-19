@@ -40,7 +40,7 @@ export default function Explanation() {
           // xValues={[diabetes_s5_shapValues]}
           // colorValues={[diabetes_s5_featureValues]}
           // ids={["serum triglycerides level"]}
-          width={500}
+          width={450}
           height={300}
           selectedIndices={selectedIndices}
           setSelectedIndices={setSelectedIndices}
@@ -67,8 +67,8 @@ export default function Explanation() {
         <Scatter
           yValues={diabetes_bmi_shapValues}
           xValues={diabetes_bmi_featureValues}
-          width={400}
-          height={300}
+          width={450}
+          height={350}
           id="bmi-scatter"
           offsets={[0, 0]}
           selectedIndices={selectedIndices}
@@ -91,8 +91,8 @@ export default function Explanation() {
         <Bar
           allShapValues={shap_diabetes["shap_values"].slice(0, 100)}
           featureNames={shap_diabetes["feature_names"].slice(0, 100)}
-          width={600}
-          height={200}
+          width={450}
+          height={250}
           id="bmi-scatter"
           offsets={[0, 0]}
           // annotation={{ type: "verticalLine", xValue: 15 }}
@@ -109,7 +109,7 @@ export default function Explanation() {
           shapValuesArray={diabetesShapValues}
           featureValuesArray={diabetesFeatureValues}
           labels={diabetesLabels}
-          width={600}
+          width={450}
           height={250}
           title="Diabetes Heatmap"
         />
