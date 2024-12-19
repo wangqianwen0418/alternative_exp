@@ -63,7 +63,6 @@ export default function UserResponse() {
       questionOrder: questionIndexesArray.toString(),
       freeText,
       currentVis: initVis,
-      optimalVis: secondVis,
       isSecondPart: isSecondPart ? "Yes" : "No",
       userAnswer,
       confidence,

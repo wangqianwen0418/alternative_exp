@@ -62,6 +62,7 @@ export default function Interpretation() {
   };
 
   const isUserStudy = pageName?.includes("question");
+  console.log("USER STUDY: " + isUserStudy);
 
   const handleSubmission = async () => {
     if (!freeText.trim()) return;
@@ -146,8 +147,10 @@ export default function Interpretation() {
           value={freeText}
           onChange={handleTextChange}
           multiline
-          rows={2}
+          minRows={1}
+          maxRows={10}
           fullWidth
+          disabled={isUserStudy}
         />
 
         <div style={{ alignItems: "center" }}>

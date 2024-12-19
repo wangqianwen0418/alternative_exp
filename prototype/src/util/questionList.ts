@@ -24,6 +24,11 @@ export const QuestionList: TQuestion[] = [
         graphType: "Bar",
         xValues: "None",
         yValues: "None",
+        features: ["bmi"],
+        annotation: {
+          type: "singleLine",
+          xValue: 20
+        }
       },
     },
     testCondition: "random vis",
@@ -52,6 +57,11 @@ export const QuestionList: TQuestion[] = [
         graphType: "Bar",
         xValues: "None",
         yValues: "None",
+        features: ["blood pressure"],
+        annotation: {
+          type: "singleLine",
+          xValue: 5
+        }
       },
     },
     testCondition: "ours",
@@ -80,6 +90,11 @@ export const QuestionList: TQuestion[] = [
         graphType: "Bar",
         xValues: "None",
         yValues: "None",
+        features: ["serum triglycerides"],
+        annotation: {
+          type: "singleLine",
+          xValue: 30
+        }
       },
     },
     testCondition: "random vis",
@@ -108,6 +123,11 @@ export const QuestionList: TQuestion[] = [
         graphType: "Bar",
         xValues: "None",
         yValues: "None",
+        features: ["serum cholesterol"],
+        annotation: {
+          type: "singleLine",
+          xValue: 2.5
+        }
       },
     },
     testCondition: "ours",
@@ -139,6 +159,8 @@ export const QuestionList: TQuestion[] = [
         graphType: "Bar",
         xValues: "none",
         yValues: "none",
+        features: ["blood pressure", "age"],
+        
       },
     },
     testCondition: "random vis",
@@ -170,6 +192,7 @@ export const QuestionList: TQuestion[] = [
         graphType: "Bar",
         xValues: "None",
         yValues: "None",
+        features: ["bmi", "sex"]
       },
     },
     testCondition: "random vis",
@@ -201,6 +224,7 @@ export const QuestionList: TQuestion[] = [
         graphType: "Bar",
         xValues: "None",
         yValues: "None",
+        features: ["age", "low-density lipoproteins"]
       },
     },
     testCondition: "ours",
@@ -233,6 +257,7 @@ export const QuestionList: TQuestion[] = [
         graphType: "Swarm",
         xValues: "BMI",
         yValues: "BMI",
+        features: ["blood pressure", "age"],
         annotation: {
           type: "singleLine",
           xValue: 0,
@@ -266,9 +291,9 @@ export const QuestionList: TQuestion[] = [
       relation: "positively",
       condition: undefined,
       graph: {
-        graphType: "Bar",
-        xValues: "None",
-        yValues: "None",
+        graphType: "Scatter",
+        xValues: "blood pressure",
+        yValues: "blood pressure",
       },
     },
     testCondition: "ours",
@@ -298,9 +323,13 @@ export const QuestionList: TQuestion[] = [
       relation: "negatively",
       condition: undefined,
       graph: {
-        graphType: "Bar",
-        xValues: "None",
-        yValues: "None",
+        graphType: "Scatter",
+        xValues: "age",
+        yValues: "age",
+        annotation: {
+          type: "highlightRange",
+          xRange: [-0.1, 0]
+        }
       },
     },
     testCondition: "random vis",
@@ -331,8 +360,12 @@ export const QuestionList: TQuestion[] = [
       condition: undefined,
       graph: {
         graphType: "Scatter",
-        xValues: "Age",
-        yValues: "Age",
+        xValues: "bmi",
+        yValues: "bmi",
+        annotation: {
+          type: "highlightRange",
+          xRange: [0.05, 0.1]
+        }
       },
     },
     testCondition: "ours",
@@ -362,9 +395,9 @@ export const QuestionList: TQuestion[] = [
       relation: "same",
       condition: undefined,
       graph: {
-        graphType: "Bar",
-        xValues: "None",
-        yValues: "None",
+        graphType: "Scatter",
+        xValues: "bmi",
+        yValues: "bmi",
       },
     },
     testCondition: "ours",
