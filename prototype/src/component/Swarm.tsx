@@ -56,7 +56,7 @@ export default function Swarm(props: SwarmProps) {
     });
   }, [ids, canvasContext, labelFontSize, maxLabelWidth]);
 
-  const leftTitleMargin = maxLabelWidth + 5;
+  const leftTitleMargin = maxLabelWidth + 10;
   const margin = useMemo(
     () => [35, 80, 45, leftTitleMargin],
     [leftTitleMargin]
@@ -509,7 +509,7 @@ export default function Swarm(props: SwarmProps) {
       <g className="annotations">
         {datasetStats ? (
           <text
-            x={width / 2}
+            x={(width - margin[1] - margin[3]) / 2 + margin[3]}
             y={margin[0] - 10}
             textAnchor="middle"
             fontSize={labelFontSize}
@@ -521,7 +521,7 @@ export default function Swarm(props: SwarmProps) {
           </text>
         ) : (
           <text
-            x={width / 2}
+            x={(width - margin[1] - margin[3]) / 2 + margin[3]}
             y={margin[0] - 10}
             textAnchor="middle"
             fontSize={labelFontSize}
@@ -550,7 +550,7 @@ export default function Swarm(props: SwarmProps) {
             key={`dataset-${datasetIndex}`}
           >
             <text
-              x={margin[3] - 2}
+              x={margin[3] - 5}
               y={yCenters[datasetIndex]}
               textAnchor="end"
               alignmentBaseline="middle"
