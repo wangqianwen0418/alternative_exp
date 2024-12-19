@@ -76,7 +76,7 @@ export default function Scatter(props: ScatterProps) {
       .attr("y", 30)
       .attr("fill", "black")
       .attr("font-size", labelFontSize)
-      .text("Feature Value");
+      .text(`Feature Value (${id})`);
 
     const yAxisGroup = d3
       .select(`g.scatter#${id}`)
@@ -95,7 +95,7 @@ export default function Scatter(props: ScatterProps) {
       .attr("y", -27.5)
       .attr("fill", "black")
       .attr("font-size", labelFontSize)
-      .text("SHAP Value");
+      .text(`SHAP Value (${id})`);
 
     if (!annotation) {
       const brushGroup = d3

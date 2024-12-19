@@ -69,7 +69,7 @@ export default function Explanation() {
           xValues={diabetes_bmi_featureValues}
           width={450}
           height={350}
-          id="bmi-scatter"
+          id="bmi"
           offsets={[0, 0]}
           selectedIndices={selectedIndices}
           setSelectedIndices={setSelectedIndices}
@@ -93,7 +93,7 @@ export default function Explanation() {
           featureNames={shap_diabetes["feature_names"].slice(0, 100)}
           width={450}
           height={250}
-          id="bmi-scatter"
+          id="bmi"
           offsets={[0, 0]}
           // annotation={{ type: "verticalLine", xValue: 15 }}
           // annotation={{
@@ -132,7 +132,7 @@ export default function Explanation() {
         xValues={diabetes_bmi_featureValues}
         width={400}
         height={300}
-        id="bmi-scatter"
+        id="bmi"
         offsets={[0, 150]}
         selectedIndices={selectedIndices}
         setSelectedIndices={setSelectedIndices}
