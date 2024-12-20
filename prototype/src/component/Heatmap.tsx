@@ -20,14 +20,10 @@ export default function Heatmap({
 }: HeatmapProps) {
   const svgRef = useRef(null);
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
-  const [leftMargin, setLeftMargin] = useState<number>(100);
   const groupRef = useRef<SVGGElement>(null);
 
-  const topMargin = 40;
-  const bottomMargin = 40;
-  const rowSpacing = 10;
-  const legendBarWidth = 10;
-  const fontSize = 10;
+  const labelFontSizePx = 12;
+  const maxLabelWidth = 50;
 
   const [minShap, maxShap] = useMemo(() => [-50, 50], []);
   const colorScale = useMemo(
@@ -80,49 +76,79 @@ export default function Heatmap({
     [datasets]
   );
 
+  const [top, right, bottom, left, rowSpace] = useMemo(() => {
+    const top = 40;
+    const bottom = 40;
+    const right = 100;
+    const rowSpace = 10;
+    const left = maxLabelWidth + 20;
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      return [top, right, bottom, left, rowSpace];
+    }
+    ctx.font = `${labelFontSizePx}px sans-serif`;
+
+    return [top, right, bottom, left, rowSpace];
+  }, []);
+
   const numRows = sortedShapValuesArray.length;
   const numFeatures = numRows > 0 ? sortedShapValuesArray[0].length : 0;
 
-  const plotWidth = numFeatures > 0 ? totalWidth * 0.6 : 0;
+  const plotWidth = numFeatures > 0 ? totalWidth - left - right : 0;
+  const plotHeight = totalHeight - top - bottom;
   const rectHeight =
-    numRows > 0
-      ? (totalHeight - topMargin - bottomMargin - (numRows - 1) * rowSpacing) /
-        numRows
-      : 0;
+    numRows > 0 ? (plotHeight - (numRows - 1) * rowSpace) / numRows : 0;
   const rectWidth = numFeatures > 0 ? plotWidth / numFeatures : 0;
 
-  const textXOffset = leftMargin + plotWidth + 10;
+  const truncatedLabels = useMemo(() => {
+    if (typeof document === "undefined") {
+      return sortedLabels;
+    }
 
-  const totalBarAreaHeight = numRows * rectHeight + (numRows - 1) * rowSpacing;
-  const centerY = topMargin + totalBarAreaHeight / 2;
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return sortedLabels;
+
+    ctx.font = `${labelFontSizePx}px sans-serif`;
+    return sortedLabels.map((label) => {
+      let truncated = label;
+      while (
+        ctx.measureText(truncated).width > maxLabelWidth &&
+        truncated.length > 1
+      ) {
+        truncated = truncated.slice(0, -1);
+      }
+
+      if (truncated !== label) {
+        while (
+          ctx.measureText(truncated + "...").width > maxLabelWidth &&
+          truncated.length > 1
+        ) {
+          truncated = truncated.slice(0, -1);
+        }
+        truncated += "...";
+      }
+      return truncated;
+    });
+  }, [sortedLabels]);
+
+  const totalBarAreaHeight = numRows * rectHeight + (numRows - 1) * rowSpace;
+  const textXOffset = left + plotWidth + 10;
+
+  const centerY = top + totalBarAreaHeight / 2;
 
   const legendHeight = totalBarAreaHeight;
+  const legendBarWidth = 10;
   const legendXOffset = textXOffset + 45;
   const legendYStart = centerY - legendHeight / 2;
 
   const legendTopLabelY = legendYStart - 5;
   const legendBottomLabelY = legendYStart + legendHeight + 15;
-
+  const fontSize = 10;
   const legendMidY = centerY;
   const shapValuesLabelX = legendXOffset + 30;
-
-  useEffect(() => {
-    if (!svgRef.current) return;
-    const svg = d3.select(svgRef.current);
-
-    svg
-      .selectAll(".label-text")
-      .data(sortedLabels)
-      .join("text")
-      .attr("class", "label-text")
-      .attr("font-size", "12px")
-      .attr("opacity", 0)
-      .text((d) => d)
-      .each(function () {
-        const labelWidth = (this as SVGTextElement).getBBox().width;
-        setLeftMargin((prevMargin) => Math.max(prevMargin, labelWidth + 10));
-      });
-  }, [sortedLabels]);
 
   useEffect(() => {
     if (!groupRef.current) return;
@@ -130,8 +156,8 @@ export default function Heatmap({
     const brush = d3
       .brushX()
       .extent([
-        [leftMargin, topMargin],
-        [leftMargin + plotWidth, topMargin + totalBarAreaHeight],
+        [left, top],
+        [left + plotWidth, top + totalBarAreaHeight],
       ])
       .on("brush end", ({ selection }) => {
         if (!selection) {
@@ -141,8 +167,8 @@ export default function Heatmap({
 
         const [x0, x1] = selection;
         const newSelectedIndexes = d3.range(
-          Math.floor((x0 - leftMargin) / rectWidth),
-          Math.ceil((x1 - leftMargin) / rectWidth)
+          Math.floor((x0 - left) / rectWidth),
+          Math.ceil((x1 - left) / rectWidth)
         );
 
         setSelectedIndexes(newSelectedIndexes);
@@ -162,14 +188,7 @@ export default function Heatmap({
     return () => {
       group.select(".brush").remove();
     };
-  }, [
-    leftMargin,
-    plotWidth,
-    rectWidth,
-    topMargin,
-    totalBarAreaHeight,
-    groupRef,
-  ]);
+  }, [left, plotWidth, rectWidth, top, totalBarAreaHeight, groupRef]);
 
   return (
     <svg ref={svgRef} width={totalWidth} height={totalHeight}>
@@ -184,7 +203,7 @@ export default function Heatmap({
       <g ref={groupRef}>
         <text
           className="title"
-          x={(leftMargin + (leftMargin + plotWidth)) / 2}
+          x={left + plotWidth / 2}
           y={20}
           textAnchor="middle"
           fontWeight="bold"
@@ -193,9 +212,10 @@ export default function Heatmap({
           {title}
         </text>
 
-        {sortedShapValuesArray.map((shapValues, idx) => {
-          const averageShap = datasets[idx].averageShap;
-          const yOffset = topMargin + idx * (rectHeight + rowSpacing);
+        {datasets.map((dataset, idx) => {
+          const shapValues = dataset.shapValues;
+          const averageShap = dataset.averageShap;
+          const yOffset = top + idx * (rectHeight + rowSpace);
           const textY = yOffset + rectHeight / 2 + 3;
 
           return (
@@ -206,7 +226,7 @@ export default function Heatmap({
                 return (
                   <rect
                     key={i}
-                    x={leftMargin + i * rectWidth}
+                    x={left + i * rectWidth}
                     y={yOffset}
                     width={rectWidth}
                     height={rectHeight}
@@ -270,21 +290,21 @@ export default function Heatmap({
         </text>
         <text
           x={10 + textXOffset}
-          y={topMargin + totalBarAreaHeight + 20}
+          y={top + totalBarAreaHeight + 20}
           textAnchor="middle"
           fontSize={fontSize}
         >
           |Avg. SHAP|
         </text>
 
-        {sortedLabels.map((label, idx) => (
+        {truncatedLabels.map((label, idx) => (
           <text
             key={idx}
-            x={leftMargin / 2}
-            y={topMargin + idx * (rectHeight + rowSpacing) + rectHeight / 2}
-            textAnchor="middle"
+            x={left - 7.5}
+            y={top + idx * (rectHeight + rowSpace) + rectHeight / 2}
+            textAnchor="end"
             alignmentBaseline="middle"
-            fontSize={12}
+            fontSize={labelFontSizePx}
           >
             {label}
           </text>

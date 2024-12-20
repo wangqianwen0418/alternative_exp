@@ -27,7 +27,8 @@ export default function Scatter(props: ScatterProps) {
     annotation,
   } = props;
 
-  const margin = useMemo(() => [30, 10, 40, 10], []);
+  const margin = useMemo(() => [22.5, 10, 40, 52.5], []);
+  const labelFontSize = 11;
 
   const xScale = useMemo(
     () =>
@@ -63,33 +64,38 @@ export default function Scatter(props: ScatterProps) {
       .select(`g.scatter#${id}`)
       .append("g")
       .attr("class", "x-axis")
-      .attr("transform", `translate(0,${height})`);
+      .attr("transform", `translate(-10,${height - margin[2]})`);
 
     xAxisGroup.call(d3.axisBottom(xScale));
+
     xAxisGroup
       .append("text")
       .attr("text-anchor", "middle")
       .attr("class", "axis-title")
-      .attr("y", -5)
-      .attr("x", width / 2)
+      .attr("x", (margin[3] + (width - margin[1])) / 2)
+      .attr("y", 30)
       .attr("fill", "black")
-      .text("Feature Values");
+      .attr("font-size", labelFontSize)
+      .text(`Feature Value (${id})`);
 
     const yAxisGroup = d3
       .select(`g.scatter#${id}`)
       .append("g")
       .attr("class", "y-axis")
-      .attr("transform", `translate(0,0)`);
+      .attr("transform", `translate(${margin[3] - 10},0)`);
 
-    yAxisGroup.call(d3.axisRight(yScale));
+    yAxisGroup.call(d3.axisLeft(yScale));
 
     yAxisGroup
       .append("text")
-      .attr("text-anchor", "start")
+      .attr("text-anchor", "middle")
       .attr("class", "axis-title")
-      .attr("transform", `rotate(-90) translate(${-height / 2}, -35)`)
+      .attr("transform", "rotate(-90)")
+      .attr("x", -((height - margin[2] + margin[0]) / 2))
+      .attr("y", -27.5)
       .attr("fill", "black")
-      .text("Contributions");
+      .attr("font-size", labelFontSize)
+      .text(`SHAP Value (${id})`);
 
     if (!annotation) {
       const brushGroup = d3
@@ -100,8 +106,8 @@ export default function Scatter(props: ScatterProps) {
       const brush = d3
         .brush()
         .extent([
-          [0, 0],
-          [width, height],
+          [margin[3], margin[0]],
+          [width - margin[1], height - margin[2]],
         ])
         .on("start", function (event) {
           brushGroup.call(brush.move, null);
@@ -232,10 +238,10 @@ export default function Scatter(props: ScatterProps) {
       elements.push(
         <text
           key="highlightStats"
-          x={width / 2}
-          y={15}
+          x={(margin[3] + (width - margin[1])) / 2}
+          y={margin[0] / 2 + 3}
           fill="black"
-          fontSize="10px"
+          fontSize={labelFontSize}
           textAnchor="middle"
         >
           {statsText}
@@ -245,10 +251,10 @@ export default function Scatter(props: ScatterProps) {
       elements.push(
         <text
           key="noDataStats"
-          x={width / 2}
-          y={15}
+          x={(margin[3] + (width - margin[1])) / 2}
+          y={margin[0] / 2 + 3}
           fill="black"
-          fontSize="10px"
+          fontSize={labelFontSize}
           textAnchor="middle"
         >
           No data selected
@@ -264,9 +270,9 @@ export default function Scatter(props: ScatterProps) {
             <line
               key="xSingleLine"
               x1={xPos}
-              y1={0}
+              y1={margin[0]}
               x2={xPos}
-              y2={height}
+              y2={height - margin[2]}
               stroke="black"
               strokeDasharray="4, 2"
             />
@@ -276,9 +282,9 @@ export default function Scatter(props: ScatterProps) {
           elements.push(
             <line
               key="ySingleLine"
-              x1={0}
+              x1={margin[3]}
               y1={yPos}
-              x2={width}
+              x2={width - margin[1]}
               y2={yPos}
               stroke="black"
               strokeDasharray="4, 2"
@@ -304,14 +310,13 @@ export default function Scatter(props: ScatterProps) {
         }
 
         if (hasXRange && hasYRange) {
-          if (hasXRange && hasYRange) {
-            const [xMin, xMax] = annotation.xRange!;
-            const [yMin, yMax] = annotation.yRange!;
+          const [xMin, xMax] = annotation.xRange!;
+          const [yMin, yMax] = annotation.yRange!;
 
-            const xStart = isFinite(xMin) ? xScale(xMin) : 0;
-            const xEnd = isFinite(xMax) ? xScale(xMax) : width;
-            const yStart = isFinite(yMin) ? yScale(yMin) : height;
-            const yEnd = isFinite(yMax) ? yScale(yMax) : 0;
+          const xStart = isFinite(xMin) ? xScale(xMin) : margin[3];
+          const xEnd = isFinite(xMax) ? xScale(xMax) : width - margin[1];
+          const yStart = isFinite(yMin) ? yScale(yMin) : height - margin[2];
+          const yEnd = isFinite(yMax) ? yScale(yMax) : margin[0];
 
           elements.push(
             <rect
@@ -327,59 +332,58 @@ export default function Scatter(props: ScatterProps) {
           );
         } else if (hasXRange) {
           const [xMin, xMax] = annotation.xRange!;
-          const xStart = xScale(xMin);
-          const xEnd = xScale(xMax);
+          const xStart = isFinite(xMin) ? xScale(xMin) : margin[3];
+          const xEnd = isFinite(xMax) ? xScale(xMax) : width - margin[1];
 
-            elements.push(
-              <line
-                key="xMinLine"
-                x1={xStart}
-                y1={0}
-                x2={xStart}
-                y2={height}
-                stroke="black"
-                strokeDasharray="4, 2"
-              />
-            );
-            elements.push(
-              <line
-                key="xMaxLine"
-                x1={xEnd}
-                y1={0}
-                x2={xEnd}
-                y2={height}
-                stroke="black"
-                strokeDasharray="4, 2"
-              />
-            );
-          } else if (hasYRange) {
-            const [yMin, yMax] = annotation.yRange!;
-            const yStart = isFinite(yMin) ? yScale(yMin) : height;
-            const yEnd = isFinite(yMax) ? yScale(yMax) : 0;
+          elements.push(
+            <line
+              key="xMinLine"
+              x1={xStart}
+              y1={margin[0]}
+              x2={xStart}
+              y2={height - margin[2]}
+              stroke="black"
+              strokeDasharray="4, 2"
+            />
+          );
+          elements.push(
+            <line
+              key="xMaxLine"
+              x1={xEnd}
+              y1={margin[0]}
+              x2={xEnd}
+              y2={height - margin[2]}
+              stroke="black"
+              strokeDasharray="4, 2"
+            />
+          );
+        } else if (hasYRange) {
+          const [yMin, yMax] = annotation.yRange!;
+          const yStart = isFinite(yMin) ? yScale(yMin) : height - margin[2];
+          const yEnd = isFinite(yMax) ? yScale(yMax) : margin[0];
 
-            elements.push(
-              <line
-                key="yMinLine"
-                x1={0}
-                y1={yStart}
-                x2={width}
-                y2={yStart}
-                stroke="black"
-                strokeDasharray="4, 2"
-              />
-            );
-            elements.push(
-              <line
-                key="yMaxLine"
-                x1={0}
-                y1={yEnd}
-                x2={width}
-                y2={yEnd}
-                stroke="black"
-                strokeDasharray="4, 2"
-              />
-            );
-          }
+          elements.push(
+            <line
+              key="yMinLine"
+              x1={margin[3]}
+              y1={yStart}
+              x2={width - margin[1]}
+              y2={yStart}
+              stroke="black"
+              strokeDasharray="4, 2"
+            />
+          );
+          elements.push(
+            <line
+              key="yMaxLine"
+              x1={margin[3]}
+              y1={yEnd}
+              x2={width - margin[1]}
+              y2={yEnd}
+              stroke="black"
+              strokeDasharray="4, 2"
+            />
+          );
         }
       }
     }
@@ -388,18 +392,22 @@ export default function Scatter(props: ScatterProps) {
   }
 
   function handleMouseOver(event: any, i: number) {
-    const xPos = xScale(xValues[i]);
-    const yPos = yScale(yValues[i]);
-    setTooltip({
-      x: xPos,
-      y: yPos,
-      dataX: xValues[i],
-      dataY: yValues[i],
-    });
+    if (annotation) {
+      const xPos = xScale(xValues[i]);
+      const yPos = yScale(yValues[i]);
+      setTooltip({
+        x: xPos,
+        y: yPos,
+        dataX: xValues[i],
+        dataY: yValues[i],
+      });
+    }
   }
 
   function handleMouseOut() {
-    setTooltip(null);
+    if (annotation) {
+      setTooltip(null);
+    }
   }
 
   return (

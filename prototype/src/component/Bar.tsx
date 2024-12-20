@@ -1,4 +1,3 @@
-//Bar.tsx
 import * as d3 from "d3";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { TAnnotation } from "../util/types";
@@ -15,7 +14,11 @@ interface BarProps {
 }
 
 export default function Bar(props: BarProps) {
-  const margin = useMemo(() => [200, 10, 100, 40], []);
+  // Reduced right margin significantly
+  const margin = useMemo(
+    () => [75, 10, 20, 40] as [number, number, number, number],
+    []
+  );
 
   const {
     allShapValues,
@@ -31,7 +34,53 @@ export default function Bar(props: BarProps) {
   const [selectedBars, setSelectedBars] = useState<string[]>([]);
   const brushGroupRef = useRef<any>(null);
 
-  // Memoize sortedAvgShapeValues
+  const labelFontSize = 12;
+  const maxLabelWidth = 50;
+
+  const canvasContext = useMemo(() => {
+    if (typeof document !== "undefined") {
+      return document.createElement("canvas").getContext("2d");
+    }
+    return null;
+  }, []);
+
+  const truncatedLabels = useMemo(() => {
+    if (!canvasContext) {
+      return featureNames.map((f) =>
+        f.length > 5 ? f.slice(0, 5) + "..." : f
+      );
+    }
+
+    canvasContext.font = `${labelFontSize}px sans-serif`;
+    return featureNames.map((f) => {
+      let label = f;
+      while (
+        canvasContext.measureText(label).width > maxLabelWidth &&
+        label.length > 1
+      ) {
+        label = label.slice(0, -1);
+      }
+      if (label !== f && !label.endsWith("...")) {
+        while (
+          canvasContext.measureText(label + "...").width > maxLabelWidth &&
+          label.length > 1
+        ) {
+          label = label.slice(0, -1);
+        }
+        label = label + "...";
+      }
+      return label;
+    });
+  }, [featureNames, canvasContext, labelFontSize, maxLabelWidth]);
+
+  const truncatedLabelsMap = useMemo(() => {
+    const map: { [key: string]: string } = {};
+    featureNames.forEach((f, i) => {
+      map[f] = truncatedLabels[i];
+    });
+    return map;
+  }, [featureNames, truncatedLabels]);
+
   const sortedAvgShapeValues = useMemo(() => {
     let avgShapeValues: { [featureName: string]: number } = {};
     for (let i = 0; i < featureNames.length; i++) {
@@ -46,7 +95,6 @@ export default function Bar(props: BarProps) {
       .reverse();
   }, [allShapValues, featureNames]);
 
-  // Memoize yScale
   const yScale = useMemo(
     () =>
       d3
@@ -57,7 +105,6 @@ export default function Bar(props: BarProps) {
     [sortedAvgShapeValues, margin, height]
   );
 
-  // Memoize xScale
   const xScale = useMemo(
     () =>
       d3
@@ -85,7 +132,6 @@ export default function Bar(props: BarProps) {
   }, [featureNames, allShapValues]);
 
   useEffect(() => {
-    // Remove and create x-axis only when necessary
     d3.select(`g.bar#${id}`).selectAll("g.x-axis").remove();
     const xAxisGroup = d3
       .select(`g.bar#${id}`)
@@ -96,7 +142,6 @@ export default function Bar(props: BarProps) {
     xAxisGroup.call(d3.axisBottom(xScale));
   }, [xScale, id, height, margin]);
 
-  // Separate useEffect for the brush
   useEffect(() => {
     if (!annotation) {
       if (!brushGroupRef.current) {
@@ -203,7 +248,7 @@ export default function Bar(props: BarProps) {
       />
 
       <g className="bars">
-        {sortedAvgShapeValues.map(([featureName, value], index) => {
+        {sortedAvgShapeValues.map(([featureName, value]) => {
           const isSelected =
             selectedBars.length > 0 ? selectedBars.includes(featureName) : true;
           console.log(featureName);
@@ -219,8 +264,9 @@ export default function Bar(props: BarProps) {
                 x={margin[0] - 2}
                 y={(yScale(featureName) as number) + yScale.bandwidth() * 0.8}
                 textAnchor="end"
+                fontSize={labelFontSize}
               >
-                {featureName}
+                {truncatedLabelsMap[featureName]}
               </text>
               <rect
                 className="bar-rect"
@@ -243,8 +289,13 @@ export default function Bar(props: BarProps) {
           );
         })}
       </g>
-      <text x={width / 2} y={height - 5} textAnchor="middle">
-        Average contribution to the prediction
+      <text
+        x={(margin[0] + width - margin[2]) / 2}
+        y={height - 7.5}
+        textAnchor="middle"
+        fontSize={labelFontSize}
+      >
+        Average SHAP Value
       </text>
 
       {annotation?.type === "singleLine" && (
