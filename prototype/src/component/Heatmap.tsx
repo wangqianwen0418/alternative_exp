@@ -18,7 +18,7 @@ export default function Heatmap({
   height: totalHeight,
   title,
 }: HeatmapProps) {
-  const svgRef = useRef<SVGSVGElement>(null);
+  const svgRef = useRef(null);
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
   const groupRef = useRef<SVGGElement>(null);
 

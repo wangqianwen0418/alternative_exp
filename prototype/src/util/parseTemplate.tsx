@@ -71,17 +71,12 @@ export const GenerateTextTemplates = (insight: TInsight) => {
 
     return (
       <span className="formatted">
-        The{" "}
-        <span className="label transform">
-          {var1.transform} {var1.type}
-        </span>
-        <span className="label featureName">{var1.featureName}</span>
-        is <span className="label relation">{insight.relation}</span> correlated
-        with the
-        <span className="label transform">
-          {var2.transform} {var2.type}
-        </span>
+        The <span className="label transform">{var1.transform} {var1.type}</span> 
+        <span className="label featureName">{var1.featureName}</span> 
+        is <span className="label relation">{insight.relation}</span> correlated with the 
+        <span className="label transform">{var2.transform} {var2.type}</span> 
         <span className="label featureName">{var2.featureName}</span>.
+  
         {/* Add condition to check if insight.condition is not empty */}
         {insight.condition && Object.keys(insight.condition).length > 0 && (
           <>
@@ -126,6 +121,13 @@ export const GenerateTextTemplates = (insight: TInsight) => {
             .
           </>
         )}
+      </span>
+    );
+  }
+  else {
+    return (
+      <span className="formatted error-message">
+        The provided insight statement doesn't match our categorization scheme. Please enter an insight that belongs to one of the four categories and try again.
       </span>
     );
   }

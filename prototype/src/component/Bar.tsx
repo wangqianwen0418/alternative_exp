@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { TAnnotation } from "../util/types";
 
 interface BarProps {
   allShapValues: number[][];
@@ -8,12 +9,9 @@ interface BarProps {
   height: number;
   id: string;
   offsets: number[];
-  annotation?: Annotation;
+  annotation?: TAnnotation;
+  highlightedFeatures?: string[];
 }
-
-type Annotation =
-  | { type: "verticalLine"; xValue: number }
-  | { type: "highlightBars"; labels: string[] };
 
 export default function Bar(props: BarProps) {
   // Reduced right margin significantly
@@ -30,6 +28,7 @@ export default function Bar(props: BarProps) {
     id,
     offsets,
     annotation,
+    highlightedFeatures,
   } = props;
 
   const [selectedBars, setSelectedBars] = useState<string[]>([]);
@@ -144,7 +143,7 @@ export default function Bar(props: BarProps) {
   }, [xScale, id, height, margin]);
 
   useEffect(() => {
-    if (!annotation || annotation.type !== "highlightBars") {
+    if (!annotation) {
       if (!brushGroupRef.current) {
         const brushGroup = d3
           .select(`g.bar#${id}`)
@@ -198,13 +197,14 @@ export default function Bar(props: BarProps) {
           .style("fill", "rgba(128, 128, 128, 0.2)")
           .style("stroke", "rgba(128, 128, 128, 0.2)");
       }
-    } else if (annotation.type === "highlightBars") {
-      if (brushGroupRef.current) {
-        brushGroupRef.current.remove();
-        brushGroupRef.current = null;
-      }
-      setSelectedBars(annotation.labels);
     }
+    // else if (annotation.type === "highlightBars") {
+    //   if (brushGroupRef.current) {
+    //     brushGroupRef.current.remove();
+    //     brushGroupRef.current = null;
+    //   }
+    //   setSelectedBars(annotation.labels);
+    // }
   }, [
     id,
     annotation,
@@ -215,6 +215,23 @@ export default function Bar(props: BarProps) {
     height,
     setSelectedBars,
   ]);
+
+  useEffect(() => {
+    // If there are highlighted features, set them as selected bars
+    if (highlightedFeatures && highlightedFeatures.length > 0) {
+      console.log("FEATURES TO HIGHLIGHT: " + highlightedFeatures);
+      setSelectedBars(highlightedFeatures);
+      d3.selectAll(`g.bar#${id} .bars g.bar-group`).each(function () {
+        const featureName = d3.select(this).attr("data-feature-name");
+        const isSelected = highlightedFeatures.includes(featureName);
+        d3.select(this).attr("opacity", isSelected ? 1 : 0.3);
+      });
+    } else {
+      // If no highlighted features, reset the selection
+      setSelectedBars([]);
+      d3.selectAll(`g.bar#${id} .bars g.bar-group`).attr("opacity", 1);
+    }
+  }, [highlightedFeatures, id]);
 
   return (
     <g
@@ -234,6 +251,8 @@ export default function Bar(props: BarProps) {
         {sortedAvgShapeValues.map(([featureName, value]) => {
           const isSelected =
             selectedBars.length > 0 ? selectedBars.includes(featureName) : true;
+          console.log(featureName);
+          console.log(isSelected);
           return (
             <g
               key={featureName}
@@ -279,15 +298,26 @@ export default function Bar(props: BarProps) {
         Average SHAP Value
       </text>
 
-      {annotation?.type === "verticalLine" && (
-        <line
-          x1={xScale(annotation.xValue)}
-          y1={margin[1]}
-          x2={xScale(annotation.xValue)}
-          y2={height - margin[3]}
-          stroke="black"
-          strokeDasharray="4,2"
-        />
+      {annotation?.type === "singleLine" && (
+        <>
+          <line
+            x1={xScale(annotation.xValue ?? 0)}
+            y1={margin[1]}
+            x2={xScale(annotation.xValue ?? 0)}
+            y2={height - margin[3]}
+            stroke="black"
+            strokeDasharray="4,2"
+          />
+
+          <text
+            x={xScale(annotation.xValue ?? 0) + 5} // Position slightly to the right of the line
+            y={margin[1] + 75} // Position slightly below the top
+            fill="black"
+            fontSize="12px"
+          >
+            {`val=${(annotation.xValue ?? 0).toFixed(2)}`} {/* Add the label */}
+          </text>
+        </>
       )}
     </g>
   );

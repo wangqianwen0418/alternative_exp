@@ -8,7 +8,7 @@ interface ScatterProps {
   yValues: number[];
   width: number;
   height: number;
-  id: string;
+  id: string; // ensure accurate d3 selection with multiple scatters on the same page
   selectedIndices: number[];
   setSelectedIndices: (indices: number[]) => void;
   annotation?: TAnnotation;
@@ -175,23 +175,19 @@ export default function Scatter(props: ScatterProps) {
       let xHighlighted = true;
       let yHighlighted = true;
 
-      if (annotation.xValueRange) {
-        const [xMin, xMax] = annotation.xValueRange;
-        xHighlighted =
-          (isFinite(xMin) ? x >= xMin : true) &&
-          (isFinite(xMax) ? x <= xMax : true);
+      if (annotation.xRange) {
+        const [xMin, xMax] = annotation.xRange;
+        xHighlighted = x >= xMin && x <= xMax;
       }
 
-      if (annotation.yValueRange) {
-        const [yMin, yMax] = annotation.yValueRange;
-        yHighlighted =
-          (isFinite(yMin) ? y >= yMin : true) &&
-          (isFinite(yMax) ? y <= yMax : true);
+      if (annotation.yRange) {
+        const [yMin, yMax] = annotation.yRange;
+        yHighlighted = y >= yMin && y <= yMax;
       }
 
       return xHighlighted && yHighlighted;
-    } else if (annotation.type === "highlightPoints") {
-      return annotation.xValues.includes(x);
+    } else if (annotation.type === "highlightDataPoints") {
+      return annotation.dataPoints.includes(x);
     } else {
       return true;
     }
@@ -296,18 +292,18 @@ export default function Scatter(props: ScatterProps) {
           );
         }
       } else if (annotation.type === "highlightRange") {
-        let hasXRange = annotation.xValueRange !== undefined;
-        let hasYRange = annotation.yValueRange !== undefined;
+        let hasXRange = annotation.xRange !== undefined;
+        let hasYRange = annotation.yRange !== undefined;
 
-        if (hasXRange && annotation.xValueRange) {
-          const [xMin, xMax] = annotation.xValueRange;
+        if (hasXRange && annotation.xRange) {
+          const [xMin, xMax] = annotation.xRange;
           if (!isFinite(xMin) && !isFinite(xMax)) {
             hasXRange = false;
           }
         }
 
-        if (hasYRange && annotation.yValueRange) {
-          const [yMin, yMax] = annotation.yValueRange;
+        if (hasYRange && annotation.yRange) {
+          const [yMin, yMax] = annotation.yRange;
           if (!isFinite(yMin) && !isFinite(yMax)) {
             hasYRange = false;
           }

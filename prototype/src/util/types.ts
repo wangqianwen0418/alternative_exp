@@ -17,6 +17,22 @@ export type TQuestion = TPageBase & {
   groundTruth: boolean;
 };
 
+
+export type TAnnotation = 
+  | { type: "highlightDataPoints"; dataPoints: number[], label?: string} // An array of data points to highlight
+  | { type: "highlightRange"; xRange?: [number, number], yRange?: [number, number], label?: string} // A range along X axis
+  | { type: "singleLine"; xValue?: number, yValue?: number, label?: string}; // A vertical line at a specific X value
+
+
+export type TGraph = {
+  graphType: string;
+  xValues: string;
+  yValues: string;
+  annotation?: TAnnotation;
+  features?: string[];
+};
+
+
 export type TInsight =
   | TInsight1
   | TInsight2
@@ -29,6 +45,8 @@ export type TInsight1 = {
   type: "read";
   relation: "greater than" | "less than" | "equal to";
   condition: { featureName: string; range: [number, number] } | undefined;
+  graph: TGraph;
+
 };
 
 export type TInsight2 = {
@@ -36,6 +54,7 @@ export type TInsight2 = {
   type: "comparison";
   relation: "greater than" | "less than" | "equal to";
   condition: { featureName: string; range: [number, number] } | undefined;
+  graph: TGraph;
 };
 
 export type TInsight3 = {
@@ -43,6 +62,7 @@ export type TInsight3 = {
   type: "correlation";
   relation: "positively" | "negatively" | "no correlation";
   condition: { featureName: string; range: [number, number] } | undefined;
+  graph: TGraph;
 };
 
 export type TInsight4 = {
@@ -50,20 +70,13 @@ export type TInsight4 = {
   type: "featureInteraction";
   relation: "same" | "different";
   condition: { featureName: string; range: [number, number][] } | undefined;
+  graph: TGraph;
 };
 
 export type TVariable = {
   featureName: string;
-  transform: "average" | "deviation" | undefined;
-  type: "value of" | "contribution of" | "number of instances";
+  transform: "average" | "deviation" | "" | undefined; //relax
+  type: "value of" | "contribution of" | `number of instances ${string} of`;
 };
 
-export type TAnnotation =
-  | { type: "highlightPoints"; xValues: number[]; label?: string }
-  | {
-      type: "highlightRange";
-      xValueRange?: [number, number];
-      yValueRange?: [number, number];
-      label?: string;
-    }
-  | { type: "singleLine"; xValue?: number; yValue?: number; label?: string };
+

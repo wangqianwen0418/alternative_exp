@@ -1,4 +1,4 @@
-import { TQuestion } from "./types";
+import { TQuestion, TVariable, TInsight, TGraph, TAnnotation } from "./types";
 
 export const QuestionList: TQuestion[] = [
   {
@@ -20,6 +20,16 @@ export const QuestionList: TQuestion[] = [
       type: "read",
       relation: "greater than",
       condition: undefined,
+      graph: {
+        graphType: "Bar",
+        xValues: "None",
+        yValues: "None",
+        features: ["bmi"],
+        annotation: {
+          type: "singleLine",
+          xValue: 20
+        }
+      },
     },
     testCondition: "random vis",
     groundTruth: true,
@@ -43,6 +53,16 @@ export const QuestionList: TQuestion[] = [
       type: "read",
       relation: "greater than",
       condition: undefined,
+      graph: {
+        graphType: "Bar",
+        xValues: "None",
+        yValues: "None",
+        features: ["blood pressure"],
+        annotation: {
+          type: "singleLine",
+          xValue: 5
+        }
+      },
     },
     testCondition: "ours",
     groundTruth: true,
@@ -66,6 +86,16 @@ export const QuestionList: TQuestion[] = [
       type: "read",
       relation: "greater than",
       condition: undefined,
+      graph: {
+        graphType: "Bar",
+        xValues: "None",
+        yValues: "None",
+        features: ["serum triglycerides"],
+        annotation: {
+          type: "singleLine",
+          xValue: 30
+        }
+      },
     },
     testCondition: "random vis",
     groundTruth: false,
@@ -89,6 +119,16 @@ export const QuestionList: TQuestion[] = [
       type: "read",
       relation: "greater than",
       condition: undefined,
+      graph: {
+        graphType: "Bar",
+        xValues: "None",
+        yValues: "None",
+        features: ["serum cholesterol"],
+        annotation: {
+          type: "singleLine",
+          xValue: 2.5
+        }
+      },
     },
     testCondition: "ours",
     groundTruth: false,
@@ -115,6 +155,13 @@ export const QuestionList: TQuestion[] = [
       type: "comparison",
       relation: "greater than",
       condition: undefined,
+      graph: {
+        graphType: "Bar",
+        xValues: "none",
+        yValues: "none",
+        features: ["blood pressure", "age"],
+        
+      },
     },
     testCondition: "random vis",
     groundTruth: true,
@@ -129,18 +176,24 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "bmi",
-          type: "number of instances",
+          type: "number of instances above 5 of",
           transform: "average",
         },
         {
           featureName: "sex",
-          type: "number of instances",
+          type: "number of instances above 5 of",
           transform: "average",
         },
       ],
       type: "comparison",
       relation: "greater than",
       condition: undefined,
+      graph: {
+        graphType: "Bar",
+        xValues: "None",
+        yValues: "None",
+        features: ["bmi", "sex"]
+      },
     },
     testCondition: "random vis",
     groundTruth: true,
@@ -155,18 +208,24 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "age",
-          type: "number of instances",
+          type: "number of instances above 3 of",
           transform: "average",
         },
         {
           featureName: "low-density lipoproteins",
-          type: "number of instances",
+          type: "number of instances above 3 of",
           transform: "average",
         },
       ],
       type: "comparison",
       relation: "greater than",
       condition: undefined,
+      graph: {
+        graphType: "Bar",
+        xValues: "None",
+        yValues: "None",
+        features: ["age", "low-density lipoproteins"]
+      },
     },
     testCondition: "ours",
     groundTruth: true,
@@ -194,6 +253,16 @@ export const QuestionList: TQuestion[] = [
       type: "comparison",
       relation: "greater than",
       condition: undefined,
+      graph: {
+        graphType: "Swarm",
+        xValues: "BMI",
+        yValues: "BMI",
+        features: ["blood pressure", "age"],
+        annotation: {
+          type: "singleLine",
+          xValue: 0,
+        },
+      },
     },
     testCondition: "random vis",
     groundTruth: true,
@@ -221,6 +290,11 @@ export const QuestionList: TQuestion[] = [
       type: "correlation",
       relation: "positively",
       condition: undefined,
+      graph: {
+        graphType: "Scatter",
+        xValues: "blood pressure",
+        yValues: "blood pressure",
+      },
     },
     testCondition: "ours",
     groundTruth: true,
@@ -248,6 +322,15 @@ export const QuestionList: TQuestion[] = [
       type: "correlation",
       relation: "negatively",
       condition: undefined,
+      graph: {
+        graphType: "Scatter",
+        xValues: "age",
+        yValues: "age",
+        annotation: {
+          type: "highlightRange",
+          xRange: [-0.1, 0]
+        }
+      },
     },
     testCondition: "random vis",
     groundTruth: true,
@@ -275,6 +358,15 @@ export const QuestionList: TQuestion[] = [
       type: "correlation",
       relation: "positively",
       condition: undefined,
+      graph: {
+        graphType: "Scatter",
+        xValues: "bmi",
+        yValues: "bmi",
+        annotation: {
+          type: "highlightRange",
+          xRange: [0.05, 0.1]
+        }
+      },
     },
     testCondition: "ours",
     groundTruth: true,
@@ -302,6 +394,11 @@ export const QuestionList: TQuestion[] = [
       type: "featureInteraction",
       relation: "same",
       condition: undefined,
+      graph: {
+        graphType: "Scatter",
+        xValues: "bmi",
+        yValues: "bmi",
+      },
     },
     testCondition: "ours",
     groundTruth: false,

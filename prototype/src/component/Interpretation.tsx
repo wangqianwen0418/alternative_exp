@@ -62,6 +62,7 @@ export default function Interpretation() {
   };
 
   const isUserStudy = pageName?.includes("question");
+  console.log("USER STUDY: " + isUserStudy);
 
   const handleSubmission = async () => {
     if (!freeText.trim()) return;
@@ -79,6 +80,9 @@ export default function Interpretation() {
           prompt
         );
         setInsight(parsedInput);
+        console.log("PARSED INPUT: ");
+        console.log(parsedInput);
+
       } catch (error) {
         console.error("Error parsing input: ", error);
       }
@@ -99,6 +103,8 @@ export default function Interpretation() {
     try {
       const parsedInput: TInsight = await parseInput(freeText, apiKey, prompt);
       setInsight(parsedInput); // Update insight to reflect the newly parsed input
+      console.log("PARSED INPUT: ");
+      console.log(parsedInput);
     } catch (error) {
       console.error("Error parsing input: ", error);
     }
@@ -141,8 +147,10 @@ export default function Interpretation() {
           value={freeText}
           onChange={handleTextChange}
           multiline
-          rows={2}
+          minRows={1}
+          maxRows={10}
           fullWidth
+          disabled={isUserStudy}
         />
 
         <div style={{ alignItems: "center" }}>
@@ -160,14 +168,16 @@ export default function Interpretation() {
           )}
 
           {/* New Parse Button */}
-          <Button
-            variant="contained"
-            color="secondary"
-            style={{ margin: "10px 5px" }}
-            onClick={handleParseOnly}
-          >
-            Parse
-          </Button>
+          {!isUserStudy && (
+            <Button
+              variant="contained"
+              color="secondary"
+              style={{ margin: "10px 5px" }}
+              onClick={handleParseOnly}
+            >
+              Parse
+            </Button>
+          )}
         </div>
         {isLoading ? (
           <CircularProgress />
