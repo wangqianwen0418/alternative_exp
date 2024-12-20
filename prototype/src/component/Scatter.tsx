@@ -310,8 +310,8 @@ export default function Scatter(props: ScatterProps) {
         }
 
         if (hasXRange && hasYRange) {
-          const [xMin, xMax] = annotation.xValueRange!;
-          const [yMin, yMax] = annotation.yValueRange!;
+          const [xMin, xMax] = annotation.xRange!;
+          const [yMin, yMax] = annotation.yRange!;
 
           const xStart = isFinite(xMin) ? xScale(xMin) : margin[3];
           const xEnd = isFinite(xMax) ? xScale(xMax) : width - margin[1];
@@ -331,7 +331,7 @@ export default function Scatter(props: ScatterProps) {
             />
           );
         } else if (hasXRange) {
-          const [xMin, xMax] = annotation.xValueRange!;
+          const [xMin, xMax] = annotation.xRange!;
           const xStart = isFinite(xMin) ? xScale(xMin) : margin[3];
           const xEnd = isFinite(xMax) ? xScale(xMax) : width - margin[1];
 
@@ -358,7 +358,7 @@ export default function Scatter(props: ScatterProps) {
             />
           );
         } else if (hasYRange) {
-          const [yMin, yMax] = annotation.yValueRange!;
+          const [yMin, yMax] = annotation.yRange!;
           const yStart = isFinite(yMin) ? yScale(yMin) : height - margin[2];
           const yEnd = isFinite(yMax) ? yScale(yMax) : margin[0];
 
