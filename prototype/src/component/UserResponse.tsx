@@ -36,10 +36,10 @@ const confidenceOptions = [
 
 export default function UserResponse() {
   const [questionIndex, setQuestionIndex] = useAtom(questionIndexAtom);
-  const [insight, setInsight] = useAtom(insightAtom);
+  const [, setInsight] = useAtom(insightAtom);
   const [freeText, setFreetext] = useAtom(freeTextAtom);
   const [initVis, setInitVis] = useAtom(initVisAtom);
-  const [secondVis, setSecondVis] = useAtom(secondVisAtom);
+  const [, setSecondVis] = useAtom(secondVisAtom);
   const [, setName] = useAtom(pageNameAtom);
   const [, setIsSubmitted] = useAtom(isSubmittedAtom);
   const [uuid] = useAtom(uuidAtom);

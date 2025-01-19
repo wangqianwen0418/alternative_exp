@@ -157,13 +157,16 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
       <Grid item xs={10}>
         <Paper style={{ padding: "15px" }} elevation={0}>
           <p style={{ margin: "0px 5px" }}>
-            <b>ML Model and Dataset :</b> Each instance in the dataset
+            <b>ML Model and Dataset:</b> Each instance in the dataset
             corresponds to a patient, characterized by values for 10 distinct
             features.
             <br />
             This machine learning model predicts the progression of diabetes in
-            patients using these 10 features.{" "}
-            {/* {appProps.pageName:.includes("Free") && <SyncIcon />} */}
+            patients using these 10 features.
+            <br />
+            <b>SHAP Values:</b> These values explain the contribution of each
+            feature to the model's prediction, highlighting whether a feature
+            increases or decreases the predicted diabetes progression.
           </p>
         </Paper>
       </Grid>

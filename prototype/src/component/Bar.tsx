@@ -34,7 +34,7 @@ export default function Bar(props: BarProps) {
   const [selectedBars, setSelectedBars] = useState<string[]>([]);
   const brushGroupRef = useRef<any>(null);
 
-  const labelFontSize = 12;
+  const labelFontSize = 13;
   const maxLabelWidth = 50;
 
   const canvasContext = useMemo(() => {
@@ -143,7 +143,10 @@ export default function Bar(props: BarProps) {
   }, [xScale, id, height, margin]);
 
   useEffect(() => {
-    if (!annotation) {
+    if (
+      !annotation &&
+      (!highlightedFeatures || highlightedFeatures.length === 0)
+    ) {
       if (!brushGroupRef.current) {
         const brushGroup = d3
           .select(`g.bar#${id}`)

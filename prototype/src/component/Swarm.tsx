@@ -8,6 +8,7 @@ interface SwarmProps {
   width: number;
   height: number;
   ids: string[];
+  boldFeatureNames?: string[];
   selectedIndices: number[];
   setSelectedIndices: (index: number[]) => void;
   annotation?: TAnnotation;
@@ -28,12 +29,13 @@ export default function Swarm(props: SwarmProps) {
     width,
     height,
     ids,
+    boldFeatureNames = [],
     selectedIndices,
     setSelectedIndices,
     annotation,
   } = props;
 
-  const labelFontSize = 11;
+  const labelFontSize = 13;
   const maxLabelWidth = 50;
 
   const canvasContext = useMemo(() => {
@@ -349,10 +351,10 @@ export default function Swarm(props: SwarmProps) {
       .append("text")
       .attr("class", "legend-title")
       .attr("x", legendX + legendWidth / 2)
-      .attr("y", middleY - 20)
+      .attr("y", middleY + 25)
       .attr("text-anchor", "middle")
       .attr("font-size", labelFontSize)
-      .attr("transform", `rotate(90, ${legendX + legendWidth / 2}, ${middleY})`)
+      .attr("transform", `rotate(-90, ${legendX + legendWidth / 2}, ${middleY})`)
       .text("Feature Value");
 
     d3.select("g.swarm")
@@ -563,6 +565,7 @@ export default function Swarm(props: SwarmProps) {
               textAnchor="end"
               alignmentBaseline="middle"
               fontSize={labelFontSize}
+              fontWeight={boldFeatureNames.includes(datasetID) ? "bold" : "normal"}
             >
               {truncatedLabel}
             </text>
