@@ -159,11 +159,13 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
           <p style={{ margin: "0px 5px" }}>
             <b>ML Model and Dataset :</b> Each instance in the dataset
             corresponds to a patient, characterized by values for 10 distinct
-            features.
+            features. 
             <br />
             This machine learning model predicts the progression of diabetes in
-            patients using these 10 features.{" "}
-            {/* {appProps.pageName:.includes("Free") && <SyncIcon />} */}
+            patients using these 10 features.
+            <br />
+            {" "}
+            The explanations are based on two sets of values: Feature values and SHAP values. SHAP values represent the impact a feature had on the model's prediction (positive = increased risk, negative = decreased risk). {/* {appProps.pageName:.includes("Free") && <SyncIcon />} */}
           </p>
         </Paper>
       </Grid>
