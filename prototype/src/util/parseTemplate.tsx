@@ -12,7 +12,7 @@ export const GenerateTextTemplates = (insight: TInsight) => {
           {var1.transform} {var1.type}{" "}
         </span>{" "}
         <span className="label featureName">{var1.featureName}</span> is{" "}
-        <span className="label relation">{insight.relation}</span> than{" "}
+        <span className="label relation">{insight.relation}</span> {" "}
         <span className="label constant">{var2}</span>{" "}
         {/* Add condition to check if insight.condition is not empty */}
         {insight.condition && Object.keys(insight.condition).length > 0 && (
@@ -42,7 +42,7 @@ export const GenerateTextTemplates = (insight: TInsight) => {
           {var1.transform} {var1.type}{" "}
         </span>{" "}
         <span className="label featureName">{var1.featureName}</span> is{" "}
-        <span className="label relation">{insight.relation}</span> than the{" "}
+        <span className="label relation">{insight.relation}</span> the{" "}
         <span className="label transform">
           {var2.transform} {var1.type}{" "}
         </span>{" "}
@@ -73,9 +73,9 @@ export const GenerateTextTemplates = (insight: TInsight) => {
       <span className="formatted">
         The <span className="label transform">{var1.transform} {var1.type}</span> 
         <span className="label featureName">{var1.featureName}</span> 
-        is <span className="label relation">{insight.relation}</span> correlated with the 
+        is <span className="label relation">{insight.relation}</span> with the 
         <span className="label transform">{var2.transform} {var2.type}</span> 
-        <span className="label featureName">{var2.featureName}</span>.
+        <span className="label featureName">{var2.featureName}</span>
   
         {/* Add condition to check if insight.condition is not empty */}
         {insight.condition && Object.keys(insight.condition).length > 0 && (
@@ -89,9 +89,10 @@ export const GenerateTextTemplates = (insight: TInsight) => {
             <span className="label condition-range">
               [{insight.condition.range[0]}, {insight.condition.range[1]}]
             </span>
-            .
+            
           </>
         )}
+        .
       </span>
     );
   } else if (insight?.type === "featureInteraction") {

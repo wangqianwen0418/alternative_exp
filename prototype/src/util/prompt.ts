@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import { TInsight } from "./types";
+import { TInsight, TAnnotation} from "./types";
 import { ResetTvOutlined } from "@mui/icons-material";
 
 export const generatePrompt = (
@@ -48,6 +48,8 @@ Variables: An array of variables with the format:
 Note: For the "number of instances of <restriction> of", there would be a restriction that you should include in the value. for example, you might suggest "number of instances above 5 of" or "number of instances below 3 of". 
 For Category 2, you may have "number of instances <condition> for" -- for example, for the input prompt "age has more instances above 3 than s2", type would be "number of instances above 3 for".
 
+Note: if the type is "number of instances", there is no additional transformation (average, etc) that is provided.
+
 If "correlation" (category 3) involves both value and contribution of the same feature, include both in the array. 
 For example: "There is correlation between the contribution of bp to predictions and the bp values"
 In this case, there are two variables: contribution of BP and BP values. 
@@ -58,7 +60,7 @@ Type - this will match the category. Options are “read”, “comparison”, �
 Relationship: Based on the category
 Category 1 (“read”): options are “greater than”, “less than”, “equal to”
 Category 2 (“comparison”): options are “greater than”, “less than”, “equal to”
-Category 3 (“correlation”): options are “positively” or “negatively”
+Category 3 (“correlation”): options are “positively correlated” or “negatively correlated”
 Category 4 (“featureInteraction”): options are “same” or “different”
 
 Condition: refers to restrictions on variable values. 
@@ -278,6 +280,7 @@ export const parseInput = async (
               }),
             ...(jsonObject.Annotation !== "None" && {
               annotation: (() => {
+                let annotations: TAnnotation[] = [];
                 switch (jsonObject.Annotation) {
                   case "HighlightRange":
                     const xRange = jsonObject.AnnotationParams[0];

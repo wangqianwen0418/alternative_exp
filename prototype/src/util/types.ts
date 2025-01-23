@@ -15,6 +15,8 @@ export type TQuestion = TPageBase & {
   testCondition: "random vis" | "ours";
   index: number;
   groundTruth: boolean;
+  firstVis?: TGraph;
+  newVis?: TGraph
 };
 
 
@@ -28,7 +30,7 @@ export type TGraph = {
   graphType: string;
   xValues: string;
   yValues: string;
-  annotation?: TAnnotation;
+  annotation?: TAnnotation[];
   features?: string[];
 };
 
@@ -60,7 +62,7 @@ export type TInsight2 = {
 export type TInsight3 = {
   variables: [TVariable, TVariable];
   type: "correlation";
-  relation: "positively" | "negatively" | "no correlation";
+  relation: "positively correlated" | "negatively correlated" | "not correlated";
   condition: { featureName: string; range: [number, number] } | undefined;
   graph: TGraph;
 };
@@ -78,5 +80,6 @@ export type TVariable = {
   transform: "average" | "deviation" | "" | undefined; //relax
   type: "value of" | "contribution of" | `number of instances ${string} of`;
 };
+
 
 

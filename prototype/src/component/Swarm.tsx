@@ -9,11 +9,14 @@ interface SwarmProps {
   height: number;
   ids: string[];
   selectedIndices: number[];
-  setSelectedIndices: (index: number[]) => void;
   annotation?: TAnnotation;
+  featuresToShow?: string[];
+  setSelectedIndices: (index: number[]) => void;
+
 }
 
 export default function Swarm(props: SwarmProps) {
+  
   // let margin = useMemo(() => [10, 40, 40, 10], []);
   // const radius = 2;
   // const leftTitleMargin = 40;
@@ -30,8 +33,10 @@ export default function Swarm(props: SwarmProps) {
     ids,
     selectedIndices,
     setSelectedIndices,
+    featuresToShow,
     annotation,
   } = props;
+
 
   const labelFontSize = 11;
   const maxLabelWidth = 50;
@@ -42,6 +47,21 @@ export default function Swarm(props: SwarmProps) {
     }
     return null;
   }, []);
+
+  // Filter features based on the `featuresToShow` prop (if provided)
+  const filteredFeaturesIndices = useMemo(() => {
+    // If featuresToShow is not provided or is empty, show all features
+    if (!featuresToShow || featuresToShow.length === 0) {
+      return ids.map((_, index) => index);
+    }
+
+    // Otherwise, filter based on the provided `featuresToShow`
+    return ids
+      .map((id, index) => (featuresToShow.includes(id) ? index : null))
+      .filter((index) => index !== null) as number[];
+  }, [featuresToShow, ids]);
+
+  
 
   const truncatedLabels = useMemo(() => {
     if (!canvasContext) {
@@ -79,8 +99,22 @@ export default function Swarm(props: SwarmProps) {
     dataX: number;
   } | null>(null);
 
-  const flatXValues = useMemo(() => xValues.flat(), [xValues]);
-  const flatColorValues = useMemo(() => colorValues.flat(), [colorValues]);
+  // Use filtered xValues and colorValues
+  const flatXValues = useMemo(
+    () =>
+      filteredFeaturesIndices
+        .map((i) => xValues[i])
+        .flat(),
+    [xValues, filteredFeaturesIndices]
+  );
+
+  const flatColorValues = useMemo(
+    () =>
+      filteredFeaturesIndices
+        .map((i) => colorValues[i])
+        .flat(),
+    [colorValues, filteredFeaturesIndices]
+  );
 
   const xScale = useMemo(
     () =>
@@ -106,15 +140,16 @@ export default function Swarm(props: SwarmProps) {
   );
 
   const sortedDatasetIndices = useMemo(() => {
-    const datasetIndices = d3.range(xValues.length);
+    // Sort using only the filtered features
+    const datasetIndices = filteredFeaturesIndices;
     return datasetIndices.sort((a, b) => {
       const avgA = d3.mean(xValues[a], (d) => Math.abs(d)) || 0;
       const avgB = d3.mean(xValues[b], (d) => Math.abs(d)) || 0;
       return avgB - avgA;
     });
-  }, [xValues]);
+  }, [xValues, filteredFeaturesIndices]);
 
-  const numDatasets = xValues.length;
+  const numDatasets = filteredFeaturesIndices.length;
 
   const maxPlotHeight = 50;
   const plotHeight = useMemo(() => {
