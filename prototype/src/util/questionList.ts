@@ -116,7 +116,7 @@ export const QuestionList: TQuestion[] = [
       graphType: "Swarm",
       xValues: "None",
       yValues: "None",
-      features: ["serum triglycerides"],
+      features: ["serum triglycerides level"],
     },
     secondVis: "scatter", // randomly chosen
     newVis: {
@@ -146,7 +146,7 @@ export const QuestionList: TQuestion[] = [
         graphType: "Scatter",
         xValues: "None",
         yValues: "None",
-        features: ["serum triglycerides"],
+        features: ["serum triglycerides level"],
         annotation: [
           {
             type: "singleLine",
