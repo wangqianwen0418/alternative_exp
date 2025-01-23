@@ -5,7 +5,7 @@ export const QuestionList: TQuestion[] = [
     index: 0,
     pageName: "question",
     userText:
-      "The average contribution of the bmi to the prediction is larger than 20.",
+      "BMI contributes at least 20 to diabetes risk",
     initVis: "beeswarm",
     firstVis: {
       graphType: "Swarm",
@@ -57,7 +57,7 @@ export const QuestionList: TQuestion[] = [
     index: 1,
     pageName: "question",
     userText:
-      "The average contribution of blood pressure to the prediction is larger than 5.",
+      "blood pressure contributes more than 5 to diabetes risk.",
     initVis: "beeswarm",
     firstVis: {
       graphType: "Swarm",
@@ -110,7 +110,7 @@ export const QuestionList: TQuestion[] = [
     index: 2,
     pageName: "question",
     userText:
-      "The serum triglycerides level values contribute at least 30 to the prediction.",
+      "Serum Triglycerides contributes 30+ to the prediction",
     initVis: "beeswarm",
     firstVis: {
       graphType: "Swarm",
@@ -162,7 +162,7 @@ export const QuestionList: TQuestion[] = [
     index: 3,
     pageName: "question",
     userText:
-      "The serum cholesterol values contribute at least 2.5 to the prediction.",
+      "Serum cholesterol contributes more than 2.5",
     initVis: "beeswarm",
     firstVis: {
       graphType: "Swarm",
@@ -214,7 +214,7 @@ export const QuestionList: TQuestion[] = [
   {
     index: 4,
     pageName: "question",
-    userText: "blood pressure contributes more to the prediction than age.",
+    userText: "BP is more important than age",
     initVis: "heatmap",
     secondVis: "beeswarm", // randomly chosen
     newVis: {
@@ -314,7 +314,7 @@ export const QuestionList: TQuestion[] = [
   {
     index: 6,
     pageName: "question",
-    userText: "age has more instances above 0 than low-density lipoproteins.",
+    userText: "age contributes positively to more instances than Low-Density Lipoproteins.",
     initVis: "scatter",
     firstVis: {
       graphType: "Scatter",
@@ -360,7 +360,7 @@ export const QuestionList: TQuestion[] = [
     index: 7,
     pageName: "question",
     userText:
-      "blood pressure has larger deviations in its contribution to the prediction compared to age.",
+      "the deviations for BP are larger than they are for age",
     initVis: "scatter",
     firstVis: {
       graphType: "Scatter",
@@ -412,7 +412,7 @@ export const QuestionList: TQuestion[] = [
     index: 8,
     pageName: "question",
     userText:
-      "There is a positive correlation between the contribution of blood pressure to predictions and the blood pressure values.",
+      "bp contribution goes up as bp values go up",
     initVis: "heatmap",
     firstVis: {
       graphType: "heatmap",
@@ -454,7 +454,7 @@ export const QuestionList: TQuestion[] = [
     index: 9,
     pageName: "question",
     userText:
-      "There is a negative correlation between the contribution of age to predictions and the age values when the feature value is between -0.10 and 0.00.",
+      "Age has a negative correlation with diabetes risk when age is between -0.1 and 0",
     initVis: "heatmap",
     firstVis: {
       graphType: "heatmap",
@@ -504,7 +504,7 @@ export const QuestionList: TQuestion[] = [
     index: 10,
     pageName: "question",
     userText:
-      "There is a positive correlation between the contribution of bmi to predictions and the bmi values when the feature value is between 0.05 and 0.10.",
+      "In the BMI range of 0.05 and 0.1, it is positively correlated with diabetes risk",
     initVis: "heatmap",
     firstVis: {
       graphType: "heatmap",
@@ -554,7 +554,7 @@ export const QuestionList: TQuestion[] = [
     index: 11,
     pageName: "question",
     userText:
-      "The correlation between bmi and its feature values is stronger when the feature value for age is in the range |0.05 to 0.1| compared to |0 to 0.02|.",
+      "BMI has a stronger correlation with predictions when age is between 0.05 to 0.1 versus 0 to 0.02",
     initVis: "heatmap",
     firstVis: {
       graphType: "heatmap",
