@@ -167,7 +167,7 @@ export default function Interpretation() {
             </Button>
           )}
 
-          {/* New Parse Button */}
+          {/* New Parse Button
           {!isUserStudy && (
             <Button
               variant="contained"
@@ -177,7 +177,7 @@ export default function Interpretation() {
             >
               Parse
             </Button>
-          )}
+          )} */}
         </div>
         {isLoading ? (
           <CircularProgress />

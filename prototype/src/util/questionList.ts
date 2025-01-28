@@ -5,9 +5,26 @@ export const QuestionList: TQuestion[] = [
     index: 0,
     pageName: "question",
     userText:
-      "The average contribution of the bmi to the prediction is larger than 20.",
+      "BMI contributes at least 20 to diabetes risk",
     initVis: "beeswarm",
+    firstVis: {
+      graphType: "Swarm",
+      xValues: "None",
+      yValues: "None",
+      features: ["bmi"],
+    },
     secondVis: "scatter", // randomly chosen
+    newVis: {
+      graphType: "Scatter",
+      xValues: "None",
+      yValues: "None",
+      annotation: [
+        {
+          type: "singleLine",
+          yValue: 20,
+        },
+      ],
+    },
     insight: {
       variables: [
         {
@@ -25,10 +42,12 @@ export const QuestionList: TQuestion[] = [
         xValues: "None",
         yValues: "None",
         features: ["bmi"],
-        annotation: {
-          type: "singleLine",
-          xValue: 20
-        }
+        annotation: [
+          {
+            type: "singleLine",
+            yValue: 20,
+          },
+        ],
       },
     },
     testCondition: "random vis",
@@ -38,9 +57,27 @@ export const QuestionList: TQuestion[] = [
     index: 1,
     pageName: "question",
     userText:
-      "The average contribution of blood pressure to the prediction is larger than 5.",
+      "blood pressure contributes more than 5 to diabetes risk.",
     initVis: "beeswarm",
+    firstVis: {
+      graphType: "Swarm",
+      xValues: "None",
+      yValues: "None",
+      features: ["blood pressure"],
+    },
     secondVis: "bar",
+    newVis: {
+      graphType: "Bar",
+      xValues: "None",
+      yValues: "None",
+      features: ["blood pressure"],
+      annotation: [
+        {
+          type: "singleLine",
+          xValue: 5,
+        },
+      ],
+    },
     insight: {
       variables: [
         {
@@ -58,10 +95,12 @@ export const QuestionList: TQuestion[] = [
         xValues: "None",
         yValues: "None",
         features: ["blood pressure"],
-        annotation: {
-          type: "singleLine",
-          xValue: 5
-        }
+        annotation: [
+          {
+            type: "singleLine",
+            xValue: 5,
+          },
+        ],
       },
     },
     testCondition: "ours",
@@ -71,9 +110,26 @@ export const QuestionList: TQuestion[] = [
     index: 2,
     pageName: "question",
     userText:
-      "The serum triglycerides level values contribute at least 30 to the prediction.",
+      "Serum Triglycerides contributes 30+ to the prediction",
     initVis: "beeswarm",
-    secondVis: "bar", // randomly chosen
+    firstVis: {
+      graphType: "Swarm",
+      xValues: "None",
+      yValues: "None",
+      features: ["serum triglycerides level"],
+    },
+    secondVis: "scatter", // randomly chosen
+    newVis: {
+      graphType: "Scatter",
+      xValues: "None",
+      yValues: "None",
+      annotation: [
+        {
+          type: "singleLine",
+          yValue: 30,
+        },
+      ],
+    },
     insight: {
       variables: [
         {
@@ -87,14 +143,16 @@ export const QuestionList: TQuestion[] = [
       relation: "greater than",
       condition: undefined,
       graph: {
-        graphType: "Bar",
+        graphType: "Scatter",
         xValues: "None",
         yValues: "None",
-        features: ["serum triglycerides"],
-        annotation: {
-          type: "singleLine",
-          xValue: 30
-        }
+        features: ["serum triglycerides level"],
+        annotation: [
+          {
+            type: "singleLine",
+            yValue: 30,
+          },
+        ],
       },
     },
     testCondition: "random vis",
@@ -104,9 +162,27 @@ export const QuestionList: TQuestion[] = [
     index: 3,
     pageName: "question",
     userText:
-      "The serum cholesterol values contribute at least 2.5 to the prediction.",
+      "Serum cholesterol contributes more than 2.5",
     initVis: "beeswarm",
+    firstVis: {
+      graphType: "Swarm",
+      xValues: "None",
+      yValues: "None",
+      features: ["serum cholesterol"],
+    },
     secondVis: "bar",
+    newVis: {
+      graphType: "Bar",
+      xValues: "None",
+      yValues: "None",
+      features: ["serum cholesterol"],
+      annotation: [
+        {
+          type: "singleLine",
+          xValue: 2.5,
+        },
+      ],
+    },
     insight: {
       variables: [
         {
@@ -124,10 +200,12 @@ export const QuestionList: TQuestion[] = [
         xValues: "None",
         yValues: "None",
         features: ["serum cholesterol"],
-        annotation: {
-          type: "singleLine",
-          xValue: 2.5
-        }
+        annotation: [
+          {
+            type: "singleLine",
+            xValue: 2.5,
+          },
+        ],
       },
     },
     testCondition: "ours",
@@ -136,9 +214,21 @@ export const QuestionList: TQuestion[] = [
   {
     index: 4,
     pageName: "question",
-    userText: "blood pressure contributes more to the prediction than age.",
+    userText: "BP is more important than age",
     initVis: "heatmap",
     secondVis: "beeswarm", // randomly chosen
+    newVis: {
+      graphType: "Swarm",
+      xValues: "none",
+      yValues: "none",
+      features: ["blood pressure, age"],
+      annotation: [
+        {
+          type: "singleLine",
+          xValue: 25,
+        },
+      ],
+    },
     insight: {
       variables: [
         {
@@ -156,11 +246,11 @@ export const QuestionList: TQuestion[] = [
       relation: "greater than",
       condition: undefined,
       graph: {
-        graphType: "Bar",
-        xValues: "none",
+        graphType: "Swarm",
+        xValues: "blood pressure",
         yValues: "none",
         features: ["blood pressure", "age"],
-        
+        annotation: [{ type: "singleLine", xValue: 40 }],
       },
     },
     testCondition: "random vis",
@@ -169,19 +259,36 @@ export const QuestionList: TQuestion[] = [
   {
     index: 5,
     pageName: "question",
-    userText: "bmi has more instances above 5 than sex.",
+    userText: "bmi has more instances above 0 than sex.",
     initVis: "scatter",
-    secondVis: "beeswarm", // randomly chosen
+    firstVis: {
+      graphType: "Scatter",
+      xValues: "None",
+      yValues: "None",
+    },
+    secondVis: "bar", // randomly chosen
+    newVis: {
+      graphType: "Bar",
+      xValues: "None",
+      yValues: "None",
+      features: ["bmi", "sex"],
+      annotation: [
+        {
+          type: "singleLine",
+          xValue: 0,
+        },
+      ],
+    },
     insight: {
       variables: [
         {
           featureName: "bmi",
-          type: "number of instances above 5 of",
+          type: "number of instances above 0 of",
           transform: "average",
         },
         {
           featureName: "sex",
-          type: "number of instances above 5 of",
+          type: "number of instances above 0 of",
           transform: "average",
         },
       ],
@@ -192,7 +299,13 @@ export const QuestionList: TQuestion[] = [
         graphType: "Bar",
         xValues: "None",
         yValues: "None",
-        features: ["bmi", "sex"]
+        features: ["bmi", "sex"],
+        annotation: [
+          {
+            type: "singleLine",
+            xValue: 0,
+          },
+        ],
       },
     },
     testCondition: "random vis",
@@ -201,30 +314,43 @@ export const QuestionList: TQuestion[] = [
   {
     index: 6,
     pageName: "question",
-    userText: "age has more instances above 3 than low-density lipoproteins.",
+    userText: "age contributes positively to more instances than Low-Density Lipoproteins.",
     initVis: "scatter",
+    firstVis: {
+      graphType: "Scatter",
+      xValues: "None",
+      yValues: "None",
+    },
     secondVis: "beeswarm",
+    newVis: {
+      graphType: "Swarm",
+      xValues: "None",
+      yValues: "None",
+      features: ["age", "low-density lipoproteins"],
+      annotation: [{ type: "singleLine", xValue: 0 }],
+    },
     insight: {
       variables: [
         {
           featureName: "age",
-          type: "number of instances above 3 of",
-          transform: "average",
+          type: "number of instances above 0 of",
+          transform: "",
         },
         {
           featureName: "low-density lipoproteins",
-          type: "number of instances above 3 of",
-          transform: "average",
+          type: "number of instances above 0 of",
+          transform: "",
         },
       ],
       type: "comparison",
       relation: "greater than",
       condition: undefined,
       graph: {
-        graphType: "Bar",
+        graphType: "Swarm",
         xValues: "None",
         yValues: "None",
-        features: ["age", "low-density lipoproteins"]
+        features: ["age", "low-density lipoproteins"],
+        annotation: [{ type: "singleLine", xValue: 0 }],
       },
     },
     testCondition: "ours",
@@ -234,9 +360,24 @@ export const QuestionList: TQuestion[] = [
     index: 7,
     pageName: "question",
     userText:
-      "blood pressure has larger deviations in its contribution to the prediction compared to age.",
+      "the deviations for BP are larger than they are for age",
     initVis: "scatter",
+    firstVis: {
+      graphType: "Scatter",
+      xValues: "None",
+      yValues: "None",
+    },
     secondVis: "bar", // randomly chosen
+    newVis: {
+      graphType: "Bar",
+      xValues: "None",
+      yValues: "None",
+      features: ["blood pressure", "age"],
+      annotation: [{
+        type: "singleLine",
+        xValue: 20,
+      }],
+    },
     insight: {
       variables: [
         {
@@ -254,14 +395,14 @@ export const QuestionList: TQuestion[] = [
       relation: "greater than",
       condition: undefined,
       graph: {
-        graphType: "Swarm",
+        graphType: "Bar",
         xValues: "BMI",
         yValues: "BMI",
         features: ["blood pressure", "age"],
-        annotation: {
+        annotation: [{
           type: "singleLine",
-          xValue: 0,
-        },
+          xValue: 20,
+        }],
       },
     },
     testCondition: "random vis",
@@ -271,24 +412,34 @@ export const QuestionList: TQuestion[] = [
     index: 8,
     pageName: "question",
     userText:
-      "There is a positive correlation between the contribution of blood pressure to predictions and the blood pressure values.",
+      "bp contribution goes up as bp values go up",
     initVis: "heatmap",
+    firstVis: {
+      graphType: "heatmap",
+      xValues: "None",
+      yValues: "None",
+    },
     secondVis: "scatter",
+    newVis: {
+      graphType: "Scatter",
+      xValues: "blood pressure",
+      yValues: "blood pressure",
+    },
     insight: {
       variables: [
         {
           featureName: "blood pressure",
           type: "contribution of",
-          transform: "average",
+          transform: "",
         },
         {
           featureName: "blood pressure",
-          type: "contribution of",
-          transform: "average",
+          type: "value of",
+          transform: "",
         },
       ],
       type: "correlation",
-      relation: "positively",
+      relation: "positively correlated",
       condition: undefined,
       graph: {
         graphType: "Scatter",
@@ -303,9 +454,23 @@ export const QuestionList: TQuestion[] = [
     index: 9,
     pageName: "question",
     userText:
-      "There is a negative correlation between the contribution of age to predictions and the age values when the feature value is between -0.10 and 0.00.",
+      "Age has a negative correlation with diabetes risk when age is between -0.1 and 0",
     initVis: "heatmap",
+    firstVis: {
+      graphType: "heatmap",
+      xValues: "None",
+      yValues: "None",
+    },
     secondVis: "scatter", // randomly chosen
+    newVis: {
+      graphType: "Scatter",
+      xValues: "age",
+      yValues: "age",
+      annotation: [{
+        type: "highlightRange",
+        xRange: [-0.1, 0],
+      }],
+    },
     insight: {
       variables: [
         {
@@ -315,21 +480,21 @@ export const QuestionList: TQuestion[] = [
         },
         {
           featureName: "age",
-          type: "contribution of",
+          type: "value of",
           transform: "average",
         },
       ],
       type: "correlation",
-      relation: "negatively",
-      condition: undefined,
+      relation: "negatively correlated",
+      condition: { featureName: "age", range: [-0.1, 0] },
       graph: {
         graphType: "Scatter",
         xValues: "age",
         yValues: "age",
-        annotation: {
+        annotation: [{
           type: "highlightRange",
-          xRange: [-0.1, 0]
-        }
+          xRange: [-0.1, 0],
+        }],
       },
     },
     testCondition: "random vis",
@@ -339,33 +504,47 @@ export const QuestionList: TQuestion[] = [
     index: 10,
     pageName: "question",
     userText:
-      "There is a positive correlation between the contribution of bmi to predictions and the bmi values when the feature value is between 0.05 and 0.10.",
+      "In the BMI range of 0.05 and 0.1, it is positively correlated with diabetes risk",
     initVis: "heatmap",
+    firstVis: {
+      graphType: "heatmap",
+      xValues: "None",
+      yValues: "None",
+    },
     secondVis: "scatter",
+    newVis: {
+      graphType: "Scatter",
+      xValues: "bmi",
+      yValues: "bmi",
+      annotation: [{
+        type: "highlightRange",
+        xRange: [0.05, 0.1],
+      }],
+    },
     insight: {
       variables: [
         {
           featureName: "bmi",
-          type: "contribution of",
-          transform: "average",
+          type: "value of",
+          transform: "",
         },
         {
           featureName: "bmi",
           type: "contribution of",
-          transform: "average",
+          transform: "",
         },
       ],
       type: "correlation",
-      relation: "positively",
-      condition: undefined,
+      relation: "positively correlated",
+      condition: { featureName: "bmi", range: [0.05, 0.1] },
       graph: {
         graphType: "Scatter",
         xValues: "bmi",
         yValues: "bmi",
-        annotation: {
+        annotation: [{
           type: "highlightRange",
-          xRange: [0.05, 0.1]
-        }
+          xRange: [0.05, 0.1],
+        }],
       },
     },
     testCondition: "ours",
@@ -375,9 +554,19 @@ export const QuestionList: TQuestion[] = [
     index: 11,
     pageName: "question",
     userText:
-      "The correlation between bmi and its feature values is stronger when the feature value for age is in the range |0.05 to 0.1| compared to |0 to 0.02|.",
+      "BMI has a stronger correlation with predictions when age is between 0.05 to 0.1 versus 0 to 0.02",
     initVis: "heatmap",
+    firstVis: {
+      graphType: "heatmap",
+      xValues: "None",
+      yValues: "None",
+    },
     secondVis: "scatter",
+    newVis: {
+      graphType: "Scatter",
+      xValues: "bmi",
+      yValues: "bmi",
+    },
     insight: {
       variables: [
         {

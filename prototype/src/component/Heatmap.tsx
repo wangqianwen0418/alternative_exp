@@ -9,6 +9,7 @@ interface HeatmapProps {
   width: number;
   height: number;
   title: string;
+  featuresToShow?: string[];
 }
 
 export default function Heatmap({
@@ -19,6 +20,7 @@ export default function Heatmap({
   width: totalWidth,
   height: totalHeight,
   title,
+  featuresToShow,
 }: HeatmapProps) {
   const svgRef = useRef(null);
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
@@ -39,6 +41,27 @@ export default function Heatmap({
   );
 
   const datasets = useMemo(() => {
+    const selectedFeatureIndices = featuresToShow
+      ? featuresToShow
+          .map((feature) => labels.indexOf(feature))
+          .filter((index) => index !== -1)
+      : labels.map((_, index) => index);
+
+    // Filter shapValuesArray and featureValuesArray to keep only the selected features
+    const filteredShapValuesArray = shapValuesArray.map((shapValues) =>
+      selectedFeatureIndices.map((i) => shapValues[i])
+    );
+
+    const filteredFeatureValuesArray = featureValuesArray.map((featureValues) =>
+      selectedFeatureIndices.map((i) => featureValues[i])
+    );
+
+    const filteredLabels = selectedFeatureIndices.map((i) => labels[i]);
+
+    const filteredAverageShapValues = filteredShapValuesArray.map(
+      (shapValues) => d3.mean(shapValues.map(Math.abs)) ?? 0
+    );
+
     const averageShapValues = shapValuesArray.map(
       (shapValues) => d3.mean(shapValues.map(Math.abs)) ?? 0
     );

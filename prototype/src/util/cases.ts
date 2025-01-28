@@ -27,6 +27,7 @@ export const CASES: TCase[] = [
         graphType: "Bar",
         xValues: "None",
         yValues: "None",
+        features: ["age", "bmi"],
       },
     },
   },
@@ -53,10 +54,10 @@ export const CASES: TCase[] = [
         graphType: "Swarm",
         xValues: "BMI",
         yValues: "BMI",
-        annotation: {
+        annotation: [{
           type: "singleLine",
           xValue: 0,
-        },
+        }],
       },
     },
   },
@@ -77,7 +78,7 @@ export const CASES: TCase[] = [
         },
       ],
       type: "correlation",
-      relation: "positively",
+      relation: "positively correlated",
       condition: undefined,
       graph: {
         graphType: "Scatter",

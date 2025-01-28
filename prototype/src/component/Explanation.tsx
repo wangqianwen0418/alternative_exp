@@ -187,7 +187,7 @@ export default function Explanation() {
               offsets={[0, 0]}
               annotation={
                 insight?.graph.annotation
-                  ? insight?.graph.annotation
+                  ? insight?.graph.annotation[0]
                   : undefined
               }
               highlightedFeatures={insight?.graph.features}
@@ -222,7 +222,7 @@ export default function Explanation() {
               setSelectedIndices={setSelectedIndices}
               annotation={
                 insight?.graph.annotation
-                  ? insight?.graph.annotation
+                  ? insight?.graph.annotation[0]
                   : undefined
               }
             />
@@ -231,19 +231,18 @@ export default function Explanation() {
         break;
       case "Swarm":
         console.log("Swarm");
-        if (insight?.graph.xValues) {
-          const featureName = insight?.graph.xValues;
-        } else {
-          const featureName = "bmi";
-        }
-        featureIndex = shap_diabetes["feature_names"].indexOf(featureName);
-        featureValues = shap_diabetes["feature_values"].map(
-          (row) => row[featureIndex]
-        );
-        featureShapValues = shap_diabetes["shap_values"].map(
-          (row) => row[featureIndex]
-        );
+        let swarmFeatureValues = [[0.0]];
+        let swarmFeatureShapValues = [[0]];
+        if (insight.graph?.features){
+          const featureIndices = insight?.graph.features.map(feature => shap_diabetes["feature_names"].indexOf(feature));
+          swarmFeatureValues = shap_diabetes["feature_values"].map(row =>
+            featureIndices.map(index => row[index])
+          );
+          const featureShapValues = shap_diabetes["shap_values"].map(row =>
+            featureIndices.map(index => row[index])
+          );
 
+        }
         additionalVisualizations = isSubmitted && (
           <>
             <Swarm
@@ -256,7 +255,7 @@ export default function Explanation() {
               setSelectedIndices={setSelectedIndices}
               annotation={
                 insight?.graph.annotation
-                  ? insight?.graph.annotation
+                  ? insight?.graph.annotation[0]
                   : undefined
               }
               boldFeatureNames={insight?.graph.features}
@@ -283,19 +282,23 @@ export default function Explanation() {
 
       default:
         console.log("UNKNOWN GRAPH TYPE");
+        console.log(insight?.graph.graphType);
     }
   }
 
   useEffect(() => {
     if (initialVisRef.current) {
+      
       const bbox = initialVisRef.current.getBBox();
       setInitialVisHeight(bbox.height); // Set the height of the initial visualization
+      console.log("initialVisHeight: " + initialVisHeight);
     }
 
-    if (additionalVisRef.current) {
-      const bbox = additionalVisRef.current.getBBox();
-      setAdditionalVisHeight(bbox.height); // Set the height of the additional visualization
-    }
+    // if (additionalVisRef.current) {
+    //   const bbox = additionalVisRef.current.getBBox();
+    //   setAdditionalVisHeight(bbox.height); // Set the height of the additional visualization
+    //   console.log("additionalVisHeight: " + additionalVisHeight);
+    // }
   }, [initialVisualization, additionalVisualizations]);
 
   const yOffsetDifference = initialVisYPos - additionalVisYPos;
@@ -315,7 +318,8 @@ export default function Explanation() {
         {isSubmitted && (
           <g
             ref={additionalVisRef}
-            transform={`translate(0, ${initialVisHeight + 20})`}
+            //transform={`translate(0, ${initialVisHeight -100})`}
+            transform={`translate(0,200)`}
           >
             {additionalVisualizations}
           </g>
