@@ -156,17 +156,17 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
 
       <Grid item xs={10}>
         <Paper style={{ padding: "15px" }} elevation={0}>
-          <p style={{ margin: "0px 5px" }}>
+          <p style={{ margin: "0px -50px" }}>
             <b>ML Model and Dataset:</b> Each instance in the dataset
             corresponds to a patient, characterized by values for 10 distinct
-            features.
+            features. This machine learning model predicts the progression of
+            diabetes in patients using these 10 features.
             <br />
-            This machine learning model predicts the progression of diabetes in
-            patients using these 10 features.
-            <br /> The explanations are based on two sets of values: Feature
-            values and SHAP values. SHAP values represent the impact a feature
-            had on the model's prediction (positive = increased risk, negative =
-            decreased risk).{" "}
+            <b>Explanations:</b> Based on Feature values and SHAP values.
+            Feature values represent the specific numerical value of a
+            particular feature at a data point. SHAP values represent the impact
+            a feature had on the model's prediction (positive = increased risk,
+            negative = decreased risk).
             {/* {appProps.pageName:.includes("Free") && <SyncIcon />} */}
           </p>
         </Paper>
