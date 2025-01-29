@@ -9,11 +9,20 @@ interface TwoColorScatterProps {
   height: number;
   label: string;
   colorLabel: string;
+  annotation?: Array<[number, number]>; // [[low, high]] or [[low1, high1], [low2, high2]]
 }
 
 export default function TwoColorScatter(props: TwoColorScatterProps) {
-  const { xValues, yValues, colorValues, width, height, label, colorLabel } =
-    props;
+  const {
+    xValues,
+    yValues,
+    colorValues,
+    width,
+    height,
+    label,
+    colorLabel,
+    annotation,
+  } = props;
 
   const margin = useMemo(() => [22.5, 10, 40, 52.5], []);
   const labelFontSize = 13;
@@ -52,7 +61,6 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
   const legendHeight = height - margin[0] - margin[2];
   const legendX = chartRight + 30;
   const legendY = margin[0];
-
   const legendScale = useMemo(() => {
     return d3
       .scaleLinear()
@@ -65,8 +73,10 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
   const handleMaxRef = useRef<SVGRectElement>(null);
 
   useEffect(() => {
-    setSliderRange([minColor, maxColor]);
-  }, [minColor, maxColor]);
+    if (!annotation) {
+      setSliderRange([minColor, maxColor]);
+    }
+  }, [minColor, maxColor, annotation]);
 
   function createDragHandle(isMinHandle: boolean) {
     return d3
@@ -87,13 +97,15 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
   }
 
   useEffect(() => {
-    if (handleMinRef.current) {
-      d3.select(handleMinRef.current).call(createDragHandle(true));
+    if (!annotation) {
+      if (handleMinRef.current) {
+        d3.select(handleMinRef.current).call(createDragHandle(true));
+      }
+      if (handleMaxRef.current) {
+        d3.select(handleMaxRef.current).call(createDragHandle(false));
+      }
     }
-    if (handleMaxRef.current) {
-      d3.select(handleMaxRef.current).call(createDragHandle(false));
-    }
-  }, [handleMinRef.current, handleMaxRef.current, legendScale]);
+  }, [handleMinRef.current, handleMaxRef.current, legendScale, annotation]);
 
   useEffect(() => {
     d3.select(`g.twoColorScatter#${label}`).selectAll("g.x-axis").remove();
@@ -148,9 +160,18 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
   ]);
 
   function getCircleOpacity(val: number) {
-    if (!sliderEnabled) return 0.8;
-    const [low, high] = sliderRange;
-    return val >= low && val <= high ? 0.8 : 0.1;
+    if (annotation) {
+      for (let [low, high] of annotation) {
+        if (val >= low && val <= high) {
+          return 0.8;
+        }
+      }
+      return 0.1;
+    } else {
+      if (!sliderEnabled) return 0.8;
+      const [low, high] = sliderRange;
+      return val >= low && val <= high ? 0.8 : 0.1;
+    }
   }
 
   const toggleWidth = 120;
@@ -159,22 +180,49 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
   const sliderToggleY = margin[0] / 2;
   const ticks = legendScale.ticks(10);
 
+  let rangeRects: Array<{
+    topY: number;
+    height: number;
+  }> = [];
+
+  if (annotation) {
+    rangeRects = annotation.map(([low, high]) => {
+      const topY = legendScale(high);
+      const bottomY = legendScale(low);
+      return {
+        topY,
+        height: bottomY - topY,
+      };
+    });
+  } else {
+    const topY = legendScale(sliderRange[1]);
+    const bottomY = legendScale(sliderRange[0]);
+    rangeRects = [
+      {
+        topY,
+        height: bottomY - topY,
+      },
+    ];
+  }
+
   return (
     <g className="twoColorScatter" id={label}>
       <rect width={width} height={height} fill="white" stroke="black" />
-      <g transform={`translate(${sliderToggleX}, ${sliderToggleY})`}>
-        <foreignObject width={toggleWidth} height={toggleHeight}>
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <input
-              type="checkbox"
-              checked={sliderEnabled}
-              onChange={() => setSliderEnabled(!sliderEnabled)}
-              style={{ marginRight: 4 }}
-            />
-            <span style={{ fontSize: "12px" }}>Enable Slider</span>
-          </div>
-        </foreignObject>
-      </g>
+      {!annotation && (
+        <g transform={`translate(${sliderToggleX}, ${sliderToggleY})`}>
+          <foreignObject width={toggleWidth} height={toggleHeight}>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <input
+                type="checkbox"
+                checked={sliderEnabled}
+                onChange={() => setSliderEnabled(!sliderEnabled)}
+                style={{ marginRight: 4 }}
+              />
+              <span style={{ fontSize: "12px" }}>Enable Slider</span>
+            </div>
+          </foreignObject>
+        </g>
+      )}
       <g className="points">
         {xValues.map((x, i) => {
           const cx = xScale(x);
@@ -228,25 +276,66 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
           width={legendWidth}
           height={legendHeight}
           fill={`url(#color-gradient-${label})`}
+          opacity={0.3}
         />
-        <rect
-          ref={handleMinRef}
-          x={5}
-          y={legendScale(sliderRange[0]) - 2}
-          width={legendWidth + 10}
-          height={4}
-          fill="black"
-          style={{ cursor: "grab" }}
-        />
-        <rect
-          ref={handleMaxRef}
-          x={5}
-          y={legendScale(sliderRange[1]) - 2}
-          width={legendWidth + 10}
-          height={4}
-          fill="black"
-          style={{ cursor: "grab" }}
-        />
+        {rangeRects.map(({ topY, height }, i) => (
+          <rect
+            key={`rangeRect-${i}`}
+            x={10}
+            y={topY}
+            width={legendWidth}
+            height={height}
+            fill={`url(#color-gradient-${label})`}
+            opacity={1}
+          />
+        ))}
+        {annotation ? (
+          annotation.map(([low, high], i) => {
+            const yTop = legendScale(high) - 2;
+            const yBottom = legendScale(low) - 2;
+            return (
+              <g key={`annotationHandle-${i}`}>
+                <rect
+                  x={5}
+                  y={yTop}
+                  width={legendWidth + 10}
+                  height={4}
+                  fill="black"
+                  style={{ cursor: "default" }}
+                />
+                <rect
+                  x={5}
+                  y={yBottom}
+                  width={legendWidth + 10}
+                  height={4}
+                  fill="black"
+                  style={{ cursor: "default" }}
+                />
+              </g>
+            );
+          })
+        ) : (
+          <>
+            <rect
+              ref={handleMinRef}
+              x={5}
+              y={legendScale(sliderRange[0]) - 2}
+              width={legendWidth + 10}
+              height={4}
+              fill="black"
+              style={{ cursor: "grab" }}
+            />
+            <rect
+              ref={handleMaxRef}
+              x={5}
+              y={legendScale(sliderRange[1]) - 2}
+              width={legendWidth + 10}
+              height={4}
+              fill="black"
+              style={{ cursor: "grab" }}
+            />
+          </>
+        )}
         <text
           x={legendWidth + 40}
           y={legendHeight / 2 - 12}

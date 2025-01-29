@@ -159,6 +159,10 @@ export default function Explanation() {
           height={400}
           label="bmi"
           colorLabel="age"
+          // annotationRanges={[
+          //   [-5, 0],
+          //   [15, 20],
+          // ]}
         />
       );
       break;
@@ -233,15 +237,16 @@ export default function Explanation() {
         console.log("Swarm");
         let swarmFeatureValues = [[0.0]];
         let swarmFeatureShapValues = [[0]];
-        if (insight.graph?.features){
-          const featureIndices = insight?.graph.features.map(feature => shap_diabetes["feature_names"].indexOf(feature));
-          swarmFeatureValues = shap_diabetes["feature_values"].map(row =>
-            featureIndices.map(index => row[index])
+        if (insight.graph?.features) {
+          const featureIndices = insight?.graph.features.map((feature) =>
+            shap_diabetes["feature_names"].indexOf(feature)
           );
-          const featureShapValues = shap_diabetes["shap_values"].map(row =>
-            featureIndices.map(index => row[index])
+          swarmFeatureValues = shap_diabetes["feature_values"].map((row) =>
+            featureIndices.map((index) => row[index])
           );
-
+          const featureShapValues = shap_diabetes["shap_values"].map((row) =>
+            featureIndices.map((index) => row[index])
+          );
         }
         additionalVisualizations = isSubmitted && (
           <>
@@ -288,7 +293,6 @@ export default function Explanation() {
 
   useEffect(() => {
     if (initialVisRef.current) {
-      
       const bbox = initialVisRef.current.getBBox();
       setInitialVisHeight(bbox.height); // Set the height of the initial visualization
       console.log("initialVisHeight: " + initialVisHeight);
