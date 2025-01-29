@@ -39,6 +39,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import Cookies from "js-cookie";
 import { generateQuestionOrder } from "./util/questionBalance";
+import Tutorial from "./component/Tutorial";
 
 function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
   const [open, setOpen] = useState(false); // sider drawer
@@ -50,6 +51,7 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
   const [, setQuestionIndex] = useAtom(questionIndexAtom);
   const [, setUUID] = useAtom(uuidAtom);
   const [, setQuestionOrder] = useAtom(questionOrderAtom);
+  const [showTutorial, setShowTutorial] = useState(true);
 
   let uuid = Cookies.get("uuid");
 
@@ -178,8 +180,23 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
           <CounterbalanceButton />
         </Paper> */}
       </Grid>
+      {"index" in appProps && (
+        <Tutorial show={showTutorial} onClose={() => setShowTutorial(false)} />
+      )}
       <Grid item xs={7} className="App-body">
-        <Explanation />
+        {!("index" in appProps) || !showTutorial ? (
+          <Explanation />
+        ) : (
+          <div
+            style={{
+              width: "100%",
+              height: "400px",
+              background: "transparent",
+            }}
+          >
+            {/* Placeholder div to keep layout stable */}
+          </div>
+        )}
       </Grid>
     </Grid>
   );

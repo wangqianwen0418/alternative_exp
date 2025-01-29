@@ -310,11 +310,6 @@ export default function Swarm(props: SwarmProps) {
     d3.select("g.swarm g.x-axis").remove();
     d3.selectAll("g.swarm .brush").remove();
 
-    const svg = d3.select("svg");
-    if (totalPlotHeight + 60 > height) {
-      svg.attr("height", totalPlotHeight + 60);
-    }
-
     const xAxis = d3.axisBottom(xScale);
     d3.select("g.swarm")
       .append("g")

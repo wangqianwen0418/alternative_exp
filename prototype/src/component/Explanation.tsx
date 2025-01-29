@@ -188,7 +188,7 @@ export default function Explanation() {
               width={600}
               height={400}
               id="bar"
-              offsets={[0, 0]}
+              offsets={[0, 225]}
               annotation={
                 insight?.graph.annotation
                   ? insight?.graph.annotation[0]
@@ -221,7 +221,7 @@ export default function Explanation() {
               width={600}
               height={400}
               id="bmi-scatter"
-              offsets={[0, 0]}
+              offsets={[0, 175]}
               selectedIndices={selectedIndices}
               setSelectedIndices={setSelectedIndices}
               annotation={
