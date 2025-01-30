@@ -143,14 +143,14 @@ const tutorialSteps = [
     content: (
       <>
         <Typography variant="body1" sx={{ mb: 1 }}>
-          For each question, you'll be given an insight (a statement about a
-          data visualization) and an <b>initial visualization</b>. Below is an
-          example of a visualization you could receive.
+          For each question, you'll be given an <b>insight</b> (a statement
+          about a data visualization) and an <b>initial visualization</b>. Below
+          is an example of a visualization you could receive.
         </Typography>
         <FirstTutorialGraph />
         <Typography variant="body2" color="text.secondary" sx={{ mt: -2 }}>
-          Note that charts without annotations are interactive! Try highlighting
-          a portion of the beeswarm plot.
+          Note that charts without annotations are interactive! Try left
+          clicking and dragging to highlight a portion of the beeswarm plot.
         </Typography>
         <Typography variant="body1" sx={{ mt: 1 }}>
           Now, an example insight you may be given is:{" "}
