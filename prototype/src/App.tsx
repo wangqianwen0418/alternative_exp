@@ -139,7 +139,7 @@ function App(appProps: TCase | TQuestion) {
       </Grid>
       <Grid item xs={4} className="App-body">
         <Interpretation />
-        {"index" in appProps && isSubmitted && <UserResponse />}
+        {"index" in appProps && <UserResponse />}
       </Grid>
       <Grid item xs={7} className="App-body">
         <Explanation />
