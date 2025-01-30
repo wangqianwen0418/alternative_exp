@@ -7,6 +7,9 @@ import {
   Radio,
   Modal,
   Box,
+  Stepper,
+  Step,
+  StepLabel,
 } from "@mui/material";
 import { QuestionList } from "../util/questionList";
 import { useAtom } from "jotai";
@@ -22,7 +25,7 @@ import {
   questionOrderAtom,
 } from "../store";
 import Selection from "./webUtil/Selection";
-import { weburl } from "../util/appscript_url";
+import { test_weburl } from "../util/appscript_url";
 
 const confidenceOptions = [
   "please select",
@@ -36,10 +39,10 @@ const confidenceOptions = [
 
 export default function UserResponse() {
   const [questionIndex, setQuestionIndex] = useAtom(questionIndexAtom);
-  const [insight, setInsight] = useAtom(insightAtom);
+  const [, setInsight] = useAtom(insightAtom);
   const [freeText, setFreetext] = useAtom(freeTextAtom);
   const [initVis, setInitVis] = useAtom(initVisAtom);
-  const [secondVis, setSecondVis] = useAtom(secondVisAtom);
+  const [, setSecondVis] = useAtom(secondVisAtom);
   const [, setName] = useAtom(pageNameAtom);
   const [, setIsSubmitted] = useAtom(isSubmittedAtom);
   const [uuid] = useAtom(uuidAtom);
@@ -55,6 +58,23 @@ export default function UserResponse() {
   const currentQuestionIndex = questionIndexesArray[questionIndex];
   const isLastQuestion = questionIndex >= questionIndexesArray.length - 1;
 
+  const moveToNextQuestion = () => {
+    const nextQuestionIndex = questionIndexesArray[questionIndex + 1];
+
+    setFreetext(QuestionList[nextQuestionIndex].userText);
+    setInsight(QuestionList[nextQuestionIndex].insight);
+    setInitVis(QuestionList[nextQuestionIndex].initVis);
+    setSecondVis(QuestionList[nextQuestionIndex].secondVis);
+    setName(QuestionList[nextQuestionIndex].pageName);
+
+    setUserAnswer(undefined);
+    setConfidence(confidenceOptions[0]);
+    setIsSubmitted(false);
+    setIsSecondPart(false);
+    setQuestionIndex((prevIndex) => prevIndex + 1);
+  };
+
+  // -- Original "Next" logic that also SUBMITS data
   const onSubmit = async () => {
     const data = {
       uuid,
@@ -70,7 +90,7 @@ export default function UserResponse() {
 
     try {
       console.log("Submitting form:", JSON.stringify(data));
-      await fetch(weburl!, {
+      await fetch(test_weburl!, {
         method: "POST",
         mode: "no-cors",
         headers: {
@@ -89,7 +109,6 @@ export default function UserResponse() {
         moveToNextQuestion();
       }
     } else {
-      //setInitVis(QuestionList[currentQuestionIndex].secondVis);
       setSecondVis(QuestionList[currentQuestionIndex].secondVis);
       setUserAnswer(undefined);
       setConfidence(confidenceOptions[0]);
@@ -98,20 +117,20 @@ export default function UserResponse() {
     }
   };
 
-  const moveToNextQuestion = () => {
-    const nextQuestionIndex = questionIndexesArray[questionIndex + 1];
-
-    setFreetext(QuestionList[nextQuestionIndex].userText);
-    setInsight(QuestionList[nextQuestionIndex].insight);
-    setInitVis(QuestionList[nextQuestionIndex].initVis);
-    setSecondVis(QuestionList[nextQuestionIndex].secondVis);
-    setName(QuestionList[nextQuestionIndex].pageName);
-
-    setUserAnswer(undefined);
-    setConfidence(confidenceOptions[0]);
-    setIsSubmitted(false);
-    setIsSecondPart(false);
-    setQuestionIndex((prevIndex) => prevIndex + 1);
+  const onStepperNext = () => {
+    if (isSecondPart) {
+      if (isLastQuestion) {
+        setModalVisible(true);
+      } else {
+        moveToNextQuestion();
+      }
+    } else {
+      setSecondVis(QuestionList[currentQuestionIndex].secondVis);
+      setUserAnswer(undefined);
+      setConfidence(confidenceOptions[0]);
+      setIsSecondPart(true);
+      setIsSubmitted(true);
+    }
   };
 
   return (
@@ -143,8 +162,7 @@ export default function UserResponse() {
               onChange={() => setUserAnswer("yes")}
             />
             <span>
-              <b>Correct</b>: the visualization(s) clearly supports this
-              statement.
+              <b>Correct</b>: the visualization clearly supports this statement.
             </span>
           </div>
 
@@ -160,7 +178,7 @@ export default function UserResponse() {
               onChange={() => setUserAnswer("no")}
             />
             <span>
-              <b>Incorrect</b> - the visualization contradict this statement.
+              <b>Incorrect</b>: the visualization contradicts this statement.
             </span>
           </div>
 
@@ -170,7 +188,7 @@ export default function UserResponse() {
               onChange={() => setUserAnswer("unsure")}
             />
             <span>
-              <b>Irrelevant</b> - the visualization does not provide enough
+              <b>Irrelevant</b>: the visualization does not provide enough
               information to confirm or refute this statement.
             </span>
           </div>
@@ -191,15 +209,37 @@ export default function UserResponse() {
           />
         </div>
         <br />
-        <Button
-          variant="contained"
-          disabled={
-            userAnswer === undefined || confidence === confidenceOptions[0]
-          }
-          onClick={() => onSubmit()}
-        >
-          {isSecondPart ? (isLastQuestion ? "Submit" : "Next") : "Next"}
-        </Button>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <Button
+            variant="contained"
+            disabled={
+              userAnswer === undefined || confidence === confidenceOptions[0]
+            }
+            onClick={onSubmit}
+          >
+            {isSecondPart ? (isLastQuestion ? "Submit" : "Next") : "Next"}
+          </Button>
+
+          <Button
+            variant="outlined"
+            sx={{ ml: 2 }}
+            onClick={onStepperNext}
+            disabled={isLastQuestion && isSecondPart}
+          >
+            Stepper Next
+          </Button>
+
+          {/* Progress Stepper to the right */}
+          <Box sx={{ flex: 1, ml: 2 }}>
+            <Stepper activeStep={questionIndex} alternativeLabel>
+              {questionIndexesArray.map((_, index) => (
+                <Step key={index}>
+                  <StepLabel>Q{index + 1}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+          </Box>
+        </div>
       </Paper>
 
       {/* Thank You Modal */}

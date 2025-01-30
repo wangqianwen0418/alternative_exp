@@ -28,7 +28,7 @@ export default function Scatter(props: ScatterProps) {
   } = props;
 
   const margin = useMemo(() => [22.5, 10, 40, 52.5], []);
-  const labelFontSize = 11;
+  const labelFontSize = 13;
 
   const xScale = useMemo(
     () =>
@@ -239,7 +239,7 @@ export default function Scatter(props: ScatterProps) {
         <text
           key="highlightStats"
           x={(margin[3] + (width - margin[1])) / 2}
-          y={margin[0] / 2 + 3}
+          y={margin[0] / 2 + 10}
           fill="black"
           fontSize={labelFontSize}
           textAnchor="middle"
@@ -252,7 +252,7 @@ export default function Scatter(props: ScatterProps) {
         <text
           key="noDataStats"
           x={(margin[3] + (width - margin[1])) / 2}
-          y={margin[0] / 2 + 3}
+          y={margin[0] / 2 + 10}
           fill="black"
           fontSize={labelFontSize}
           textAnchor="middle"

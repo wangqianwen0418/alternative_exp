@@ -39,6 +39,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import Cookies from "js-cookie";
 import { generateQuestionOrder } from "./util/questionBalance";
+import Tutorial from "./component/Tutorial";
 
 function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
   const [open, setOpen] = useState(false); // sider drawer
@@ -50,6 +51,7 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
   const [, setQuestionIndex] = useAtom(questionIndexAtom);
   const [, setUUID] = useAtom(uuidAtom);
   const [, setQuestionOrder] = useAtom(questionOrderAtom);
+  const [showTutorial, setShowTutorial] = useState(true);
 
   let uuid = Cookies.get("uuid");
 
@@ -156,16 +158,18 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
 
       <Grid item xs={10}>
         <Paper style={{ padding: "15px" }} elevation={0}>
-          <p style={{ margin: "0px 5px" }}>
-            <b>ML Model and Dataset :</b> Each instance in the dataset
+          <p style={{ margin: "0px -50px" }}>
+            <b>ML Model and Dataset:</b> Each instance in the dataset
             corresponds to a patient, characterized by values for 10 distinct
-            features. 
+            features. This machine learning model predicts the progression of
+            diabetes in patients using these 10 features.
             <br />
-            This machine learning model predicts the progression of diabetes in
-            patients using these 10 features.
-            <br />
-            {" "}
-            The explanations are based on two sets of values: Feature values and SHAP values. SHAP values represent the impact a feature had on the model's prediction (positive = increased risk, negative = decreased risk). {/* {appProps.pageName:.includes("Free") && <SyncIcon />} */}
+            <b>Explanations:</b> Based on feature values and SHAP values.
+            Feature values represent the specific numerical value of a
+            particular feature at a data point. SHAP values represent the impact
+            a feature had on the model's prediction (positive = increased risk,
+            negative = decreased risk).
+            {/* {appProps.pageName:.includes("Free") && <SyncIcon />} */}
           </p>
         </Paper>
       </Grid>
@@ -176,8 +180,23 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
           <CounterbalanceButton />
         </Paper> */}
       </Grid>
+      {"index" in appProps && (
+        <Tutorial show={showTutorial} onClose={() => setShowTutorial(false)} />
+      )}
       <Grid item xs={7} className="App-body">
-        <Explanation />
+        {!("index" in appProps) || !showTutorial ? (
+          <Explanation />
+        ) : (
+          <div
+            style={{
+              width: "100%",
+              height: "400px",
+              background: "transparent",
+            }}
+          >
+            {/* Placeholder div to keep layout stable */}
+          </div>
+        )}
       </Grid>
     </Grid>
   );

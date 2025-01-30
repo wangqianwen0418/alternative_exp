@@ -19,12 +19,15 @@ export type TQuestion = TPageBase & {
   newVis?: TGraph
 };
 
-
-export type TAnnotation = 
-  | { type: "highlightDataPoints"; dataPoints: number[], label?: string} // An array of data points to highlight
-  | { type: "highlightRange"; xRange?: [number, number], yRange?: [number, number], label?: string} // A range along X axis
-  | { type: "singleLine"; xValue?: number, yValue?: number, label?: string}; // A vertical line at a specific X value
-
+export type TAnnotation =
+  | { type: "highlightDataPoints"; dataPoints: number[]; label?: string } // An array of data points to highlight
+  | {
+      type: "highlightRange";
+      xRange?: [number, number];
+      yRange?: [number, number];
+      label?: string;
+    } // A range along X axis
+  | { type: "singleLine"; xValue?: number; yValue?: number; label?: string }; // A vertical line at a specific X value
 
 export type TGraph = {
   graphType: string;
@@ -33,7 +36,6 @@ export type TGraph = {
   annotation?: TAnnotation[];
   features?: string[];
 };
-
 
 export type TInsight =
   | TInsight1
@@ -48,7 +50,6 @@ export type TInsight1 = {
   relation: "greater than" | "less than" | "equal to";
   condition: { featureName: string; range: [number, number] } | undefined;
   graph: TGraph;
-
 };
 
 export type TInsight2 = {
@@ -80,6 +81,3 @@ export type TVariable = {
   transform: "average" | "deviation" | "" | undefined; //relax
   type: "value of" | "contribution of" | `number of instances ${string} of`;
 };
-
-
-

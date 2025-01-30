@@ -8,15 +8,14 @@ interface SwarmProps {
   width: number;
   height: number;
   ids: string[];
+  boldFeatureNames?: string[];
   selectedIndices: number[];
   annotation?: TAnnotation;
   featuresToShow?: string[];
   setSelectedIndices: (index: number[]) => void;
-
 }
 
 export default function Swarm(props: SwarmProps) {
-  
   // let margin = useMemo(() => [10, 40, 40, 10], []);
   // const radius = 2;
   // const leftTitleMargin = 40;
@@ -31,14 +30,14 @@ export default function Swarm(props: SwarmProps) {
     width,
     height,
     ids,
+    boldFeatureNames = [],
     selectedIndices,
     setSelectedIndices,
     featuresToShow,
     annotation,
   } = props;
 
-
-  const labelFontSize = 11;
+  const labelFontSize = 13;
   const maxLabelWidth = 50;
 
   const canvasContext = useMemo(() => {
@@ -60,8 +59,6 @@ export default function Swarm(props: SwarmProps) {
       .map((id, index) => (featuresToShow.includes(id) ? index : null))
       .filter((index) => index !== null) as number[];
   }, [featuresToShow, ids]);
-
-  
 
   const truncatedLabels = useMemo(() => {
     if (!canvasContext) {
@@ -101,18 +98,12 @@ export default function Swarm(props: SwarmProps) {
 
   // Use filtered xValues and colorValues
   const flatXValues = useMemo(
-    () =>
-      filteredFeaturesIndices
-        .map((i) => xValues[i])
-        .flat(),
+    () => filteredFeaturesIndices.map((i) => xValues[i]).flat(),
     [xValues, filteredFeaturesIndices]
   );
 
   const flatColorValues = useMemo(
-    () =>
-      filteredFeaturesIndices
-        .map((i) => colorValues[i])
-        .flat(),
+    () => filteredFeaturesIndices.map((i) => colorValues[i]).flat(),
     [colorValues, filteredFeaturesIndices]
   );
 
@@ -319,11 +310,6 @@ export default function Swarm(props: SwarmProps) {
     d3.select("g.swarm g.x-axis").remove();
     d3.selectAll("g.swarm .brush").remove();
 
-    const svg = d3.select("svg");
-    if (totalPlotHeight + 60 > height) {
-      svg.attr("height", totalPlotHeight + 60);
-    }
-
     const xAxis = d3.axisBottom(xScale);
     d3.select("g.swarm")
       .append("g")
@@ -384,10 +370,13 @@ export default function Swarm(props: SwarmProps) {
       .append("text")
       .attr("class", "legend-title")
       .attr("x", legendX + legendWidth / 2)
-      .attr("y", middleY - 20)
+      .attr("y", middleY + 25)
       .attr("text-anchor", "middle")
       .attr("font-size", labelFontSize)
-      .attr("transform", `rotate(90, ${legendX + legendWidth / 2}, ${middleY})`)
+      .attr(
+        "transform",
+        `rotate(-90, ${legendX + legendWidth / 2}, ${middleY})`
+      )
       .text("Feature Value");
 
     d3.select("g.swarm")
@@ -598,6 +587,9 @@ export default function Swarm(props: SwarmProps) {
               textAnchor="end"
               alignmentBaseline="middle"
               fontSize={labelFontSize}
+              fontWeight={
+                boldFeatureNames.includes(datasetID) ? "bold" : "normal"
+              }
             >
               {truncatedLabel}
             </text>

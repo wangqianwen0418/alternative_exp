@@ -5,6 +5,7 @@ interface HeatmapProps {
   shapValuesArray: number[][];
   featureValuesArray: number[][];
   labels: string[];
+  boldFeatureNames?: string[];
   width: number;
   height: number;
   title: string;
@@ -15,6 +16,7 @@ export default function Heatmap({
   shapValuesArray,
   featureValuesArray,
   labels,
+  boldFeatureNames = [],
   width: totalWidth,
   height: totalHeight,
   title,
@@ -24,7 +26,7 @@ export default function Heatmap({
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
   const groupRef = useRef<SVGGElement>(null);
 
-  const labelFontSizePx = 12;
+  const labelFontSizePx = 13;
   const maxLabelWidth = 50;
 
   const [minShap, maxShap] = useMemo(() => [-50, 50], []);
@@ -169,49 +171,49 @@ export default function Heatmap({
 
   const legendTopLabelY = legendYStart - 5;
   const legendBottomLabelY = legendYStart + legendHeight + 15;
-  const fontSize = 10;
   const legendMidY = centerY;
   const shapValuesLabelX = legendXOffset + 30;
 
-  useEffect(() => {
-    if (!groupRef.current) return;
+  // brush effect do not remove
+  // useEffect(() => {
+  //   if (!groupRef.current) return;
 
-    const brush = d3
-      .brushX()
-      .extent([
-        [left, top],
-        [left + plotWidth, top + totalBarAreaHeight],
-      ])
-      .on("brush end", ({ selection }) => {
-        if (!selection) {
-          setSelectedIndexes([]);
-          return;
-        }
+  //   const brush = d3
+  //     .brushX()
+  //     .extent([
+  //       [left, top],
+  //       [left + plotWidth, top + totalBarAreaHeight],
+  //     ])
+  //     .on("brush end", ({ selection }) => {
+  //       if (!selection) {
+  //         setSelectedIndexes([]);
+  //         return;
+  //       }
 
-        const [x0, x1] = selection;
-        const newSelectedIndexes = d3.range(
-          Math.floor((x0 - left) / rectWidth),
-          Math.ceil((x1 - left) / rectWidth)
-        );
+  //       const [x0, x1] = selection;
+  //       const newSelectedIndexes = d3.range(
+  //         Math.floor((x0 - left) / rectWidth),
+  //         Math.ceil((x1 - left) / rectWidth)
+  //       );
 
-        setSelectedIndexes(newSelectedIndexes);
-      });
+  //       setSelectedIndexes(newSelectedIndexes);
+  //     });
 
-    const group = d3.select(groupRef.current);
-    group.selectAll(".brush").remove();
+  //   const group = d3.select(groupRef.current);
+  //   group.selectAll(".brush").remove();
 
-    const brushGroup = group.append("g").attr("class", "brush");
-    brushGroup.call(brush);
+  //   const brushGroup = group.append("g").attr("class", "brush");
+  //   brushGroup.call(brush);
 
-    brushGroup
-      .selectAll(".selection")
-      .style("fill", "rgba(128, 128, 128, 0.2)")
-      .style("stroke", "rgba(128, 128, 128, 0.2)");
+  //   brushGroup
+  //     .selectAll(".selection")
+  //     .style("fill", "rgba(128, 128, 128, 0.2)")
+  //     .style("stroke", "rgba(128, 128, 128, 0.2)");
 
-    return () => {
-      group.select(".brush").remove();
-    };
-  }, [left, plotWidth, rectWidth, top, totalBarAreaHeight, groupRef]);
+  //   return () => {
+  //     group.select(".brush").remove();
+  //   };
+  // }, [left, plotWidth, rectWidth, top, totalBarAreaHeight, groupRef]);
 
   return (
     <svg ref={svgRef} width={totalWidth} height={totalHeight}>
@@ -230,7 +232,7 @@ export default function Heatmap({
           y={20}
           textAnchor="middle"
           fontWeight="bold"
-          fontSize={12}
+          fontSize={labelFontSizePx}
         >
           {title}
         </text>
@@ -262,7 +264,7 @@ export default function Heatmap({
                 x={textXOffset}
                 y={textY}
                 textAnchor="start"
-                fontSize={fontSize}
+                fontSize={labelFontSizePx}
                 fill="black"
               >
                 {averageShap.toFixed(2)}
@@ -282,7 +284,7 @@ export default function Heatmap({
         <text
           x={legendXOffset}
           y={legendTopLabelY}
-          fontSize={fontSize}
+          fontSize={labelFontSizePx}
           textAnchor="start"
         >
           {maxShap.toFixed(2)}+
@@ -297,7 +299,7 @@ export default function Heatmap({
         <text
           x={legendXOffset}
           y={legendBottomLabelY}
-          fontSize={fontSize}
+          fontSize={labelFontSizePx}
           textAnchor="start"
         >
           {minShap.toFixed(2)}+
@@ -305,7 +307,7 @@ export default function Heatmap({
         <text
           x={shapValuesLabelX}
           y={legendMidY}
-          fontSize={fontSize}
+          fontSize={labelFontSizePx}
           textAnchor="middle"
           transform={`rotate(-90, ${shapValuesLabelX}, ${legendMidY})`}
         >
@@ -315,7 +317,7 @@ export default function Heatmap({
           x={10 + textXOffset}
           y={top + totalBarAreaHeight + 20}
           textAnchor="middle"
-          fontSize={fontSize}
+          fontSize={labelFontSizePx}
         >
           |Avg. SHAP|
         </text>
@@ -328,6 +330,7 @@ export default function Heatmap({
             textAnchor="end"
             alignmentBaseline="middle"
             fontSize={labelFontSizePx}
+            fontWeight={boldFeatureNames.includes(sortedLabels[idx]) ? "bold" : "normal"}
           >
             {label}
           </text>

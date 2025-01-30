@@ -8,6 +8,7 @@ import {
   // test_random_shap,
   diabetes_bmi_featureValues,
   diabetes_bmi_shapValues,
+  diabetes_age_shapValues,
   // diabetes_s5_shapValues,
   // diabetes_s5_featureValues,
 } from "../util/diabetesData";
@@ -18,6 +19,7 @@ import Scatter from "./Scatter";
 import Bar from "./Bar";
 import { useAtom } from "jotai";
 import { initVisAtom, insightAtom, isSubmittedAtom } from "../store";
+import TwoColorScatter from "./TwoColorScatter";
 
 function getRandomPoints(arr: number[]) {
   if (arr.length < 25) {
@@ -47,11 +49,10 @@ export default function Explanation() {
   const [initialVisHeight, setInitialVisHeight] = useState(0); // State to store initial vis height
   const [additionalVisHeight, setAdditionalVisHeight] = useState(0); // State to store additional vis height
   const initialVisRef = useRef<SVGGElement>(null);
-  const additionalVisRef = useRef<SVGGElement>(null)
+  const additionalVisRef = useRef<SVGGElement>(null);
 
   const [initialVisYPos, setInitialVisYPos] = useState(0);
-  const [additionalVisYPos, setAdditionalVisYPos] = useState(0); 
-
+  const [additionalVisYPos, setAdditionalVisYPos] = useState(0);
 
   let featureName = "bmi",
     featureIndex = shap_diabetes["feature_names"].indexOf(featureName),
@@ -76,8 +77,9 @@ export default function Explanation() {
           // xValues={[diabetes_s5_shapValues]}
           // colorValues={[diabetes_s5_featureValues]}
           // ids={["serum triglycerides level"]}
-          width={450}
-          height={300}
+          // boldFeatureNames={["sex", "age"]}
+          width={600}
+          height={400}
           selectedIndices={selectedIndices}
           setSelectedIndices={setSelectedIndices}
           // annotation={{
@@ -103,8 +105,8 @@ export default function Explanation() {
         <Scatter
           yValues={diabetes_bmi_shapValues}
           xValues={diabetes_bmi_featureValues}
-          width={450}
-          height={350}
+          width={600}
+          height={400}
           id="bmi"
           offsets={[0, 0]}
           selectedIndices={selectedIndices}
@@ -127,8 +129,8 @@ export default function Explanation() {
         <Bar
           allShapValues={shap_diabetes["shap_values"].slice(0, 100)}
           featureNames={shap_diabetes["feature_names"].slice(0, 100)}
-          width={450}
-          height={250}
+          width={600}
+          height={400}
           id="bmi"
           offsets={[0, 0]}
         />
@@ -140,9 +142,27 @@ export default function Explanation() {
           shapValuesArray={diabetesShapValues}
           featureValuesArray={diabetesFeatureValues}
           labels={diabetesLabels}
-          width={450}
-          height={250}
+          // boldFeatureNames={["sex", "age"]}
+          width={600}
+          height={350}
           title="Diabetes Heatmap"
+        />
+      );
+      break;
+    case "two-scatter":
+      initialVisualization = (
+        <TwoColorScatter
+          yValues={diabetes_bmi_shapValues}
+          xValues={diabetes_bmi_featureValues}
+          colorValues={diabetes_age_shapValues}
+          width={600}
+          height={400}
+          label="bmi"
+          colorLabel="age"
+          // annotationRanges={[
+          //   [-5, 0],
+          //   [15, 20],
+          // ]}
         />
       );
       break;
@@ -166,9 +186,9 @@ export default function Explanation() {
               allShapValues={shap_diabetes["shap_values"].slice(0, 100)}
               featureNames={shap_diabetes["feature_names"].slice(0, 100)}
               width={600}
-              height={200}
+              height={400}
               id="bar"
-              offsets={[0, 150]}
+              offsets={[0, 225]}
               annotation={
                 insight?.graph.annotation
                   ? insight?.graph.annotation[0]
@@ -198,10 +218,10 @@ export default function Explanation() {
             <Scatter
               yValues={featureShapValues}
               xValues={featureValues}
-              width={400}
-              height={300}
+              width={600}
+              height={400}
               id="bmi-scatter"
-              offsets={[0, 150]}
+              offsets={[0, 175]}
               selectedIndices={selectedIndices}
               setSelectedIndices={setSelectedIndices}
               annotation={
@@ -217,23 +237,24 @@ export default function Explanation() {
         console.log("Swarm");
         let swarmFeatureValues = [[0.0]];
         let swarmFeatureShapValues = [[0]];
-        if (insight.graph?.features){
-          const featureIndices = insight?.graph.features.map(feature => shap_diabetes["feature_names"].indexOf(feature));
-          swarmFeatureValues = shap_diabetes["feature_values"].map(row =>
-            featureIndices.map(index => row[index])
+        if (insight.graph?.features) {
+          const featureIndices = insight?.graph.features.map((feature) =>
+            shap_diabetes["feature_names"].indexOf(feature)
           );
-          const featureShapValues = shap_diabetes["shap_values"].map(row =>
-            featureIndices.map(index => row[index])
+          swarmFeatureValues = shap_diabetes["feature_values"].map((row) =>
+            featureIndices.map((index) => row[index])
           );
-
+          const featureShapValues = shap_diabetes["shap_values"].map((row) =>
+            featureIndices.map((index) => row[index])
+          );
         }
         additionalVisualizations = isSubmitted && (
           <>
             <Swarm
               colorValues={[featureValues]}
               xValues={[featureShapValues]}
-              width={400}
-              height={300}
+              width={600}
+              height={400}
               ids={["bmi-scatter"]}
               selectedIndices={selectedIndices}
               setSelectedIndices={setSelectedIndices}
@@ -242,6 +263,7 @@ export default function Explanation() {
                   ? insight?.graph.annotation[0]
                   : undefined
               }
+              boldFeatureNames={insight?.graph.features}
             />
           </>
         );
@@ -254,9 +276,10 @@ export default function Explanation() {
               shapValuesArray={diabetesShapValues}
               featureValuesArray={diabetesFeatureValues}
               labels={diabetesLabels}
-              width={800}
-              height={50}
+              width={600}
+              height={350}
               title="Diabetes Heatmap"
+              boldFeatureNames={insight?.graph.features}
             />
           </>
         );
@@ -270,7 +293,6 @@ export default function Explanation() {
 
   useEffect(() => {
     if (initialVisRef.current) {
-      
       const bbox = initialVisRef.current.getBBox();
       setInitialVisHeight(bbox.height); // Set the height of the initial visualization
       console.log("initialVisHeight: " + initialVisHeight);

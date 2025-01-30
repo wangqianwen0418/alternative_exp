@@ -16,7 +16,7 @@ interface BarProps {
 export default function Bar(props: BarProps) {
   // Reduced right margin significantly
   const margin = useMemo(
-    () => [75, 10, 20, 40] as [number, number, number, number],
+    () => [125, 10, 20, 40] as [number, number, number, number],
     []
   );
 
@@ -34,8 +34,8 @@ export default function Bar(props: BarProps) {
   const [selectedBars, setSelectedBars] = useState<string[]>([]);
   const brushGroupRef = useRef<any>(null);
 
-  const labelFontSize = 12;
-  const maxLabelWidth = 50;
+  const labelFontSize = 13;
+  const maxLabelWidth = 100;
 
   const canvasContext = useMemo(() => {
     if (typeof document !== "undefined") {
@@ -109,7 +109,13 @@ export default function Bar(props: BarProps) {
     () =>
       d3
         .scaleLinear()
-        .domain([0, Math.max(...allShapValues.flat().map((d) => Math.abs(d)))])
+        .domain([
+          0,
+          Math.min(
+            35,
+            Math.max(...allShapValues.flat().map((d) => Math.abs(d)))
+          ),
+        ])
         .range([margin[0], width - margin[2]]),
     [allShapValues, margin, width]
   );
@@ -143,7 +149,10 @@ export default function Bar(props: BarProps) {
   }, [xScale, id, height, margin]);
 
   useEffect(() => {
-    if (!annotation) {
+    if (
+      !annotation &&
+      (!highlightedFeatures || highlightedFeatures.length === 0)
+    ) {
       if (!brushGroupRef.current) {
         const brushGroup = d3
           .select(`g.bar#${id}`)
@@ -311,7 +320,7 @@ export default function Bar(props: BarProps) {
 
           <text
             x={xScale(annotation.xValue ?? 0) + 5} // Position slightly to the right of the line
-            y={margin[1] + 75} // Position slightly below the top
+            y={margin[1] + 200} // Position slightly below the top
             fill="black"
             fontSize="12px"
           >
