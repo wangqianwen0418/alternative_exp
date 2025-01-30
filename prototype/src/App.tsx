@@ -77,7 +77,7 @@ function App(appProps: TCase | TQuestion) {
 
         {CASES.map((c) => (
           <ListItem key={c.pageName} disablePadding>
-            <ListItemButton href={c.href}>
+            <ListItemButton href={`#${c.href}`}>
               <ListItemIcon>
                 <TroubleShootIcon />
               </ListItemIcon>
@@ -86,7 +86,7 @@ function App(appProps: TCase | TQuestion) {
           </ListItem>
         )).concat(
           <ListItem key="questions" disablePadding>
-            <ListItemButton href="/questions">
+            <ListItemButton href="#/questions">
               <ListItemIcon>
                 <TroubleShootIcon />
               </ListItemIcon>
