@@ -164,7 +164,7 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
             features. This machine learning model predicts the progression of
             diabetes in patients using these 10 features.
             <br />
-            <b>Explanations:</b> Based on Feature values and SHAP values.
+            <b>Explanations:</b> Based on feature values and SHAP values.
             Feature values represent the specific numerical value of a
             particular feature at a data point. SHAP values represent the impact
             a feature had on the model's prediction (positive = increased risk,

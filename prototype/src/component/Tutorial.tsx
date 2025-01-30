@@ -1,5 +1,13 @@
 import * as React from "react";
-import { Box, Button, Typography, Modal, MobileStepper } from "@mui/material";
+import {
+  Box,
+  Button,
+  Typography,
+  Modal,
+  MobileStepper,
+  Radio,
+  RadioGroup,
+} from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
@@ -70,7 +78,7 @@ function SecondTutorialGraph() {
             height={350}
             id="bmi"
             offsets={[0, 0]}
-            annotation={{ type: "singleLine", xValue: 30 }}
+            annotation={{ type: "singleLine", xValue: 5 }}
           />
         </g>
       </svg>
@@ -88,9 +96,6 @@ const tutorialSteps = [
           through how things work and then you'll begin the real questions.
         </Typography>
         <Typography variant="body1" sx={{ mt: 2 }}>
-          ADD INFO ABOUT USER STUDY
-        </Typography>
-        <Typography variant="body1" sx={{ mt: 2 }}>
           If you already know what you're doing, feel free to skip this
           tutorial.
         </Typography>
@@ -98,34 +103,70 @@ const tutorialSteps = [
     ),
   },
   {
-    title: "Step 1: Reading the Insight",
+    title: "Step 1: Background",
     content: (
       <>
         <Typography variant="body1">
-          In each question, you'll be given an insight (a statement about a data
-          visualization).
+          First, we'd like to provide some background about the user study.
         </Typography>
         <Typography variant="body1" sx={{ mt: 2 }}>
-          Here's an example:
+          <b>What is the purpose of this study?:</b> We aim to evaluate a novel
+          interactive visualization technique designed to enhance users'
+          understanding of AI explanations.
         </Typography>
-        <Typography
-          variant="subtitle1"
-          sx={{ fontStyle: "italic", fontWeight: "bold", mt: 1 }}
-        >
-          CREATE INSIGHT FOR TUTORIAL
+        <Typography variant="body1" sx={{ mt: 2 }}>
+          <b>What is the significance of this research topic?:</b> Although XAI
+          methods are designed to clarify model behavior, they do not ensure
+          accurate user interpretations. Research has shown that users often
+          struggle to correctly understand AI explanations, sometimes misusing
+          them to justify incorrect predictions, and may even place blind trust
+          in these explanations.
+        </Typography>
+        <Typography variant="body1" sx={{ mt: 2 }}>
+          <b>How does the model work?:</b> By analyzing patient data such as
+          BMI, blood pressure, and other health indicators, our model makes
+          predictions about the progression of diabetes in a patient.
+        </Typography>
+        <Typography variant="body1" sx={{ mt: 2 }}>
+          <b>What are SHAP and feature values?:</b> SHAP values represent the
+          impact a feature had on the model's prediction (positive = increased
+          risk, negative = decreased risk). SHAP values are the primary values
+          we use in this user study. Feature values represent the specific
+          numerical value of a particular feature at a data point. Feature
+          values will be explicitly referenced if used.
         </Typography>
       </>
     ),
   },
   {
-    title: "Step 2: Visual Check (First Graph)",
+    title: "Step 2: The Insight and First Visualization",
+    content: (
+      <>
+        <Typography variant="body1" sx={{ mb: 1 }}>
+          For each question, you'll be given an insight (a statement about a
+          data visualization) and an <b>initial visualization</b>. Below is an
+          example of a visualization you could receive.
+        </Typography>
+        <FirstTutorialGraph />
+        <Typography variant="body2" color="text.secondary" sx={{ mt: -2 }}>
+          Note that charts without annotations are interactive! Try highlighting
+          a portion of the beeswarm plot.
+        </Typography>
+        <Typography variant="body1" sx={{ mt: 1 }}>
+          Now, an example insight you may be given is:{" "}
+          <i>"age contributes at least 5 to the prediction."</i>
+        </Typography>
+      </>
+    ),
+  },
+  {
+    title: "Step 3: Selecting an Answer and Rating Confidence",
     content: (
       <>
         <Typography variant="body1">
-          We will show you a visualization below. You need to decide if the
-          insight is:
+          Next, you'll need to decide if the provided insight is:
         </Typography>
-        <ul>
+        <ul style={{ marginTop: 2 }}>
           <li>
             <b>Correct</b> (the visualization supports the insight),
           </li>
@@ -137,31 +178,60 @@ const tutorialSteps = [
             information to determine).
           </li>
         </ul>
-        <FirstTutorialGraph />
-        <Typography variant="body2" color="text.secondary">
-          Note that charts without annotations are interactive! Try highlighting
-          a portion of the beeswarm plot.
-        </Typography>
-      </>
-    ),
-  },
-  {
-    title: "Step 3: Selecting an Answer and Rating Confidence",
-    content: (
-      <>
-        <Typography variant="body1">
-          ADD CORRECT/INCORRECT ANSWER Additionally, you would rate your
-          confidence in the answer by selecting a value between 1-6.
-        </Typography>
-        <Typography variant="body1" sx={{ mt: 2 }}>
+        <Typography variant="body1" sx={{ mt: -1 }}>
           In this tutorial, we highlight one possible option. (In the real
           study, you have to decide for yourself!)
         </Typography>
-        <Typography variant="body1" sx={{ mt: 2 }}>
-          ADD RADIO BUTTONS
-        </Typography>
-        <Typography variant="body2" sx={{ mt: 2, color: "gray" }}>
-          Everything else is grayed out, so you can see how an answer is chosen.
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <RadioGroup
+            row
+            aria-labelledby="disabled-radio-buttons-group-label"
+            name="disabled-radio-buttons-group"
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginRight: "16px",
+                opacity: 0.5,
+              }}
+            >
+              <Radio checked={false} disabled />
+              <span>
+                <b>Correct</b>
+              </span>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginRight: "16px",
+                opacity: 0.5,
+              }}
+            >
+              <Radio checked={false} disabled />
+              <span>
+                <b>Incorrect</b>
+              </span>
+            </div>
+
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <Radio checked={true} />
+              <span>
+                <b>Irrelevant</b>
+              </span>
+            </div>
+          </RadioGroup>
+        </div>
+        <Typography variant="body1">
+          Additionally, you'll rate your confidence in your response from 1-6.
         </Typography>
       </>
     ),
@@ -174,13 +244,12 @@ const tutorialSteps = [
           Next, we show a <b>second graph</b> about the same statement.
         </Typography>
         <SecondTutorialGraph />
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" color="text.secondary" sx={{ mt: -2 }}>
           Since this chart has an annotation, it is not interactive.
         </Typography>
         <Typography variant="body1" sx={{ mt: 2 }}>
-          You again choose whether the same statement (<i>"ADD STATEMENT"</i> )
-          is supported, contradicted, or irrelevant based on the <b>new</b>{" "}
-          visualization.
+          As a reminder, the original insight was{" "}
+          <i>"age contributes at least 5 to the prediction."</i>
         </Typography>
       </>
     ),
@@ -189,8 +258,67 @@ const tutorialSteps = [
     title: "Last Step: Selecting an Answer and Rating Confidence",
     content: (
       <>
-        <Typography variant="body1">REPEAT STEP 3</Typography>
-        <Typography variant="body1" sx={{ mt: 2 }}>
+        <Typography variant="body1">
+          Finally, you will once again decide if the provided insight is
+          correct, incorrect, or irrelevant and then rate your confidence in
+          your answer. In the case of the new visualization, an example response
+          may be:
+        </Typography>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <RadioGroup
+            row
+            aria-labelledby="disabled-radio-buttons-group-label"
+            name="disabled-radio-buttons-group"
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginRight: "16px",
+                opacity: 0.5,
+              }}
+            >
+              <Radio checked={false} disabled />
+              <span>
+                <b>Correct</b>
+              </span>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginRight: "16px",
+              }}
+            >
+              <Radio checked={true} />
+              <span>
+                <b>Incorrect</b>
+              </span>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginRight: "16px",
+                opacity: 0.5,
+              }}
+            >
+              <Radio checked={false} disabled />
+              <span>
+                <b>Irrelevant</b>
+              </span>
+            </div>
+          </RadioGroup>
+        </div>
+        <Typography variant="body1">
           That's it! Click "Finish" to begin the real user study now, or "Back"
           to revisit any step.
         </Typography>
