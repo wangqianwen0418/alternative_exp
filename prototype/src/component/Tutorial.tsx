@@ -154,7 +154,7 @@ const tutorialSteps = [
         </Typography>
         <FirstTutorialGraph />
         <Typography variant="body2" color="text.secondary" sx={{ mt: -2 }}>
-          Note that charts without annotations are interactive! Try left
+          Note that visualizations without annotations are interactive! Try left
           clicking and dragging to highlight a portion of the beeswarm plot.
         </Typography>
         <Typography variant="body1" sx={{ mt: 1 }}>

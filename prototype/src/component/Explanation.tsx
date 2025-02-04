@@ -312,6 +312,9 @@ export default function Explanation() {
       <Typography variant="h5" gutterBottom>
         Visual Explanation
       </Typography>
+      <Typography variant="body2" color="text.secondary" sx={{ mt: 1, mb: 1 }}>
+        Note that visualizations without annotations are interactive.
+      </Typography>
       <svg className="swarm" width="100%" height="100vh">
         {/* Initial Visualization */}
         <g ref={initialVisRef} transform="translate(0, 0)">
