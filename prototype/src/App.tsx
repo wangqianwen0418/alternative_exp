@@ -10,6 +10,7 @@ import {
   questionIndexAtom,
   uuidAtom,
   questionOrderAtom,
+  tutorialAtom,
 } from "./store";
 
 import Explanation from "./component/Explanation";
@@ -51,7 +52,7 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
   const [, setQuestionIndex] = useAtom(questionIndexAtom);
   const [, setUUID] = useAtom(uuidAtom);
   const [, setQuestionOrder] = useAtom(questionOrderAtom);
-  const [showTutorial, setShowTutorial] = useState(true);
+  const [showTutorial, setShowTutorial] = useAtom(tutorialAtom);
 
   let uuid = Cookies.get("uuid");
 

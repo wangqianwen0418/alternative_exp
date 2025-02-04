@@ -82,7 +82,6 @@ export default function Interpretation() {
         setInsight(parsedInput);
         console.log("PARSED INPUT: ");
         console.log(parsedInput);
-
       } catch (error) {
         console.error("Error parsing input: ", error);
       }
@@ -141,17 +140,34 @@ export default function Interpretation() {
             </IconButton>
           )}
         </Box>
-        <TextField
-          id="outlined-basic"
-          label="e.g., a high bmi leads to large diabetes progression"
-          value={freeText}
-          onChange={handleTextChange}
-          multiline
-          minRows={1}
-          maxRows={10}
-          fullWidth
-          disabled={isUserStudy}
-        />
+        {isUserStudy ? (
+          <TextField
+            id="outlined-basic"
+            value={freeText}
+            onChange={handleTextChange}
+            multiline
+            minRows={1}
+            maxRows={10}
+            fullWidth
+            disabled={isUserStudy}
+            sx={{
+              "& .Mui-disabled": {
+                WebkitTextFillColor: "black !important",
+              },
+            }}
+          />
+        ) : (
+          <TextField
+            id="outlined-basic"
+            label="e.g., a high bmi leads to large diabetes progression"
+            value={freeText}
+            onChange={handleTextChange}
+            multiline
+            minRows={1}
+            maxRows={10}
+            fullWidth
+          />
+        )}
 
         <div style={{ alignItems: "center" }}>
           {/* Conditionally render the button if the user is NOT in the user study */}
@@ -182,7 +198,8 @@ export default function Interpretation() {
         {isLoading ? (
           <CircularProgress />
         ) : (
-          (isSubmitted || insight) && (
+          (isSubmitted || insight) &&
+          !isUserStudy && (
             <Paper className="parse-input" elevation={0}>
               <b>Formatted: </b>
               {GenerateTextTemplates(insight)}

@@ -7,7 +7,12 @@ import {
   MobileStepper,
   Radio,
   RadioGroup,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
+import Selection from "./webUtil/Selection";
 import { useTheme } from "@mui/material/styles";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
@@ -66,7 +71,7 @@ function SecondTutorialGraph() {
     >
       <svg
         className="swarm"
-        width={600}
+        width={550}
         height={375}
         style={{ marginTop: "15px" }}
       >
@@ -74,7 +79,7 @@ function SecondTutorialGraph() {
           <Bar
             allShapValues={shap_diabetes["shap_values"].slice(0, 100)}
             featureNames={shap_diabetes["feature_names"].slice(0, 100)}
-            width={600}
+            width={550}
             height={350}
             id="bmi"
             offsets={[0, 0]}
@@ -233,6 +238,29 @@ const tutorialSteps = [
         <Typography variant="body1">
           Additionally, you'll rate your confidence in your response from 1-6.
         </Typography>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <FormControl sx={{ mt: 2, minWidth: 100 }}>
+            <InputLabel id="tutorial-initial-confidence-label">
+              Confidence
+            </InputLabel>
+            <Select
+              labelId="tutorial-initial-confidence-label"
+              id="tutorial-initial-confidence"
+              value={"2"}
+              autoWidth
+              label="Confidence"
+              readOnly
+            >
+              <MenuItem value="2">2</MenuItem>
+            </Select>
+          </FormControl>
+        </div>
       </>
     ),
   },
@@ -269,6 +297,7 @@ const tutorialSteps = [
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
+            flexDirection: "column",
           }}
         >
           <RadioGroup
@@ -316,7 +345,22 @@ const tutorialSteps = [
                 <b>Irrelevant</b>
               </span>
             </div>
-          </RadioGroup>
+          </RadioGroup>{" "}
+          <FormControl sx={{ m: 2, minWidth: 100 }}>
+            <InputLabel id="tutorial-second-confidence-label">
+              Confidence
+            </InputLabel>
+            <Select
+              labelId="tutorial-second-confidence-label"
+              id="tutorial-second-confidence"
+              value={"5"}
+              autoWidth
+              label="Confidence"
+              readOnly
+            >
+              <MenuItem value="5">5</MenuItem>
+            </Select>
+          </FormControl>
         </div>
         <Typography variant="body1">
           That's it! Click "Finish" to begin the real user study now, or "Back"
@@ -367,7 +411,7 @@ export default function Tutorial({ show, onClose }: TutorialProps) {
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: "35vw",
+          width: "40vw",
           bgcolor: "background.paper",
           borderRadius: 2,
           boxShadow: 24,
