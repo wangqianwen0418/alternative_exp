@@ -24,7 +24,7 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
     annotation,
   } = props;
 
-  const margin = useMemo(() => [22.5, 10, 40, 52.5], []);
+  const margin = [22.5, 10, 40, 52.5];
   const labelFontSize = 13;
   const chartLeft = margin[3];
   const chartRight = width - margin[1] - 90;
@@ -41,7 +41,7 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
       .scaleLinear()
       .domain(d3.extent(yValues) as [number, number])
       .range([height - margin[2], margin[0]]);
-  }, [yValues, height, margin, chartRight]);
+  }, [yValues, height, margin]);
 
   const [minColor, maxColor] = d3.extent(colorValues) as [number, number];
   const colorScale = useMemo(() => {
@@ -55,7 +55,12 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
     minColor,
     maxColor,
   ]);
-  const [sliderEnabled, setSliderEnabled] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (annotation) {
+      setSliderRange([minColor, maxColor]);
+    }
+  }, [annotation, minColor, maxColor]);
 
   const legendWidth = 20;
   const legendHeight = height - margin[0] - margin[2];
@@ -68,15 +73,8 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
       .range([legendHeight, 0]);
   }, [minColor, maxColor, legendHeight]);
 
-  const legendRef = useRef<SVGGElement>(null);
   const handleMinRef = useRef<SVGRectElement>(null);
   const handleMaxRef = useRef<SVGRectElement>(null);
-
-  useEffect(() => {
-    if (!annotation) {
-      setSliderRange([minColor, maxColor]);
-    }
-  }, [minColor, maxColor, annotation]);
 
   function createDragHandle(isMinHandle: boolean) {
     return d3
@@ -105,20 +103,18 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
         d3.select(handleMaxRef.current).call(createDragHandle(false));
       }
     }
-  }, [handleMinRef.current, handleMaxRef.current, legendScale, annotation]);
+  }, [annotation, createDragHandle]);
 
   useEffect(() => {
-    d3.select(`g.twoColorScatter#${label}`).selectAll("g.x-axis").remove();
-    d3.select(`g.twoColorScatter#${label}`).selectAll("g.y-axis").remove();
+    const container = d3.select(`g.twoColorScatter#${label}`);
+    container.selectAll("g.x-axis").remove();
+    container.selectAll("g.y-axis").remove();
 
-    const xAxisGroup = d3
-      .select(`g.twoColorScatter#${label}`)
+    const xAxisGroup = container
       .append("g")
       .attr("class", "x-axis")
       .attr("transform", `translate(-10,${height - margin[2]})`);
-
     xAxisGroup.call(d3.axisBottom(xScale));
-
     xAxisGroup
       .append("text")
       .attr("text-anchor", "middle")
@@ -129,14 +125,11 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
       .attr("font-size", labelFontSize)
       .text(`Feature Value (${label})`);
 
-    const yAxisGroup = d3
-      .select(`g.twoColorScatter#${label}`)
+    const yAxisGroup = container
       .append("g")
       .attr("class", "y-axis")
       .attr("transform", `translate(${margin[3] - 10},0)`);
-
     yAxisGroup.call(d3.axisLeft(yScale));
-
     yAxisGroup
       .append("text")
       .attr("text-anchor", "middle")
@@ -150,79 +143,31 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
   }, [
     xScale,
     yScale,
-    width,
+    label,
     height,
     margin,
-    labelFontSize,
-    label,
     chartLeft,
     chartRight,
+    labelFontSize,
   ]);
 
   function getCircleOpacity(val: number) {
     if (annotation) {
       for (let [low, high] of annotation) {
-        if (val >= low && val <= high) {
-          return 0.8;
-        }
+        if (val >= low && val <= high) return 0.8;
       }
       return 0.1;
     } else {
-      if (!sliderEnabled) return 0.8;
       const [low, high] = sliderRange;
       return val >= low && val <= high ? 0.8 : 0.1;
     }
   }
 
-  const toggleWidth = 120;
-  const toggleHeight = 20;
-  const sliderToggleX = (chartLeft + chartRight) / 2 - toggleWidth / 2;
-  const sliderToggleY = margin[0] / 2;
   const ticks = legendScale.ticks(10);
-
-  let rangeRects: Array<{
-    topY: number;
-    height: number;
-  }> = [];
-
-  if (annotation) {
-    rangeRects = annotation.map(([low, high]) => {
-      const topY = legendScale(high);
-      const bottomY = legendScale(low);
-      return {
-        topY,
-        height: bottomY - topY,
-      };
-    });
-  } else {
-    const topY = legendScale(sliderRange[1]);
-    const bottomY = legendScale(sliderRange[0]);
-    rangeRects = [
-      {
-        topY,
-        height: bottomY - topY,
-      },
-    ];
-  }
 
   return (
     <g className="twoColorScatter" id={label}>
       <rect width={width} height={height} fill="white" stroke="black" />
-      {!annotation && (
-        <g transform={`translate(${sliderToggleX}, ${sliderToggleY})`}>
-          <foreignObject width={toggleWidth} height={toggleHeight}>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <input
-                type="checkbox"
-                checked={sliderEnabled}
-                onChange={() => setSliderEnabled(!sliderEnabled)}
-                style={{ marginRight: 4 }}
-              />
-              <span style={{ fontSize: "12px" }}>Enable Slider</span>
-            </div>
-          </foreignObject>
-        </g>
-      )}
       <g className="points">
         {xValues.map((x, i) => {
           const cx = xScale(x);
@@ -240,11 +185,7 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
           );
         })}
       </g>
-      <g
-        ref={legendRef}
-        className="legend"
-        transform={`translate(${legendX}, ${legendY})`}
-      >
+      <g transform={`translate(${legendX}, ${legendY})`}>
         <defs>
           <linearGradient
             id={`color-gradient-${label}`}
@@ -276,19 +217,89 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
           width={legendWidth}
           height={legendHeight}
           fill={`url(#color-gradient-${label})`}
-          opacity={0.3}
         />
-        {rangeRects.map(({ topY, height }, i) => (
-          <rect
-            key={`rangeRect-${i}`}
-            x={10}
-            y={topY}
-            width={legendWidth}
-            height={height}
-            fill={`url(#color-gradient-${label})`}
-            opacity={1}
-          />
-        ))}
+        {annotation
+          ? (() => {
+              let intervals = annotation.map(([low, high]) => {
+                const t = legendScale(Math.max(low, high));
+                const b = legendScale(Math.min(low, high));
+                return [
+                  Math.max(0, Math.min(legendHeight, t)),
+                  Math.max(0, Math.min(legendHeight, b)),
+                ] as [number, number];
+              });
+              intervals.sort((a, b) => a[0] - b[0]);
+
+              const overlays: JSX.Element[] = [];
+              let currentY = 0;
+
+              intervals.forEach(([topY, bottomY], idx) => {
+                if (topY > currentY) {
+                  overlays.push(
+                    <rect
+                      key={`gap-${idx}`}
+                      x={10}
+                      y={currentY}
+                      width={legendWidth}
+                      height={topY - currentY}
+                      fill="white"
+                      opacity={0.6}
+                    />
+                  );
+                }
+                currentY = bottomY;
+              });
+              if (currentY < legendHeight) {
+                overlays.push(
+                  <rect
+                    key="gap-last"
+                    x={10}
+                    y={currentY}
+                    width={legendWidth}
+                    height={legendHeight - currentY}
+                    fill="white"
+                    opacity={0.6}
+                  />
+                );
+              }
+              return overlays;
+            })()
+          : (() => {
+              const [low, high] = sliderRange;
+              const topVal = Math.max(low, high);
+              const bottomVal = Math.min(low, high);
+              const yTop = legendScale(topVal);
+              const yBottom = legendScale(bottomVal);
+
+              const overlays: JSX.Element[] = [];
+              if (yTop > 0) {
+                overlays.push(
+                  <rect
+                    key="above"
+                    x={10}
+                    y={0}
+                    width={legendWidth}
+                    height={yTop}
+                    fill="white"
+                    opacity={0.6}
+                  />
+                );
+              }
+              if (yBottom < legendHeight) {
+                overlays.push(
+                  <rect
+                    key="below"
+                    x={10}
+                    y={yBottom}
+                    width={legendWidth}
+                    height={legendHeight - yBottom}
+                    fill="white"
+                    opacity={0.6}
+                  />
+                );
+              }
+              return overlays;
+            })()}
         {annotation ? (
           annotation.map(([low, high], i) => {
             const yTop = legendScale(high) - 2;
@@ -301,7 +312,6 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
                   width={legendWidth + 10}
                   height={4}
                   fill="black"
-                  style={{ cursor: "default" }}
                 />
                 <rect
                   x={5}
@@ -309,7 +319,6 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
                   width={legendWidth + 10}
                   height={4}
                   fill="black"
-                  style={{ cursor: "default" }}
                 />
               </g>
             );

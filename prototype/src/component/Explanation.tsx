@@ -159,9 +159,9 @@ export default function Explanation() {
           height={400}
           label="bmi"
           colorLabel="age"
-          // annotationRanges={[
+          // annotation={[
           //   [-5, 0],
-          //   [15, 20],
+          //   [15, 25],
           // ]}
         />
       );
