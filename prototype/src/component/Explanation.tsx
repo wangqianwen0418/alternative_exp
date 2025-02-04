@@ -113,8 +113,8 @@ export default function Explanation() {
           setSelectedIndices={setSelectedIndices}
           // annotation={{
           //   type: "highlightRange",
-          //   xValueRange: [-0.04, Infinity],
-          //   yValueRange: [Infinity, 30],
+          //   xRange: [-0.04, Infinity],
+          //   yRange: [Infinity, 30],
           // }}
           // annotation={{ type: "singleLine", xValue: 0.04 }}
           // annotation={{

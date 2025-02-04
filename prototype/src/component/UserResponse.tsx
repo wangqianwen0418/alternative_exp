@@ -209,10 +209,10 @@ export default function UserResponse() {
           <span style={{ marginTop: "20px" }}>
             <b>Part 2:</b>{" "}
             {isSecondPart
-              ? "Given the new visualization, please rate your confidence"
+              ? "Given the new visualization, `please rate your confi`dence"
               : "Please rate your confidence"}{" "}
           </span>
-          <FormControl sx={{ mt: 2, minWidth: 100 }}>
+          <FormControl sx={{ mt: 2, maxWidth: 250 }}>
             <InputLabel id="user-study-confidence-label">
               Please select
             </InputLabel>
