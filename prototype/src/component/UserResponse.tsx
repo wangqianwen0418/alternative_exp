@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Button,
   Typography,
@@ -30,6 +30,7 @@ import {
   tutorialAtom,
 } from "../store";
 import { test_weburl } from "../util/appscript_url";
+import Cookies from "js-cookie";
 
 const confidenceOptions = [
   { value: "", label: "Please select" },
@@ -66,6 +67,14 @@ export default function UserResponse() {
   });
   const [isSecondPart, setIsSecondPart] = React.useState(false);
 
+  useEffect(() => {
+    const savedIsSecondPart = Cookies.get("isSecondPart");
+
+    if (savedIsSecondPart !== undefined) {
+      setIsSecondPart(savedIsSecondPart === "true");
+    }
+  }, [setQuestionIndex, setIsSecondPart]);
+
   const currentQuestionIndex = questionIndexesArray[questionIndex];
   const isLastQuestion = questionIndex >= questionIndexesArray.length - 1;
 
@@ -82,7 +91,13 @@ export default function UserResponse() {
     setConfidence(confidenceOptions[0]);
     setIsSubmitted(false);
     setIsSecondPart(false);
-    setQuestionIndex((prevIndex) => prevIndex + 1);
+
+    setQuestionIndex((prevIndex) => {
+      const newIndex = prevIndex + 1;
+      Cookies.set("questionIndex", String(newIndex));
+      Cookies.set("isSecondPart", "false");
+      return newIndex;
+    });
   };
 
   const onSubmit = async () => {
@@ -124,6 +139,7 @@ export default function UserResponse() {
       setConfidence(confidenceOptions[0]);
       setIsSecondPart(true);
       setIsSubmitted(true);
+      Cookies.set("isSecondPart", "true");
     }
   };
 
@@ -140,6 +156,7 @@ export default function UserResponse() {
       setConfidence(confidenceOptions[0]);
       setIsSecondPart(true);
       setIsSubmitted(true);
+      Cookies.set("isSecondPart", "true");
     }
   };
 
@@ -257,6 +274,19 @@ export default function UserResponse() {
           >
             Stepper Next
           </Button>
+          <Button
+            variant="outlined"
+            sx={{ ml: 2 }}
+            onClick={() => {
+              Cookies.remove("questionIndex");
+              Cookies.remove("isSecondPart");
+              setQuestionIndex(0); // Reset to first question
+              setIsSecondPart(false); // Reset to Part A
+            }}
+          >
+            Reset User Study
+          </Button>
+
           <Button
             variant="outlined"
             sx={{ ml: 2 }}

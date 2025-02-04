@@ -12,7 +12,7 @@ export const GenerateTextTemplates = (insight: TInsight) => {
           {var1.transform} {var1.type}{" "}
         </span>{" "}
         <span className="label featureName">{var1.featureName}</span> is{" "}
-        <span className="label relation">{insight.relation}</span> {" "}
+        <span className="label relation">{insight.relation}</span>{" "}
         <span className="label constant">{var2}</span>{" "}
         {/* Add condition to check if insight.condition is not empty */}
         {insight.condition && Object.keys(insight.condition).length > 0 && (
@@ -66,17 +66,21 @@ export const GenerateTextTemplates = (insight: TInsight) => {
     );
   } else if (insight?.type === "correlation") {
     const [var1, var2] = insight.variables;
-    console.log("VAR 2: ");
-    console.log(var2);
+    // console.log("VAR 2: ");
+    // console.log(var2);
 
     return (
       <span className="formatted">
-        The <span className="label transform">{var1.transform} {var1.type}</span> 
-        <span className="label featureName">{var1.featureName}</span> 
-        is <span className="label relation">{insight.relation}</span> with the 
-        <span className="label transform">{var2.transform} {var2.type}</span> 
+        The{" "}
+        <span className="label transform">
+          {var1.transform} {var1.type}
+        </span>
+        <span className="label featureName">{var1.featureName}</span>
+        is <span className="label relation">{insight.relation}</span> with the
+        <span className="label transform">
+          {var2.transform} {var2.type}
+        </span>
         <span className="label featureName">{var2.featureName}</span>
-  
         {/* Add condition to check if insight.condition is not empty */}
         {insight.condition && Object.keys(insight.condition).length > 0 && (
           <>
@@ -89,7 +93,6 @@ export const GenerateTextTemplates = (insight: TInsight) => {
             <span className="label condition-range">
               [{insight.condition.range[0]}, {insight.condition.range[1]}]
             </span>
-            
           </>
         )}
         .
@@ -124,11 +127,12 @@ export const GenerateTextTemplates = (insight: TInsight) => {
         )}
       </span>
     );
-  }
-  else {
+  } else {
     return (
       <span className="formatted error-message">
-        The provided insight statement doesn't match our categorization scheme. Please enter an insight that belongs to one of the four categories and try again.
+        The provided insight statement doesn't match our categorization scheme.
+        Please enter an insight that belongs to one of the four categories and
+        try again.
       </span>
     );
   }

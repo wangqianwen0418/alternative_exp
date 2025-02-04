@@ -258,8 +258,8 @@ export const parseInput = async (
       ) {
         console.error("Improper feature/prediction detected");
       } else {
-        console.log("JSON from GPT!!");
-        console.log(jsonObject);
+        // console.log("JSON from GPT!!");
+        // console.log(jsonObject);
         let variableArray = jsonObject.Variables;
         if (jsonObject.Numbers && jsonObject.Numbers.length > 0) {
           variableArray.push(jsonObject.Numbers[0]);

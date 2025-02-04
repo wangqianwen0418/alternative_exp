@@ -39,7 +39,7 @@ export default function Interpretation() {
   // 1. Use useEffect to check if an API key is already stored in localStorage
   useEffect(() => {
     const storedApiKey = localStorage.getItem("apiKey");
-    console.log("Stored API key: " + storedApiKey);
+    // console.log("Stored API key: " + storedApiKey);
 
     if (pageName?.includes("Free") && !storedApiKey) {
       setModalVisible(true);
@@ -62,7 +62,7 @@ export default function Interpretation() {
   };
 
   const isUserStudy = pageName?.includes("question");
-  console.log("USER STUDY: " + isUserStudy);
+  // console.log("USER STUDY: " + isUserStudy);
 
   const handleSubmission = async () => {
     if (!freeText.trim()) return;
@@ -80,8 +80,8 @@ export default function Interpretation() {
           prompt
         );
         setInsight(parsedInput);
-        console.log("PARSED INPUT: ");
-        console.log(parsedInput);
+        // console.log("PARSED INPUT: ");
+        // console.log(parsedInput);
       } catch (error) {
         console.error("Error parsing input: ", error);
       }
@@ -102,8 +102,8 @@ export default function Interpretation() {
     try {
       const parsedInput: TInsight = await parseInput(freeText, apiKey, prompt);
       setInsight(parsedInput); // Update insight to reflect the newly parsed input
-      console.log("PARSED INPUT: ");
-      console.log(parsedInput);
+      // console.log("PARSED INPUT: ");
+      // console.log(parsedInput);
     } catch (error) {
       console.error("Error parsing input: ", error);
     }

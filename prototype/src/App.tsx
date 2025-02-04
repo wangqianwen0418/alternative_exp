@@ -62,11 +62,20 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
   }
 
   useEffect(() => {
+    const tutorialSeen = Cookies.get("showTutorial");
+    if (!tutorialSeen) {
+      setShowTutorial(true);
+      Cookies.set("showTutorial", "false");
+    } else {
+      setShowTutorial(false);
+    }
+  }, [setShowTutorial]);
+
+  useEffect(() => {
     setUUID(uuid);
     // setUUID("d42ccc56-b330-427b-9b4f-d99b0a626b5b"); // test uuid
     // setUUID("d46741cf-57b6-43a1-a661-119204bb7a00"); // test uuid
     const questionIndexesArray = generateQuestionOrder(uuid!);
-    console.log(questionIndexesArray);
     setQuestionOrder(questionIndexesArray);
   }, [setUUID, setQuestionOrder, uuid]);
 
@@ -182,7 +191,13 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
         </Paper> */}
       </Grid>
       {"index" in appProps && (
-        <Tutorial show={showTutorial} onClose={() => setShowTutorial(false)} />
+        <Tutorial
+          show={showTutorial}
+          onClose={() => {
+            setShowTutorial(false);
+            Cookies.set("showTutorial", "false", { expires: 365 }); // Ensure it doesn't show again
+          }}
+        />
       )}
       <Grid item xs={7} className="App-body">
         {!("index" in appProps) || !showTutorial ? (

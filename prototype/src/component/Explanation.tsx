@@ -179,7 +179,7 @@ export default function Explanation() {
   if (insight?.graph.graphType) {
     switch (insight?.graph.graphType) {
       case "Bar":
-        console.log("Bar");
+        // console.log("Bar");
         additionalVisualizations = isSubmitted && (
           <>
             <Bar
@@ -200,7 +200,7 @@ export default function Explanation() {
         );
         break;
       case "Scatter":
-        console.log("Scatter");
+        // console.log("Scatter");
         if (insight?.graph.xValues) {
           const featureName = insight?.graph.xValues;
         } else {
@@ -234,7 +234,7 @@ export default function Explanation() {
         );
         break;
       case "Swarm":
-        console.log("Swarm");
+        // console.log("Swarm");
         let swarmFeatureValues = [[0.0]];
         let swarmFeatureShapValues = [[0]];
         if (insight.graph?.features) {
@@ -269,7 +269,7 @@ export default function Explanation() {
         );
         break;
       case "Heatmap":
-        console.log("Heatmap");
+        // console.log("Heatmap");
         additionalVisualizations = isSubmitted && (
           <>
             <Heatmap
@@ -287,7 +287,7 @@ export default function Explanation() {
 
       default:
         console.log("UNKNOWN GRAPH TYPE");
-        console.log(insight?.graph.graphType);
+      // console.log(insight?.graph.graphType);
     }
   }
 
@@ -295,7 +295,7 @@ export default function Explanation() {
     if (initialVisRef.current) {
       const bbox = initialVisRef.current.getBBox();
       setInitialVisHeight(bbox.height); // Set the height of the initial visualization
-      console.log("initialVisHeight: " + initialVisHeight);
+      // console.log("initialVisHeight: " + initialVisHeight);
     }
 
     // if (additionalVisRef.current) {
