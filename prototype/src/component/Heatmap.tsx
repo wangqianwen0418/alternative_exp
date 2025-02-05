@@ -27,7 +27,7 @@ export default function Heatmap({
   const groupRef = useRef<SVGGElement>(null);
 
   const labelFontSizePx = 13;
-  const maxLabelWidth = 50;
+  const maxLabelWidth = 100;
 
   const [minShap, maxShap] = useMemo(() => [-50, 50], []);
   const colorScale = useMemo(
@@ -330,7 +330,9 @@ export default function Heatmap({
             textAnchor="end"
             alignmentBaseline="middle"
             fontSize={labelFontSizePx}
-            fontWeight={boldFeatureNames.includes(sortedLabels[idx]) ? "bold" : "normal"}
+            fontWeight={
+              boldFeatureNames.includes(sortedLabels[idx]) ? "bold" : "normal"
+            }
           >
             {label}
           </text>

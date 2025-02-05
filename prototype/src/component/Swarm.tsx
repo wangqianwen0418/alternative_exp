@@ -38,7 +38,7 @@ export default function Swarm(props: SwarmProps) {
   } = props;
 
   const labelFontSize = 13;
-  const maxLabelWidth = 50;
+  const maxLabelWidth = 100;
 
   const canvasContext = useMemo(() => {
     if (typeof document !== "undefined") {

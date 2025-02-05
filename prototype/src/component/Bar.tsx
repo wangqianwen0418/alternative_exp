@@ -228,7 +228,7 @@ export default function Bar(props: BarProps) {
   useEffect(() => {
     // If there are highlighted features, set them as selected bars
     if (highlightedFeatures && highlightedFeatures.length > 0) {
-      console.log("FEATURES TO HIGHLIGHT: " + highlightedFeatures);
+      // console.log("FEATURES TO HIGHLIGHT: " + highlightedFeatures);
       setSelectedBars(highlightedFeatures);
       d3.selectAll(`g.bar#${id} .bars g.bar-group`).each(function () {
         const featureName = d3.select(this).attr("data-feature-name");
@@ -260,8 +260,8 @@ export default function Bar(props: BarProps) {
         {sortedAvgShapeValues.map(([featureName, value]) => {
           const isSelected =
             selectedBars.length > 0 ? selectedBars.includes(featureName) : true;
-          console.log(featureName);
-          console.log(isSelected);
+          // console.log(featureName);
+          // console.log(isSelected);
           return (
             <g
               key={featureName}

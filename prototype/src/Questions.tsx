@@ -1,14 +1,27 @@
 import { QuestionList } from "./util/questionList";
 import App from "./App";
 import { useAtom } from "jotai";
-import { questionOrderAtom } from "./store";
+import { questionIndexAtom, questionOrderAtom } from "./store";
+import Cookies from "js-cookie";
+import { useEffect } from "react";
 
 export default function Questions() {
   const [questionIndexesArray] = useAtom(questionOrderAtom);
+  const [questionIndex, setQuestionIndex] = useAtom(questionIndexAtom);
+  const savedQuestionIndex = Cookies.get("questionIndex");
 
-  // useEffect(() => {
-  //     setQuestionIndex(0);
-  //     console.info("questionIndex reset", questionIndex);
-  // }); // set the question index to 0 when the component is mounted
-  return <App {...QuestionList[questionIndexesArray[0]]} questionIndex={0} />;
+  useEffect(() => {
+    if (savedQuestionIndex !== undefined) {
+      setQuestionIndex(parseInt(savedQuestionIndex));
+    } else {
+      setQuestionIndex(0);
+    }
+  }, [setQuestionIndex]);
+
+  return (
+    <App
+      {...QuestionList[questionIndexesArray[questionIndex]]}
+      questionIndex={questionIndex}
+    />
+  );
 }
