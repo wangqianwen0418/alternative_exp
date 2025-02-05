@@ -20,7 +20,7 @@ export default function Questions() {
 
   return (
     <App
-      {...QuestionList[questionIndexesArray[0]]}
+      {...QuestionList[questionIndexesArray[questionIndex]]}
       questionIndex={questionIndex}
     />
   );

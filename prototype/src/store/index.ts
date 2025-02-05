@@ -15,3 +15,4 @@ export const questionOrderAtom = atom<number[]>([]); // order of questions for u
 export const uuidAtom = atom<string>(); // uuid of user
 export const initVisAtom = atom(); // the initial visualization type that users see
 export const secondVisAtom = atom(); //the second visualization that users see during a user story
+export const isSecondPartAtom = atom(false); // determine if question a or b should be shown

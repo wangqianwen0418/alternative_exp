@@ -42,17 +42,19 @@ function getRandomPoints(arr: number[]) {
 
 export default function Explanation() {
   const [isSubmitted] = useAtom(isSubmittedAtom);
-  const [insight, setInsight] = useAtom(insightAtom);
+  const [insight] = useAtom(insightAtom);
   const [initVis] = useAtom(initVisAtom);
   const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
-  const [initialVisWidth, setInitialVisWidth] = useState(0);
-  const [initialVisHeight, setInitialVisHeight] = useState(0); // State to store initial vis height
-  const [additionalVisHeight, setAdditionalVisHeight] = useState(0); // State to store additional vis height
   const initialVisRef = useRef<SVGGElement>(null);
   const additionalVisRef = useRef<SVGGElement>(null);
+  const [secondVisTranslateY, setSecondVisTranslateY] = useState(0);
 
-  const [initialVisYPos, setInitialVisYPos] = useState(0);
-  const [additionalVisYPos, setAdditionalVisYPos] = useState(0);
+  useEffect(() => {
+    if (initialVisRef.current) {
+      const bbox = initialVisRef.current.getBBox();
+      setSecondVisTranslateY(bbox.height + 25);
+    }
+  }, [initVis, isSubmitted, selectedIndices, insight]);
 
   let featureName = "bmi",
     featureIndex = shap_diabetes["feature_names"].indexOf(featureName),
@@ -63,8 +65,8 @@ export default function Explanation() {
       (row) => row[featureIndex]
     );
 
-  const test_random_shap = getRandomPoints(featureShapValues);
-  const test_random_feature = getRandomPoints(featureValues);
+  // const test_random_shap = getRandomPoints(featureShapValues);
+  // const test_random_feature = getRandomPoints(featureValues);
 
   let initialVisualization;
   switch (initVis) {
@@ -131,7 +133,7 @@ export default function Explanation() {
           featureNames={shap_diabetes["feature_names"].slice(0, 100)}
           width={600}
           height={400}
-          id="bmi"
+          id="bar"
           offsets={[0, 0]}
         />
       );
@@ -157,7 +159,7 @@ export default function Explanation() {
           colorValues={diabetes_age_shapValues}
           width={600}
           height={400}
-          label="bmi"
+          label="two-color-scatter"
           colorLabel="age"
           // annotation={[
           //   [-5, 0],
@@ -179,63 +181,53 @@ export default function Explanation() {
   if (insight?.graph.graphType) {
     switch (insight?.graph.graphType) {
       case "Bar":
-        // console.log("Bar");
         additionalVisualizations = isSubmitted && (
-          <>
-            <Bar
-              allShapValues={shap_diabetes["shap_values"].slice(0, 100)}
-              featureNames={shap_diabetes["feature_names"].slice(0, 100)}
-              width={600}
-              height={400}
-              id="bar"
-              offsets={[0, 225]}
-              annotation={
-                insight?.graph.annotation
-                  ? insight?.graph.annotation[0]
-                  : undefined
-              }
-              highlightedFeatures={insight?.graph.features}
-            />
-          </>
+          <Bar
+            allShapValues={shap_diabetes["shap_values"].slice(0, 100)}
+            featureNames={shap_diabetes["feature_names"].slice(0, 100)}
+            width={600}
+            height={400}
+            id="bar"
+            offsets={[0, 0]}
+            annotation={
+              insight?.graph.annotation
+                ? insight?.graph.annotation[0]
+                : undefined
+            }
+            highlightedFeatures={insight?.graph.features}
+          />
         );
         break;
-      case "Scatter":
-        // console.log("Scatter");
-        if (insight?.graph.xValues) {
-          const featureName = insight?.graph.xValues;
-        } else {
-          const featureName = "bmi";
-        }
-        featureIndex = shap_diabetes["feature_names"].indexOf(featureName);
-        featureValues = shap_diabetes["feature_values"].map(
-          (row) => row[featureIndex]
+      case "Scatter": {
+        const featureName = insight?.graph.xValues || "bmi";
+        const fIndex = shap_diabetes["feature_names"].indexOf(featureName);
+        const fValues = shap_diabetes["feature_values"].map(
+          (row) => row[fIndex]
         );
-        featureShapValues = shap_diabetes["shap_values"].map(
-          (row) => row[featureIndex]
+        const fShapValues = shap_diabetes["shap_values"].map(
+          (row) => row[fIndex]
         );
         additionalVisualizations = isSubmitted && (
-          <>
-            <Scatter
-              yValues={featureShapValues}
-              xValues={featureValues}
-              width={600}
-              height={400}
-              id="bmi-scatter"
-              offsets={[0, 175]}
-              selectedIndices={selectedIndices}
-              setSelectedIndices={setSelectedIndices}
-              annotation={
-                insight?.graph.annotation
-                  ? insight?.graph.annotation[0]
-                  : undefined
-              }
-            />
-          </>
+          <Scatter
+            yValues={fShapValues}
+            xValues={fValues}
+            width={600}
+            height={400}
+            id="bmi-scatter"
+            offsets={[0, 0]}
+            selectedIndices={selectedIndices}
+            setSelectedIndices={setSelectedIndices}
+            annotation={
+              insight?.graph.annotation
+                ? insight?.graph.annotation[0]
+                : undefined
+            }
+          />
         );
         break;
-      case "Swarm":
-        // console.log("Swarm");
-        let swarmFeatureValues = [[0.0]];
+      }
+      case "Swarm": {
+        let swarmFeatureValues = [[0]];
         let swarmFeatureShapValues = [[0]];
         if (insight.graph?.features) {
           const featureIndices = insight?.graph.features.map((feature) =>
@@ -244,68 +236,46 @@ export default function Explanation() {
           swarmFeatureValues = shap_diabetes["feature_values"].map((row) =>
             featureIndices.map((index) => row[index])
           );
-          const featureShapValues = shap_diabetes["shap_values"].map((row) =>
+          swarmFeatureShapValues = shap_diabetes["shap_values"].map((row) =>
             featureIndices.map((index) => row[index])
           );
         }
         additionalVisualizations = isSubmitted && (
-          <>
-            <Swarm
-              colorValues={[featureValues]}
-              xValues={[featureShapValues]}
-              width={600}
-              height={400}
-              ids={["bmi-scatter"]}
-              selectedIndices={selectedIndices}
-              setSelectedIndices={setSelectedIndices}
-              annotation={
-                insight?.graph.annotation
-                  ? insight?.graph.annotation[0]
-                  : undefined
-              }
-              boldFeatureNames={insight?.graph.features}
-            />
-          </>
+          <Swarm
+            colorValues={[featureValues]}
+            xValues={[featureShapValues]}
+            width={600}
+            height={400}
+            ids={["bmi-swarm"]}
+            selectedIndices={selectedIndices}
+            setSelectedIndices={setSelectedIndices}
+            annotation={
+              insight?.graph.annotation
+                ? insight?.graph.annotation[0]
+                : undefined
+            }
+            boldFeatureNames={insight?.graph.features}
+          />
         );
         break;
+      }
       case "Heatmap":
-        // console.log("Heatmap");
         additionalVisualizations = isSubmitted && (
-          <>
-            <Heatmap
-              shapValuesArray={diabetesShapValues}
-              featureValuesArray={diabetesFeatureValues}
-              labels={diabetesLabels}
-              width={600}
-              height={350}
-              title="Diabetes Heatmap"
-              boldFeatureNames={insight?.graph.features}
-            />
-          </>
+          <Heatmap
+            shapValuesArray={diabetesShapValues}
+            featureValuesArray={diabetesFeatureValues}
+            labels={diabetesLabels}
+            width={600}
+            height={350}
+            title="Diabetes Heatmap"
+            boldFeatureNames={insight?.graph.features}
+          />
         );
         break;
-
       default:
         console.log("UNKNOWN GRAPH TYPE");
-      // console.log(insight?.graph.graphType);
     }
   }
-
-  useEffect(() => {
-    if (initialVisRef.current) {
-      const bbox = initialVisRef.current.getBBox();
-      setInitialVisHeight(bbox.height); // Set the height of the initial visualization
-      // console.log("initialVisHeight: " + initialVisHeight);
-    }
-
-    // if (additionalVisRef.current) {
-    //   const bbox = additionalVisRef.current.getBBox();
-    //   setAdditionalVisHeight(bbox.height); // Set the height of the additional visualization
-    //   console.log("additionalVisHeight: " + additionalVisHeight);
-    // }
-  }, [initialVisualization, additionalVisualizations]);
-
-  const yOffsetDifference = initialVisYPos - additionalVisYPos;
 
   return (
     <Paper style={{ padding: "15px" }}>
@@ -325,8 +295,7 @@ export default function Explanation() {
         {isSubmitted && (
           <g
             ref={additionalVisRef}
-            //transform={`translate(0, ${initialVisHeight -100})`}
-            transform={`translate(0,200)`}
+            transform={`translate(0, ${secondVisTranslateY})`}
           >
             {additionalVisualizations}
           </g>

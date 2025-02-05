@@ -69,11 +69,11 @@ export default function UserResponse() {
 
   useEffect(() => {
     const savedIsSecondPart = Cookies.get("isSecondPart");
-
     if (savedIsSecondPart !== undefined) {
       setIsSecondPart(savedIsSecondPart === "true");
+      setIsSubmitted(savedIsSecondPart === "true");
     }
-  }, [setQuestionIndex, setIsSecondPart]);
+  }, [setIsSecondPart]);
 
   const currentQuestionIndex = questionIndexesArray[questionIndex];
   const isLastQuestion = questionIndex >= questionIndexesArray.length - 1;
@@ -226,7 +226,7 @@ export default function UserResponse() {
           <span style={{ marginTop: "20px" }}>
             <b>Part 2:</b>{" "}
             {isSecondPart
-              ? "Given the new visualization, `please rate your confi`dence"
+              ? "Given the new visualization, please rate your confidence"
               : "Please rate your confidence"}{" "}
           </span>
           <FormControl sx={{ mt: 2, maxWidth: 250 }}>
@@ -282,6 +282,7 @@ export default function UserResponse() {
               Cookies.remove("isSecondPart");
               setQuestionIndex(0); // Reset to first question
               setIsSecondPart(false); // Reset to Part A
+              setIsSubmitted(false);
             }}
           >
             Reset User Study
