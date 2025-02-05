@@ -199,7 +199,10 @@ export default function Explanation() {
         );
         break;
       case "Scatter": {
-        const featureName = insight?.graph.xValues || "bmi";
+        const featureName =
+          insight?.graph.xValues && insight?.graph.xValues !== "None"
+            ? insight.graph.xValues
+            : "bmi";
         const fIndex = shap_diabetes["feature_names"].indexOf(featureName);
         const fValues = shap_diabetes["feature_values"].map(
           (row) => row[fIndex]
@@ -207,6 +210,7 @@ export default function Explanation() {
         const fShapValues = shap_diabetes["shap_values"].map(
           (row) => row[fIndex]
         );
+        console.log(featureName);
         additionalVisualizations = isSubmitted && (
           <Scatter
             yValues={fShapValues}
