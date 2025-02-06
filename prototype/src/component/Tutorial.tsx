@@ -23,6 +23,7 @@ import {
 } from "../util/diabetesData";
 import shap_diabetes from "../assets/shap_diabetes.json";
 import Bar from "./Bar";
+import DefinableWord from "./DefinableWord";
 
 function FirstTutorialGraph() {
   const [selectedIndices, setSelectedIndices] = React.useState<number[]>([]);
@@ -85,6 +86,10 @@ function SecondTutorialGraph() {
   );
 }
 
+const definedWords = {
+  XAI: "Explainable AI (XAI) is an approach to provide insight into the decision-making process of AI models, where explanations or rationales accompany recommendations made by AI.",
+};
+
 const tutorialSteps = [
   {
     title: "Welcome to the User Study",
@@ -114,12 +119,13 @@ const tutorialSteps = [
           understanding of AI explanations.
         </Typography>
         <Typography variant="body1" sx={{ mt: 2 }}>
-          <b>What is the significance of this research topic?:</b> Although XAI
-          methods are designed to clarify model behavior, they do not ensure
-          accurate user interpretations. Research has shown that users often
-          struggle to correctly understand AI explanations, sometimes misusing
-          them to justify incorrect predictions, and may even place blind trust
-          in these explanations.
+          <b>What is the significance of this research topic?:</b> Although{" "}
+          <DefinableWord word="XAI" definition={definedWords.XAI} /> methods are
+          designed to clarify model behavior, they do not ensure accurate user
+          interpretations. Research has shown that users often struggle to
+          correctly understand AI explanations, sometimes misusing them to
+          justify incorrect predictions, and may even place blind trust in these
+          explanations.
         </Typography>
         <Typography variant="body1" sx={{ mt: 2 }}>
           <b>How does the model work?:</b> By analyzing patient data such as

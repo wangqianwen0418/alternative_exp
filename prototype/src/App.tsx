@@ -163,7 +163,6 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
   const definitions = {
     Features:
       "The different inputs for the model. In this experiment, the features were age, sex, bmi, blood pressure, serum cholesterol, low-density lipoproteins, high-density lipoproteins, total/HDL cholesterol ratio, serum triglycerides level, and blood sugar level.",
-
     FeatureValues:
       "The value of a specific feature for that patient/datapoint. Feature values are normalized and standardized to make them easier to compare across different features.",
     SHAP: "SHapley Additive exPlanations. SHAP values represent the CONTRIBUTION a feature had on the model's prediction (positive = increased risk, negative = decreased risk)",
