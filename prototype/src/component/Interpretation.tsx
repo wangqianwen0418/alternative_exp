@@ -39,7 +39,7 @@ export default function Interpretation() {
   // 1. Use useEffect to check if an API key is already stored in localStorage
   useEffect(() => {
     const storedApiKey = localStorage.getItem("apiKey");
-    console.log("Stored API key: " + storedApiKey);
+    // console.log("Stored API key: " + storedApiKey);
 
     if (pageName?.includes("Free") && !storedApiKey) {
       setModalVisible(true);
@@ -62,7 +62,7 @@ export default function Interpretation() {
   };
 
   const isUserStudy = pageName?.includes("question");
-  console.log("USER STUDY: " + isUserStudy);
+  // console.log("USER STUDY: " + isUserStudy);
 
   const handleSubmission = async () => {
     if (!freeText.trim()) return;
@@ -80,9 +80,8 @@ export default function Interpretation() {
           prompt
         );
         setInsight(parsedInput);
-        console.log("PARSED INPUT: ");
-        console.log(parsedInput);
-
+        // console.log("PARSED INPUT: ");
+        // console.log(parsedInput);
       } catch (error) {
         console.error("Error parsing input: ", error);
       }
@@ -103,8 +102,8 @@ export default function Interpretation() {
     try {
       const parsedInput: TInsight = await parseInput(freeText, apiKey, prompt);
       setInsight(parsedInput); // Update insight to reflect the newly parsed input
-      console.log("PARSED INPUT: ");
-      console.log(parsedInput);
+      // console.log("PARSED INPUT: ");
+      // console.log(parsedInput);
     } catch (error) {
       console.error("Error parsing input: ", error);
     }
@@ -141,17 +140,34 @@ export default function Interpretation() {
             </IconButton>
           )}
         </Box>
-        <TextField
-          id="outlined-basic"
-          label="e.g., a high bmi leads to large diabetes progression"
-          value={freeText}
-          onChange={handleTextChange}
-          multiline
-          minRows={1}
-          maxRows={10}
-          fullWidth
-          disabled={isUserStudy}
-        />
+        {isUserStudy ? (
+          <TextField
+            id="outlined-basic"
+            value={freeText}
+            onChange={handleTextChange}
+            multiline
+            minRows={1}
+            maxRows={10}
+            fullWidth
+            disabled={isUserStudy}
+            sx={{
+              "& .Mui-disabled": {
+                WebkitTextFillColor: "black !important",
+              },
+            }}
+          />
+        ) : (
+          <TextField
+            id="outlined-basic"
+            label="e.g., a high bmi leads to large diabetes progression"
+            value={freeText}
+            onChange={handleTextChange}
+            multiline
+            minRows={1}
+            maxRows={10}
+            fullWidth
+          />
+        )}
 
         <div style={{ alignItems: "center" }}>
           {/* Conditionally render the button if the user is NOT in the user study */}
@@ -182,7 +198,8 @@ export default function Interpretation() {
         {isLoading ? (
           <CircularProgress />
         ) : (
-          (isSubmitted || insight) && (
+          (isSubmitted || insight) &&
+          !isUserStudy && (
             <Paper className="parse-input" elevation={0}>
               <b>Formatted: </b>
               {GenerateTextTemplates(insight)}

@@ -4,6 +4,7 @@ import { CASES } from "../util/cases";
 
 export const freeTextAtom = atom(""); // the free text that users input
 export const isSubmittedAtom = atom(false); // whether users have submitted the free text (or Question Part 1) for formatting
+export const tutorialAtom = atom(true); // whether the user should see the tutorial (only applicable to user study)
 
 export const insightAtom = atom<TInsight>(CASES[0].insight); // the formatted text that users can see
 
@@ -14,3 +15,4 @@ export const questionOrderAtom = atom<number[]>([]); // order of questions for u
 export const uuidAtom = atom<string>(); // uuid of user
 export const initVisAtom = atom(); // the initial visualization type that users see
 export const secondVisAtom = atom(); //the second visualization that users see during a user story
+export const isSecondPartAtom = atom(false); // determine if question a or b should be shown

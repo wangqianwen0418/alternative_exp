@@ -8,6 +8,7 @@ interface SwarmProps {
   width: number;
   height: number;
   ids: string[];
+  boldFeatureNames?: string[];
   selectedIndices: number[];
   annotation?: TAnnotation;
   featuresToShow?: string[];
@@ -15,8 +16,9 @@ interface SwarmProps {
 }
 
 export default function Swarm(props: SwarmProps) {
-  const svgRef = useRef<SVGGElement>(null);
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  // let margin = useMemo(() => [10, 40, 40, 10], []);
+  // const radius = 2;
+  // const leftTitleMargin = 40;
   const [selectedPoints, setSelectedPoints] = useState<number[]>([]);
   const [brushSelection, setBrushSelection] = useState<[number, number] | null>(
     null
@@ -28,15 +30,15 @@ export default function Swarm(props: SwarmProps) {
     width,
     height,
     ids,
+    boldFeatureNames = [],
     selectedIndices,
     setSelectedIndices,
     featuresToShow,
     annotation,
   } = props;
-  console.log("IDs: " + ids);
 
-  const labelFontSize = 11;
-  const maxLabelWidth = 50;
+  const labelFontSize = 13;
+  const maxLabelWidth = 100;
 
   const canvasContext = useMemo(() => {
     if (typeof document !== "undefined") {
@@ -333,11 +335,6 @@ export default function Swarm(props: SwarmProps) {
     d3.select("g.swarm text.x-axis-label").remove();
     d3.selectAll("g.swarm .brush").remove();
 
-    const svg = d3.select("svg");
-    if (totalPlotHeight + 60 > height) {
-      svg.attr("height", totalPlotHeight + 60);
-    }
-
     const xAxis = d3.axisBottom(xScale);
     d3.select("g.swarm")
       .append("g")
@@ -398,10 +395,13 @@ export default function Swarm(props: SwarmProps) {
       .append("text")
       .attr("class", "legend-title")
       .attr("x", legendX + legendWidth / 2)
-      .attr("y", middleY - 20)
+      .attr("y", middleY + 25)
       .attr("text-anchor", "middle")
       .attr("font-size", labelFontSize)
-      .attr("transform", `rotate(90, ${legendX + legendWidth / 2}, ${middleY})`)
+      .attr(
+        "transform",
+        `rotate(-90, ${legendX + legendWidth / 2}, ${middleY})`
+      )
       .text("Feature Value");
 
     d3.select("g.swarm")

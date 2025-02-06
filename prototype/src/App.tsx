@@ -10,6 +10,7 @@ import {
   questionIndexAtom,
   uuidAtom,
   questionOrderAtom,
+  tutorialAtom,
 } from "./store";
 
 import Explanation from "./component/Explanation";
@@ -39,6 +40,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import Cookies from "js-cookie";
 import { generateQuestionOrder } from "./util/questionBalance";
+import Tutorial from "./component/Tutorial";
 
 function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
   const [open, setOpen] = useState(false); // sider drawer
@@ -50,6 +52,7 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
   const [, setQuestionIndex] = useAtom(questionIndexAtom);
   const [, setUUID] = useAtom(uuidAtom);
   const [, setQuestionOrder] = useAtom(questionOrderAtom);
+  const [showTutorial, setShowTutorial] = useAtom(tutorialAtom);
 
   let uuid = Cookies.get("uuid");
 
@@ -59,11 +62,20 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
   }
 
   useEffect(() => {
+    const tutorialSeen = Cookies.get("showTutorial");
+    if (!tutorialSeen) {
+      setShowTutorial(true);
+      Cookies.set("showTutorial", "false");
+    } else {
+      setShowTutorial(false);
+    }
+  }, [setShowTutorial]);
+
+  useEffect(() => {
     setUUID(uuid);
     // setUUID("d42ccc56-b330-427b-9b4f-d99b0a626b5b"); // test uuid
     // setUUID("d46741cf-57b6-43a1-a661-119204bb7a00"); // test uuid
     const questionIndexesArray = generateQuestionOrder(uuid!);
-    console.log(questionIndexesArray);
     setQuestionOrder(questionIndexesArray);
   }, [setUUID, setQuestionOrder, uuid]);
 
@@ -156,16 +168,30 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
 
       <Grid item xs={10}>
         <Paper style={{ padding: "15px" }} elevation={0}>
-          <p style={{ margin: "0px 5px" }}>
-            <b>ML Model and Dataset :</b> Each instance in the dataset
-            corresponds to a patient, characterized by values for 10 distinct
-            features. 
+          <p style={{ margin: "0px -50px" }}>
+            <b>Features Studied:</b> age, sex, bmi, blood pressure, serum
+            cholesterol, low-density lipoproteins, high-density lipoproteins,
+            total/HDL cholesterol ratio, serum triglycerides level, and blood
+            sugar level.
             <br />
-            This machine learning model predicts the progression of diabetes in
-            patients using these 10 features.
+            <b>ML Model and Dataset:</b> Each instance in the dataset
+            corresponds to a patient, characterized by values for ten distinct
+            features above. This machine learning model predicts the progression
+            of diabetes in patients using these ten features.
             <br />
-            {" "}
-            The explanations are based on two sets of values: Feature values and SHAP values. SHAP values represent the impact a feature had on the model's prediction (positive = increased risk, negative = decreased risk). {/* {appProps.pageName:.includes("Free") && <SyncIcon />} */}
+            <b>Explanations:</b> Based on feature values and SHAP values.
+            Feature values represent the specific numerical value of a
+            particular feature at a data point. SHAP values represent the impact
+            a feature had on the model's prediction (positive = increased risk,
+            negative = decreased risk).
+            <br />
+            <b>Annotations:</b> An additional visual element added to a
+            visualization (e.g., a highlighted range or a vertical line at a
+            value).
+            <br />
+            <b>Instance:</b> A single patient and their data corresponding to
+            the ten features.
+            {/* {appProps.pageName:.includes("Free") && <SyncIcon />} */}
           </p>
         </Paper>
       </Grid>
@@ -176,8 +202,29 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
           <CounterbalanceButton />
         </Paper> */}
       </Grid>
+      {"index" in appProps && (
+        <Tutorial
+          show={showTutorial}
+          onClose={() => {
+            setShowTutorial(false);
+            Cookies.set("showTutorial", "false", { expires: 365 }); // Ensure it doesn't show again
+          }}
+        />
+      )}
       <Grid item xs={7} className="App-body">
-        <Explanation />
+        {!("index" in appProps) || !showTutorial ? (
+          <Explanation />
+        ) : (
+          <div
+            style={{
+              width: "100%",
+              height: "400px",
+              background: "transparent",
+            }}
+          >
+            {/* Placeholder div to keep layout stable */}
+          </div>
+        )}
       </Grid>
     </Grid>
   );

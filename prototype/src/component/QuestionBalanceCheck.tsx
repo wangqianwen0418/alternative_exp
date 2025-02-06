@@ -12,7 +12,7 @@ const CounterbalanceButton: React.FC = () => {
       // "d46741cf-57b6-43a1-a661-119204bb7a00" // test uuid
       uuid!
     );
-    console.log("Generated Question Indexes: ", questionOrder);
+    // console.log("Generated Question Indexes: ", questionOrder);
   };
 
   return (
