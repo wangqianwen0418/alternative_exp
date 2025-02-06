@@ -15,76 +15,15 @@ import {
 import { useTheme } from "@mui/material/styles";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
-import Swarm from "./Swarm";
-import {
-  diabetesFeatureValues,
-  diabetesLabels,
-  diabetesShapValues,
-} from "../util/diabetesData";
-import shap_diabetes from "../assets/shap_diabetes.json";
-import Bar from "./Bar";
 import DefinableWord from "./DefinableWord";
-
-function FirstTutorialGraph() {
-  const [selectedIndices, setSelectedIndices] = React.useState<number[]>([]);
-
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <svg className="swarm" width={600} height={400}>
-        <g>
-          <Swarm
-            xValues={diabetesShapValues}
-            colorValues={diabetesFeatureValues}
-            ids={diabetesLabels}
-            width={600}
-            height={400}
-            selectedIndices={selectedIndices}
-            setSelectedIndices={setSelectedIndices}
-          />
-        </g>
-      </svg>
-    </Box>
-  );
-}
-
-function SecondTutorialGraph() {
-  const [selectedIndices, setSelectedIndices] = React.useState<number[]>([]);
-
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <svg
-        className="swarm"
-        width={550}
-        height={375}
-        style={{ marginTop: "15px" }}
-      >
-        <g>
-          <Bar
-            allShapValues={shap_diabetes["shap_values"].slice(0, 100)}
-            featureNames={shap_diabetes["feature_names"].slice(0, 100)}
-            width={550}
-            height={350}
-            id="bmi"
-            offsets={[0, 0]}
-            annotation={{ type: "singleLine", xValue: 5 }}
-          />
-        </g>
-      </svg>
-    </Box>
-  );
-}
+import {
+  SwarmTutorialGraph,
+  ScatterTutorialGraph,
+  BarTutorialGraph,
+  HeatmapTutorialGraph,
+  TwoColorTutorialGraph,
+  AnnotationTutorialGraph,
+} from "../util/tutorialGraphs";
 
 const definedWords = {
   XAI: "Explainable AI (XAI) is an approach to provide insight into the decision-making process of AI models, where explanations or rationales accompany recommendations made by AI.",
@@ -107,7 +46,7 @@ const tutorialSteps = [
     ),
   },
   {
-    title: "Step 1: Background",
+    title: "Step 1a: Background Info",
     content: (
       <>
         <Typography variant="body1">
@@ -144,6 +83,99 @@ const tutorialSteps = [
     ),
   },
   {
+    title: "Step 1b: Background Info",
+    content: (
+      <>
+        <Typography variant="body1" sx={{ mb: 2 }}>
+          Now, we'd like to go over the five different visualizations you will
+          see in the user study. The first viusalization you will see is the
+          Swarm plot. Each data point represents a SHAP value corresponding to
+          the feature type for a particular instance. The data points are
+          colored on feature values.
+        </Typography>
+        <SwarmTutorialGraph />
+        <Typography variant="body1">
+          To interact with this visualization, you can click and drag a
+          selection box to highlight data points to see additional info and the
+          same instance across features. Additionally, visualizations without
+          annotations are interactive, while visualizations with annotations are
+          not.
+        </Typography>
+      </>
+    ),
+  },
+  {
+    title: "Step 1c: Background Info",
+    content: (
+      <>
+        <Typography variant="body1" sx={{ mb: 2 }}>
+          The second visualization you will see is the Bar plot. Each bar
+          represents the average SHAP value for each feature.
+        </Typography>
+        <BarTutorialGraph />
+        <Typography variant="body1" sx={{ mt: 1 }}>
+          To interact with this visualization, you can click and drag a
+          selection box to highlight bars to focus on specific features.
+        </Typography>
+      </>
+    ),
+  },
+  {
+    title: "Step 1d: Background Info",
+    content: (
+      <>
+        <Typography variant="body1" sx={{ mb: 2 }}>
+          The third visualization you will see is the Scatter plot. Each data
+          point represents the feature value and SHAP value for one instance,
+          plotted in the (x, y) plane.
+        </Typography>
+        <ScatterTutorialGraph />
+        <Typography variant="body1" sx={{ mt: 1 }}>
+          To interact with this visualization, you can click and drag a
+          selection box around a group of points to see additional info.
+        </Typography>
+      </>
+    ),
+  },
+  {
+    title: "Step 1e: Background Info",
+    content: (
+      <>
+        <Typography variant="body1" sx={{ mb: 2 }}>
+          The fourth visualization you will see is the Heatmap plot. Each
+          rectangle represents a SHAP value corresponding to the feature type
+          for a particular instance. The rectangles are colored on SHAP values.
+          Note that in the Heatmap plot, each column (all features in a
+          particular x position) corresponds to one instance.{" "}
+        </Typography>
+        <HeatmapTutorialGraph />
+        <Typography variant="body1" sx={{ mt: -5 }}>
+          This visualization is not interactive.
+        </Typography>
+      </>
+    ),
+  },
+  {
+    title: "Step 1f: Background Info",
+    content: (
+      <>
+        <Typography variant="body1" sx={{ mb: 2 }}>
+          The fifth and final visualization you will see is the Two-Color
+          Scatter Plot. Similar to the previous Scatter plot, each data point
+          represents the feature value and SHAP value for one instance, plotted
+          in the (x, y) plane. However, points are colored based on another
+          feature in the Two-Color Scatter. In this case, the additional feature
+          is the SHAP values for age.
+        </Typography>
+        <TwoColorTutorialGraph />
+        <Typography variant="body1" sx={{ mt: 2 }}>
+          To interactive with this visualization, you can drag the two black
+          sliders on the legend up and down to filter out points.
+        </Typography>
+      </>
+    ),
+  },
+  {
     title: "Step 2: The Insight and First Visualization",
     content: (
       <>
@@ -152,10 +184,11 @@ const tutorialSteps = [
           about a data visualization) and an <b>initial visualization</b>. Below
           is an example of a visualization you could receive.
         </Typography>
-        <FirstTutorialGraph />
+        <SwarmTutorialGraph />
         <Typography variant="body2" color="text.secondary" sx={{ mt: -1 }}>
-          Note that visualizations without annotations are interactive! Try left
-          clicking and dragging to highlight a portion of the beeswarm plot.
+          Note isualizations without annotations are interactive, while
+          visualizations with annotations are not. Try left clicking and
+          dragging to highlight a portion of the Swarm plot.
         </Typography>
         <Typography variant="body1" sx={{ mt: 1 }}>
           Now, an example insight you may be given is:{" "}
@@ -271,7 +304,7 @@ const tutorialSteps = [
         <Typography variant="body1">
           Next, we show a <b>second graph</b> about the same statement.
         </Typography>
-        <SecondTutorialGraph />
+        <AnnotationTutorialGraph />
         <Typography variant="body2" color="text.secondary" sx={{ mt: -2 }}>
           Since this chart has an annotation, it is not interactive.
         </Typography>
@@ -411,13 +444,13 @@ export default function Tutorial({ show, onClose }: TutorialProps) {
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: "40vw",
+          width: "65vw",
           bgcolor: "background.paper",
           borderRadius: 2,
           boxShadow: 24,
-          p: 4,
-          maxHeight: "80vh",
-          overflow: "hidden",
+          p: 2,
+          maxHeight: "85vh",
+          overflow: "auto",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",

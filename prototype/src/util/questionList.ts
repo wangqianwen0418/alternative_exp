@@ -1,4 +1,4 @@
-import { TQuestion, TVariable, TInsight, TGraph, TAnnotation } from "./types";
+import { TQuestion } from "./types";
 
 export const QuestionList: TQuestion[] = [
   {
