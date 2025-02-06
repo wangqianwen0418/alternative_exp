@@ -62,6 +62,8 @@ export function ScatterTutorialGraph() {
             width={600}
             height={400}
             id="bmi"
+            xLabel="Feature Values (BMI)"
+            yLabel="SHAP Values (BMI)"
             offsets={[0, 0]}
             selectedIndices={selectedIndices}
             setSelectedIndices={setSelectedIndices}
@@ -88,7 +90,7 @@ export function BarTutorialGraph() {
             featureNames={shap_diabetes["feature_names"].slice(0, 100)}
             width={600}
             height={400}
-            id="bar"
+            id="bar-tutorial"
             offsets={[0, 0]}
           />
         </g>
@@ -139,8 +141,10 @@ export function TwoColorTutorialGraph() {
             colorValues={diabetes_age_shapValues}
             width={600}
             height={400}
-            label="two-color-scatter"
-            colorLabel="age"
+            id="two-color-tutorial"
+            xLabel="Feature Values (BMI)"
+            yLabel="SHAP Values (BMI)"
+            colorLabel="SHAP Values (Age)"
           />
         </g>
       </svg>
@@ -169,7 +173,7 @@ export function AnnotationTutorialGraph() {
             featureNames={shap_diabetes["feature_names"].slice(0, 100)}
             width={550}
             height={350}
-            id="bmi"
+            id="bar-tutorial-with-annotations"
             offsets={[0, 0]}
             annotation={{ type: "singleLine", xValue: 5 }}
           />

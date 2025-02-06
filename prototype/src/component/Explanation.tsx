@@ -140,7 +140,7 @@ export default function Explanation() {
           featureNames={shap_diabetes["feature_names"].slice(0, 100)}
           width={600}
           height={400}
-          id="bar"
+          id="bar-initVis"
           offsets={[0, 0]}
         />
       );
@@ -166,8 +166,10 @@ export default function Explanation() {
           colorValues={diabetes_age_shapValues}
           width={600}
           height={400}
-          label="two-color-scatter"
-          colorLabel="age"
+          id="two-color-initVis"
+          xLabel="Feature Values (BMI)"
+          yLabel="SHAP Values (BMI)"
+          colorLabel="SHAP Values (Age)"
           // annotation={[
           //   [-5, 0],
           //   [15, 25],

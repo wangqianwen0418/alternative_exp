@@ -7,7 +7,9 @@ interface TwoColorScatterProps {
   colorValues: number[];
   width: number;
   height: number;
-  label: string;
+  id: string;
+  xLabel: string;
+  yLabel: string;
   colorLabel: string;
   annotation?: Array<[number, number]>; // [[low, high]] or [[low1, high1], [low2, high2]]
 }
@@ -19,7 +21,9 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
     colorValues,
     width,
     height,
-    label,
+    id,
+    xLabel,
+    yLabel,
     colorLabel,
     annotation,
   } = props;
@@ -106,7 +110,7 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
   }, [annotation, createDragHandle]);
 
   useEffect(() => {
-    const container = d3.select(`g.twoColorScatter#${label}`);
+    const container = d3.select(`g.twoColorScatter#${id}`);
     container.selectAll("g.x-axis").remove();
     container.selectAll("g.y-axis").remove();
 
@@ -123,7 +127,7 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
       .attr("y", 30)
       .attr("fill", "black")
       .attr("font-size", labelFontSize)
-      .text(`Feature Value (${label})`);
+      .text(xLabel);
 
     const yAxisGroup = container
       .append("g")
@@ -139,11 +143,12 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
       .attr("y", -27.5)
       .attr("fill", "black")
       .attr("font-size", labelFontSize)
-      .text(`SHAP Value (${label})`);
+      .text(yLabel);
   }, [
     xScale,
     yScale,
-    label,
+    xLabel,
+    yLabel,
     height,
     margin,
     chartLeft,
@@ -166,7 +171,7 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
   const ticks = legendScale.ticks(10);
 
   return (
-    <g className="twoColorScatter" id={label}>
+    <g className="twoColorScatter" id={id}>
       <rect width={width} height={height} fill="white" stroke="black" />
       <g className="points">
         {xValues.map((x, i) => {
@@ -188,7 +193,7 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
       <g transform={`translate(${legendX}, ${legendY})`}>
         <defs>
           <linearGradient
-            id={`color-gradient-${label}`}
+            id={`color-gradient-${id}`}
             x1="0"
             y1="1"
             x2="0"
@@ -216,7 +221,7 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
           y={0}
           width={legendWidth}
           height={legendHeight}
-          fill={`url(#color-gradient-${label})`}
+          fill={`url(#color-gradient-${id})`}
         />
         {annotation
           ? (() => {
@@ -353,7 +358,7 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
           transform={`rotate(-90, ${legendWidth + 40}, ${legendHeight / 2})`}
           dy=".35em"
         >
-          SHAP Value ({colorLabel})
+          {colorLabel}
         </text>
       </g>
     </g>

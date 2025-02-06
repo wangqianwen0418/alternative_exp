@@ -9,11 +9,11 @@ interface ScatterProps {
   width: number;
   height: number;
   id: string;
+  xLabel: string;
+  yLabel: string;
   selectedIndices: number[];
   setSelectedIndices: (indices: number[]) => void;
   annotation?: TAnnotation;
-  xLabel?: string;
-  yLabel?: string;
 }
 
 export default function Scatter(props: ScatterProps) {
@@ -28,7 +28,7 @@ export default function Scatter(props: ScatterProps) {
     setSelectedIndices,
     annotation,
     xLabel,
-    yLabel
+    yLabel,
   } = props;
 
   const margin = useMemo(() => [22.5, 10, 40, 52.5], []);
@@ -77,7 +77,7 @@ export default function Scatter(props: ScatterProps) {
       .attr("y", 30)
       .attr("fill", "black")
       .attr("font-size", labelFontSize)
-      .text(xLabel || "Feature Value (bmi)");
+      .text(xLabel);
 
     const yAxisGroup = container
       .append("g")
@@ -95,7 +95,7 @@ export default function Scatter(props: ScatterProps) {
       .attr("y", -35)
       .attr("fill", "black")
       .attr("font-size", labelFontSize)
-      .text(yLabel || "SHAP Value (bmi)");
+      .text(yLabel);
 
     const brushGroup = d3
       .select(`g.scatter#${id}`)
@@ -141,11 +141,11 @@ export default function Scatter(props: ScatterProps) {
           setSelectedIndices(brushedIndices);
         });
 
-    brushGroup
-      .call(brush)
-      .selectAll(".selection")
-      .style("fill", "rgba(128, 128, 128, 0.2)")
-      .style("stroke", "rgba(128, 128, 128, 0.2)");
+      brushGroup
+        .call(brush)
+        .selectAll(".selection")
+        .style("fill", "rgba(128, 128, 128, 0.2)")
+        .style("stroke", "rgba(128, 128, 128, 0.2)");
 
       return () => {
         container.selectAll("g.brush").remove();
