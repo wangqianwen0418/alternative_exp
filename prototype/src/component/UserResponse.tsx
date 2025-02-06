@@ -107,14 +107,14 @@ export default function UserResponse() {
       currentIndex: currentQuestionIndex,
       questionOrder: questionIndexesArray.toString(),
       freeText,
-      currentVis: initVis,
+      currentVis: QuestionList[currentQuestionIndex].initVis.graphType,
       isSecondPart: isSecondPart ? "Yes" : "No",
       userAnswer,
       confidence: confidence.value,
     };
 
     try {
-      console.log("Submitting form:", JSON.stringify(data));
+      // console.log("Submitting form:", JSON.stringify(data));
       await fetch(test_weburl!, {
         method: "POST",
         mode: "no-cors",

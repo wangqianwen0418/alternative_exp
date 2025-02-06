@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo } from "react";
+import { useRef, useState, useMemo } from "react";
 import * as d3 from "d3";
 
 interface HeatmapProps {
@@ -16,7 +16,6 @@ export default function Heatmap({
   shapValuesArray,
   featureValuesArray,
   labels,
-  boldFeatureNames = [],
   width: totalWidth,
   height: totalHeight,
   title,
@@ -41,27 +40,7 @@ export default function Heatmap({
   );
 
   const datasets = useMemo(() => {
-    const selectedFeatureIndices = featuresToShow
-      ? featuresToShow
-          .map((feature) => labels.indexOf(feature))
-          .filter((index) => index !== -1)
-      : labels.map((_, index) => index);
-
     // Filter shapValuesArray and featureValuesArray to keep only the selected features
-    const filteredShapValuesArray = shapValuesArray.map((shapValues) =>
-      selectedFeatureIndices.map((i) => shapValues[i])
-    );
-
-    const filteredFeatureValuesArray = featureValuesArray.map((featureValues) =>
-      selectedFeatureIndices.map((i) => featureValues[i])
-    );
-
-    const filteredLabels = selectedFeatureIndices.map((i) => labels[i]);
-
-    const filteredAverageShapValues = filteredShapValuesArray.map(
-      (shapValues) => d3.mean(shapValues.map(Math.abs)) ?? 0
-    );
-
     const averageShapValues = shapValuesArray.map(
       (shapValues) => d3.mean(shapValues.map(Math.abs)) ?? 0
     );
@@ -169,7 +148,7 @@ export default function Heatmap({
     if (!ctx) return sortedLabels;
 
     ctx.font = `${labelFontSizePx}px sans-serif`;
-    if (!featuresToShow || featuresToShow.length === 0){
+    if (!featuresToShow || featuresToShow.length === 0) {
       return [];
     }
     return featuresToShow.map((label) => {
@@ -193,8 +172,6 @@ export default function Heatmap({
       return truncated;
     });
   }, [sortedLabels]);
-
-
 
   const totalBarAreaHeight = numRows * rectHeight + (numRows - 1) * rowSpace;
   const textXOffset = left + plotWidth + 10;
@@ -364,9 +341,9 @@ export default function Heatmap({
           const isSelected =
             selectedIndexes.length > 0 && selectedIndexes.includes(idx);
 
-          console.log(idx);
-          console.log("Is selected: " + selectedIndexes.includes(idx));
-          console.log(selectedIndexes);
+          // console.log(idx);
+          // console.log("Is selected: " + selectedIndexes.includes(idx));
+          // console.log(selectedIndexes);
 
           return (
             <text
@@ -377,14 +354,18 @@ export default function Heatmap({
               alignmentBaseline="middle"
               fontSize={labelFontSizePx}
               fontWeight={
-                truncatedSelectedLabels?.includes(label)
-                  ? "bold"
+                truncatedSelectedLabels && truncatedSelectedLabels.length > 0
+                  ? truncatedSelectedLabels?.includes(label)
+                    ? "bold"
+                    : "normal"
                   : "normal"
               }
               fill={
-                truncatedSelectedLabels?.includes(label)
-                  ? "black"
-                  : "gray"
+                truncatedSelectedLabels && truncatedSelectedLabels.length > 0
+                  ? truncatedSelectedLabels?.includes(label)
+                    ? "black"
+                    : "gray"
+                  : "black"
               }
             >
               {label}

@@ -16,6 +16,7 @@ import {
 import Explanation from "./component/Explanation";
 import Interpretation from "./component/Interpretation";
 import UserResponse from "./component/UserResponse";
+import DefinableWord from "./component/DefinableWord";
 import { TCase, TQuestion } from "./util/types";
 import { CASES } from "./util/cases";
 
@@ -36,64 +37,11 @@ import {
   ListItemText,
   Box,
   Paper,
-  Popover,
 } from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
 import Cookies from "js-cookie";
 import { generateQuestionOrder } from "./util/questionBalance";
 import Tutorial from "./component/Tutorial";
-
-const DefinableWord = ({
-  word,
-  definition,
-}: {
-  word: string;
-  definition: string;
-}) => {
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
-
-  return (
-    <>
-      <span
-        onClick={handleClick}
-        style={{
-          color: "#1976d2",
-          cursor: "pointer",
-          textDecoration: "underline",
-        }}
-      >
-        {word}
-      </span>
-      <Popover
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "center",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "center",
-        }}
-      >
-        <Paper style={{ padding: "8px", maxWidth: "250px" }}>
-          {definition}
-        </Paper>
-      </Popover>
-    </>
-  );
-};
 
 function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
   const [open, setOpen] = useState(false); // sider drawer
@@ -215,12 +163,14 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
   const definitions = {
     Features:
       "The different inputs for the model. In this experiment, the features were age, sex, bmi, blood pressure, serum cholesterol, low-density lipoproteins, high-density lipoproteins, total/HDL cholesterol ratio, serum triglycerides level, and blood sugar level.",
-    
-    FeatureValues: "The value of a specific feature for that patient/datapoint. Feature values are normalized and standardized to make them easier to compare across different features.",
+
+    FeatureValues:
+      "The value of a specific feature for that patient/datapoint. Feature values are normalized and standardized to make them easier to compare across different features.",
     SHAP: "SHapley Additive exPlanations. SHAP values represent the CONTRIBUTION a feature had on the model's prediction (positive = increased risk, negative = decreased risk)",
     Instance:
       "A single data point representing one patient's complete set of measurements across the ten features",
-    Annotations: "Visual markers or notes added to help interpret the data, such as a highlighted range or dashed line indicating a value",
+    Annotations:
+      "Visual markers or notes added to help interpret the data, such as a highlighted range or dashed line indicating a value",
   };
 
   return (
@@ -238,18 +188,23 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
             in the dataset corresponds to a patient, characterized by values for
             ten distinct{" "}
             <DefinableWord word="Features" definition={definitions.Features} />{" "}
-            . This machine learning model predicts the risk of diabetes progression in patients using these ten features.
+            . This machine learning model predicts the risk of diabetes
+            progression in patients using these ten features.
             <br />
-            <b>Explanations: </b> 
-            Visualizations generated based on {" "}
-            <DefinableWord word="feature values" definition={definitions.FeatureValues} /> 
-            {" "} and {" "}
+            <b>Explanations: </b>
+            Visualizations generated based on{" "}
+            <DefinableWord
+              word="feature values"
+              definition={definitions.FeatureValues}
+            />{" "}
+            and{" "}
             <DefinableWord word="SHAP values" definition={definitions.SHAP} />.
-            They can also contain {" "} 
+            They can also contain{" "}
             <DefinableWord
               word="annotations"
               definition={definitions.Annotations}
-            />.
+            />
+            .
             <br />
             {/* {appProps.pageName:.includes("Free") && <SyncIcon />} */}
           </p>

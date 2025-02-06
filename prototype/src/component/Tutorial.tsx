@@ -12,7 +12,6 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import Selection from "./webUtil/Selection";
 import { useTheme } from "@mui/material/styles";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
@@ -36,12 +35,7 @@ function FirstTutorialGraph() {
         justifyContent: "center",
       }}
     >
-      <svg
-        className="swarm"
-        width={600}
-        height={400}
-        style={{ marginBottom: "-45px" }}
-      >
+      <svg className="swarm" width={600} height={400}>
         <g>
           <Swarm
             xValues={diabetesShapValues}
@@ -153,7 +147,7 @@ const tutorialSteps = [
           is an example of a visualization you could receive.
         </Typography>
         <FirstTutorialGraph />
-        <Typography variant="body2" color="text.secondary" sx={{ mt: -2 }}>
+        <Typography variant="body2" color="text.secondary" sx={{ mt: -1 }}>
           Note that visualizations without annotations are interactive! Try left
           clicking and dragging to highlight a portion of the beeswarm plot.
         </Typography>

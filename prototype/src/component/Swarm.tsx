@@ -8,7 +8,6 @@ interface SwarmProps {
   width: number;
   height: number;
   ids: string[];
-  boldFeatureNames?: string[];
   selectedIndices: number[];
   annotation?: TAnnotation;
   featuresToShow?: string[];
@@ -30,7 +29,6 @@ export default function Swarm(props: SwarmProps) {
     width,
     height,
     ids,
-    boldFeatureNames = [],
     selectedIndices,
     setSelectedIndices,
     featuresToShow,
@@ -96,8 +94,8 @@ export default function Swarm(props: SwarmProps) {
       return label;
     });
   }, [ids, canvasContext, labelFontSize, maxLabelWidth, featuresToShow]);
-  console.log("TRUNCATED SELECTED LABELS:");
-  console.log(truncatedSelectedLabels);
+  // console.log("TRUNCATED SELECTED LABELS:");
+  // console.log(truncatedSelectedLabels);
 
   const leftTitleMargin = maxLabelWidth + 10;
   const margin = useMemo(
@@ -159,7 +157,7 @@ export default function Swarm(props: SwarmProps) {
   }, [xValues, filteredFeaturesIndices]);
 
   const numDatasets = filteredFeaturesIndices.length;
-  console.log("number of datasets: " + numDatasets);
+  // console.log("number of datasets: " + numDatasets);
 
   const maxPlotHeight = 50;
   const plotHeight = useMemo(() => {
@@ -266,8 +264,8 @@ export default function Swarm(props: SwarmProps) {
   const highlightedIndices = useMemo(() => {
     if (annotation) {
       const dataIndex = ids.indexOf(annotation.label!);
-      console.log("LABEL: ");
-      console.log(annotation.label!);
+      // console.log("LABEL: ");
+      // console.log(annotation.label!);
       if (dataIndex !== -1) {
         const datasetXValues = xValues[dataIndex];
         let indices: number[] = [];
@@ -598,7 +596,9 @@ export default function Swarm(props: SwarmProps) {
         const isAnnotationForDataset =
           annotation && annotation.label === datasetID;
 
-        console.log("next check: " + annotation + ", label: " + annotation?.label);
+        // console.log(
+        //   "next check: " + annotation + ", label: " + annotation?.label
+        // );
 
         return (
           <g
@@ -612,14 +612,18 @@ export default function Swarm(props: SwarmProps) {
               alignmentBaseline="middle"
               fontSize={labelFontSize}
               fontWeight={
-                truncatedSelectedLabels?.includes(truncatedLabel)
-                  ? "bold"
+                truncatedSelectedLabels && truncatedSelectedLabels.length > 0
+                  ? truncatedSelectedLabels?.includes(truncatedLabel)
+                    ? "bold"
+                    : "normal"
                   : "normal"
               }
               fill={
-                truncatedSelectedLabels?.includes(truncatedLabel)
-                  ? "black"
-                  : "gray"
+                truncatedSelectedLabels && truncatedSelectedLabels.length > 0
+                  ? truncatedSelectedLabels?.includes(truncatedLabel)
+                    ? "black"
+                    : "gray"
+                  : "black"
               }
             >
               {truncatedLabel}
