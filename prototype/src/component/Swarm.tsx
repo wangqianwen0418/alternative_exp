@@ -299,9 +299,6 @@ export default function Swarm(props: SwarmProps) {
         }
         return indices;
       }
-      else{
-        console.log("Annotation logic not executed oops")
-      }
     }
     return [];
   }, [annotation, ids, xValues, xScale]);

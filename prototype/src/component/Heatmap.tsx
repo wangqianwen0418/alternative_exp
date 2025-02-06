@@ -159,6 +159,43 @@ export default function Heatmap({
     });
   }, [sortedLabels]);
 
+  const truncatedSelectedLabels = useMemo(() => {
+    if (typeof document === "undefined") {
+      return featuresToShow;
+    }
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return sortedLabels;
+
+    ctx.font = `${labelFontSizePx}px sans-serif`;
+    if (!featuresToShow || featuresToShow.length === 0){
+      return [];
+    }
+    return featuresToShow.map((label) => {
+      let truncated = label;
+      while (
+        ctx.measureText(truncated).width > maxLabelWidth &&
+        truncated.length > 1
+      ) {
+        truncated = truncated.slice(0, -1);
+      }
+
+      if (truncated !== label) {
+        while (
+          ctx.measureText(truncated + "...").width > maxLabelWidth &&
+          truncated.length > 1
+        ) {
+          truncated = truncated.slice(0, -1);
+        }
+        truncated += "...";
+      }
+      return truncated;
+    });
+  }, [sortedLabels]);
+
+
+
   const totalBarAreaHeight = numRows * rectHeight + (numRows - 1) * rowSpace;
   const textXOffset = left + plotWidth + 10;
 
@@ -327,6 +364,10 @@ export default function Heatmap({
           const isSelected =
             selectedIndexes.length > 0 && selectedIndexes.includes(idx);
 
+          console.log(idx);
+          console.log("Is selected: " + selectedIndexes.includes(idx));
+          console.log(selectedIndexes);
+
           return (
             <text
               key={idx}
@@ -335,7 +376,16 @@ export default function Heatmap({
               textAnchor="end"
               alignmentBaseline="middle"
               fontSize={labelFontSizePx}
-              fontWeight={isSelected ? "bold" : "normal"} // Bold the label if selected
+              fontWeight={
+                truncatedSelectedLabels?.includes(label)
+                  ? "bold"
+                  : "normal"
+              }
+              fill={
+                truncatedSelectedLabels?.includes(label)
+                  ? "black"
+                  : "gray"
+              }
             >
               {label}
             </text>

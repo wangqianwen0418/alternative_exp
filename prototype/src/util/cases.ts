@@ -119,7 +119,11 @@ export const CASES: TCase[] = [
     href: "/case5",
     userText:
       "The correlation between bmi and its feature values is stronger when the feature value for age is in the range |0.05 to 0.1| compared to |0 to 0.02|.",
-    initVis: "two-scatter",
+    initVis: {
+      graphType: "two-scatter",
+      xValues: "none",
+      yValues: "none",
+    },
     secondVis: undefined,
     insight: undefined,
   },
