@@ -51,6 +51,7 @@ data = {}
 data['shap_values'] = shap_values.values.tolist()
 data['feature_names'] = X.columns.tolist()
 data['feature_values'] = X.values.tolist()
+print(data['feature_values'][:100])
 data['prediction'] = rforest.predict(X).tolist()
 data['ground_truth'] = y.tolist()
 

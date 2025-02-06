@@ -4,10 +4,8 @@ export const QuestionList: TQuestion[] = [
   {
     index: 0,
     pageName: "question",
-    userText:
-      "BMI contributes at least 20 to diabetes risk",
-    initVis: "beeswarm",
-    firstVis: {
+    userText: "BMI contributes at least 20 to diabetes risk",
+    initVis: {
       graphType: "Swarm",
       xValues: "None",
       yValues: "None",
@@ -16,12 +14,12 @@ export const QuestionList: TQuestion[] = [
     secondVis: "scatter", // randomly chosen
     newVis: {
       graphType: "Scatter",
-      xValues: "None",
-      yValues: "None",
+      xValues: "BMI feature values",
+      yValues: "BMI SHAP values",
       annotation: [
         {
           type: "singleLine",
-          yValue: 20,
+          xValue: 20,
         },
       ],
     },
@@ -30,7 +28,7 @@ export const QuestionList: TQuestion[] = [
         {
           featureName: "bmi",
           transform: "average",
-          type: "contribution of",
+          type: "contribution to the prediction of",
         },
         20,
       ],
@@ -45,7 +43,7 @@ export const QuestionList: TQuestion[] = [
         annotation: [
           {
             type: "singleLine",
-            yValue: 20,
+            xValue: 20,
           },
         ],
       },
@@ -56,10 +54,8 @@ export const QuestionList: TQuestion[] = [
   {
     index: 1,
     pageName: "question",
-    userText:
-      "blood pressure contributes more than 5 to diabetes risk.",
-    initVis: "beeswarm",
-    firstVis: {
+    userText: "blood pressure contributes more than 5 to diabetes risk.",
+    initVis: {
       graphType: "Swarm",
       xValues: "None",
       yValues: "None",
@@ -82,7 +78,7 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "blood pressure",
-          type: "contribution of",
+          type: "contribution to the prediction of",
           transform: "average",
         },
         5,
@@ -109,20 +105,23 @@ export const QuestionList: TQuestion[] = [
   {
     index: 2,
     pageName: "question",
-    userText:
-      "Serum Triglycerides contributes 30+ to the prediction",
-    initVis: "beeswarm",
-    firstVis: {
+    userText: "Serum Triglycerides contributes 30+ to the prediction",
+    initVis: {
       graphType: "Swarm",
       xValues: "None",
       yValues: "None",
       features: ["serum triglycerides level"],
+      // annotation: [
+      //   {type: "singleLine",
+      //     xValue: 30,
+      //   }
+      // ]
     },
     secondVis: "scatter", // randomly chosen
     newVis: {
       graphType: "Scatter",
-      xValues: "None",
-      yValues: "None",
+      xValues: "Serum triglycerides feature values",
+      yValues: "Serum triglycerides SHAP values",
       annotation: [
         {
           type: "singleLine",
@@ -134,7 +133,7 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "serum triglycerides level",
-          type: "contribution of",
+          type: "contribution to the prediction of",
           transform: "average",
         },
         30,
@@ -144,8 +143,8 @@ export const QuestionList: TQuestion[] = [
       condition: undefined,
       graph: {
         graphType: "Scatter",
-        xValues: "None",
-        yValues: "None",
+        xValues: "Serum triglycerides feature values",
+        yValues: "Serum triglycerides SHAP values",
         features: ["serum triglycerides level"],
         annotation: [
           {
@@ -161,14 +160,12 @@ export const QuestionList: TQuestion[] = [
   {
     index: 3,
     pageName: "question",
-    userText:
-      "Serum cholesterol contributes more than 2.5",
-    initVis: "beeswarm",
-    firstVis: {
+    userText: "Serum cholesterol contributes more than 2.5",
+    initVis: {
       graphType: "Swarm",
       xValues: "None",
       yValues: "None",
-      features: ["serum cholesterol"],
+      //features: ["serum cholesterol"],
     },
     secondVis: "bar",
     newVis: {
@@ -187,7 +184,7 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "serum cholesterol",
-          type: "contribution of",
+          type: "contribution to the prediction of",
           transform: "average",
         },
         2.5,
@@ -215,7 +212,12 @@ export const QuestionList: TQuestion[] = [
     index: 4,
     pageName: "question",
     userText: "BP is more important than age",
-    initVis: "heatmap",
+    initVis: {
+      graphType: "Heatmap",
+      xValues: "none",
+      yValues: "none",
+      features: ["blood pressure", "age"],
+    },
     secondVis: "beeswarm", // randomly chosen
     newVis: {
       graphType: "Swarm",
@@ -225,7 +227,7 @@ export const QuestionList: TQuestion[] = [
       annotation: [
         {
           type: "singleLine",
-          xValue: 25,
+          xValue: 5,
         },
       ],
     },
@@ -233,12 +235,12 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "blood pressure",
-          type: "contribution of",
+          type: "contribution to the prediction of",
           transform: "average",
         },
         {
           featureName: "age",
-          type: "contribution of",
+          type: "contribution to the prediction of",
           transform: "average",
         },
       ],
@@ -250,7 +252,7 @@ export const QuestionList: TQuestion[] = [
         xValues: "blood pressure",
         yValues: "none",
         features: ["blood pressure", "age"],
-        annotation: [{ type: "singleLine", xValue: 40 }],
+        annotation: [{ type: "singleLine", xValue: 5 }],
       },
     },
     testCondition: "random vis",
@@ -260,11 +262,10 @@ export const QuestionList: TQuestion[] = [
     index: 5,
     pageName: "question",
     userText: "bmi has more instances above 0 than sex.",
-    initVis: "scatter",
-    firstVis: {
+    initVis: {
       graphType: "Scatter",
-      xValues: "None",
-      yValues: "None",
+      xValues: "BMI feature values",
+      yValues: "BMI SHAP values",
     },
     secondVis: "bar", // randomly chosen
     newVis: {
@@ -284,12 +285,12 @@ export const QuestionList: TQuestion[] = [
         {
           featureName: "bmi",
           type: "number of instances above 0 of",
-          transform: "average",
+          transform: "",
         },
         {
           featureName: "sex",
           type: "number of instances above 0 of",
-          transform: "average",
+          transform: "",
         },
       ],
       type: "comparison",
@@ -314,19 +315,19 @@ export const QuestionList: TQuestion[] = [
   {
     index: 6,
     pageName: "question",
-    userText: "age contributes positively to more instances than Low-Density Lipoproteins.",
-    initVis: "scatter",
-    firstVis: {
+    userText:
+      "age contributes positively to more instances than Low-Density Lipoproteins.",
+    initVis: {
       graphType: "Scatter",
-      xValues: "None",
-      yValues: "None",
+      xValues: "LDL feature values",
+      yValues: "LDL SHAP values",
     },
     secondVis: "beeswarm",
     newVis: {
       graphType: "Swarm",
       xValues: "None",
       yValues: "None",
-      features: ["age", "low-density lipoproteins"],
+      //features: ["age", "low-density lipoproteins"],
       annotation: [{ type: "singleLine", xValue: 0 }],
     },
     insight: {
@@ -359,13 +360,11 @@ export const QuestionList: TQuestion[] = [
   {
     index: 7,
     pageName: "question",
-    userText:
-      "the deviations for BP are larger than they are for age",
-    initVis: "scatter",
-    firstVis: {
+    userText: "the deviations for BP are larger than they are for age",
+    initVis: {
       graphType: "Scatter",
-      xValues: "None",
-      yValues: "None",
+      xValues: "Blood pressure feature values",
+      yValues: "Blood pressure SHAP values",
     },
     secondVis: "bar", // randomly chosen
     newVis: {
@@ -373,22 +372,24 @@ export const QuestionList: TQuestion[] = [
       xValues: "None",
       yValues: "None",
       features: ["blood pressure", "age"],
-      annotation: [{
-        type: "singleLine",
-        xValue: 20,
-      }],
+      annotation: [
+        {
+          type: "singleLine",
+          xValue: 8,
+        },
+      ],
     },
     insight: {
       variables: [
         {
           featureName: "blood pressure",
-          type: "contribution of",
-          transform: "deviation",
+          type: "",
+          transform: "deviation of",
         },
         {
           featureName: "age",
-          type: "contribution of",
-          transform: "deviation",
+          type: "",
+          transform: "deviation of",
         },
       ],
       type: "comparison",
@@ -399,10 +400,12 @@ export const QuestionList: TQuestion[] = [
         xValues: "BMI",
         yValues: "BMI",
         features: ["blood pressure", "age"],
-        annotation: [{
-          type: "singleLine",
-          xValue: 20,
-        }],
+        annotation: [
+          {
+            type: "singleLine",
+            xValue: 8,
+          },
+        ],
       },
     },
     testCondition: "random vis",
@@ -411,25 +414,24 @@ export const QuestionList: TQuestion[] = [
   {
     index: 8,
     pageName: "question",
-    userText:
-      "bp contribution goes up as bp values go up",
-    initVis: "heatmap",
-    firstVis: {
-      graphType: "heatmap",
+    userText: "bp contribution goes up as bp values go up",
+    initVis: {
+      graphType: "Heatmap",
       xValues: "None",
       yValues: "None",
+      features: ["blood pressure"],
     },
     secondVis: "scatter",
     newVis: {
       graphType: "Scatter",
-      xValues: "blood pressure",
-      yValues: "blood pressure",
+      xValues: "Blood pressure feature values",
+      yValues: "Blood pressure SHAP values",
     },
     insight: {
       variables: [
         {
           featureName: "blood pressure",
-          type: "contribution of",
+          type: "contribution to the prediction of",
           transform: "",
         },
         {
@@ -443,8 +445,8 @@ export const QuestionList: TQuestion[] = [
       condition: undefined,
       graph: {
         graphType: "Scatter",
-        xValues: "blood pressure",
-        yValues: "blood pressure",
+        xValues: "blood pressure feature values",
+        yValues: "blood pressure SHAP values",
       },
     },
     testCondition: "ours",
@@ -455,27 +457,29 @@ export const QuestionList: TQuestion[] = [
     pageName: "question",
     userText:
       "Age has a negative correlation with diabetes risk when age is between -0.1 and 0",
-    initVis: "heatmap",
-    firstVis: {
-      graphType: "heatmap",
+    initVis: {
+      graphType: "Heatmap",
       xValues: "None",
       yValues: "None",
+      features: ["age"],
     },
     secondVis: "scatter", // randomly chosen
     newVis: {
       graphType: "Scatter",
-      xValues: "age",
-      yValues: "age",
-      annotation: [{
-        type: "highlightRange",
-        xRange: [-0.1, 0],
-      }],
+      xValues: "Age feature values",
+      yValues: "Age SHAP values",
+      annotation: [
+        {
+          type: "highlightRange",
+          xRange: [-0.1, 0],
+        },
+      ],
     },
     insight: {
       variables: [
         {
           featureName: "age",
-          type: "contribution of",
+          type: "contribution to the prediction of",
           transform: "average",
         },
         {
@@ -489,12 +493,14 @@ export const QuestionList: TQuestion[] = [
       condition: { featureName: "age", range: [-0.1, 0] },
       graph: {
         graphType: "Scatter",
-        xValues: "age",
-        yValues: "age",
-        annotation: [{
-          type: "highlightRange",
-          xRange: [-0.1, 0],
-        }],
+        xValues: "Age feature values",
+        yValues: "Age SHAP values",
+        annotation: [
+          {
+            type: "highlightRange",
+            xRange: [-0.1, 0],
+          },
+        ],
       },
     },
     testCondition: "random vis",
@@ -505,21 +511,23 @@ export const QuestionList: TQuestion[] = [
     pageName: "question",
     userText:
       "In the BMI range of 0.05 and 0.1, it is positively correlated with diabetes risk",
-    initVis: "heatmap",
-    firstVis: {
-      graphType: "heatmap",
+    initVis: {
+      graphType: "Heatmap",
       xValues: "None",
       yValues: "None",
+      features: ["bmi"],
     },
     secondVis: "scatter",
     newVis: {
       graphType: "Scatter",
-      xValues: "bmi",
-      yValues: "bmi",
-      annotation: [{
-        type: "highlightRange",
-        xRange: [0.05, 0.1],
-      }],
+      xValues: "BMI feature values",
+      yValues: "BMI SHAP values",
+      annotation: [
+        {
+          type: "highlightRange",
+          xRange: [0.05, 0.1],
+        },
+      ],
     },
     insight: {
       variables: [
@@ -530,7 +538,7 @@ export const QuestionList: TQuestion[] = [
         },
         {
           featureName: "bmi",
-          type: "contribution of",
+          type: "contribution to the prediction of",
           transform: "",
         },
       ],
@@ -539,12 +547,14 @@ export const QuestionList: TQuestion[] = [
       condition: { featureName: "bmi", range: [0.05, 0.1] },
       graph: {
         graphType: "Scatter",
-        xValues: "bmi",
-        yValues: "bmi",
-        annotation: [{
-          type: "highlightRange",
-          xRange: [0.05, 0.1],
-        }],
+        xValues: "BMI feature values",
+        yValues: "BMI SHAP values",
+        annotation: [
+          {
+            type: "highlightRange",
+            xRange: [0.05, 0.1],
+          },
+        ],
       },
     },
     testCondition: "ours",
@@ -555,38 +565,38 @@ export const QuestionList: TQuestion[] = [
     pageName: "question",
     userText:
       "BMI has a stronger correlation with predictions when age is between 0.05 to 0.1 versus 0 to 0.02",
-    initVis: "heatmap",
-    firstVis: {
-      graphType: "heatmap",
+    initVis: {
+      graphType: "Heatmap",
       xValues: "None",
       yValues: "None",
+      features: ["bmi", "age"],
     },
     secondVis: "scatter",
     newVis: {
       graphType: "Scatter",
-      xValues: "bmi",
-      yValues: "bmi",
+      xValues: "BMI feature values",
+      yValues: "BMI SHAP values",
     },
     insight: {
       variables: [
         {
           featureName: "bmi",
-          type: "contribution of",
+          type: "contribution to the prediction of",
           transform: "average",
         },
         {
           featureName: "age",
-          type: "contribution of",
+          type: "contribution to the prediction of",
           transform: "average",
         },
       ],
       type: "featureInteraction",
-      relation: "same",
-      condition: undefined,
+      relation: "different",
+      condition: {featureName: "age", range: [[0.05, 0.1], [0,0.02]]},
       graph: {
         graphType: "Scatter",
-        xValues: "bmi",
-        yValues: "bmi",
+        xValues: "BMI feature values",
+        yValues: "BMI SHAP values",
       },
     },
     testCondition: "ours",

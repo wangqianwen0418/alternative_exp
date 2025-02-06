@@ -12,6 +12,8 @@ interface ScatterProps {
   selectedIndices: number[];
   setSelectedIndices: (indices: number[]) => void;
   annotation?: TAnnotation;
+  xLabel?: string;
+  yLabel?: string;
 }
 
 export default function Scatter(props: ScatterProps) {
@@ -25,6 +27,8 @@ export default function Scatter(props: ScatterProps) {
     selectedIndices,
     setSelectedIndices,
     annotation,
+    xLabel,
+    yLabel
   } = props;
 
   const margin = useMemo(() => [22.5, 10, 40, 52.5], []);
@@ -76,7 +80,7 @@ export default function Scatter(props: ScatterProps) {
       .attr("y", 30)
       .attr("fill", "black")
       .attr("font-size", labelFontSize)
-      .text(`Feature Value (${id})`);
+      .text(xLabel || "Feature Value (bmi)");
 
     const yAxisGroup = d3
       .select(`g.scatter#${id}`)
@@ -95,61 +99,59 @@ export default function Scatter(props: ScatterProps) {
       .attr("y", -27.5)
       .attr("fill", "black")
       .attr("font-size", labelFontSize)
-      .text(`SHAP Value (${id})`);
+      .text(yLabel || "SHAP Value (bmi)");
 
-    if (!annotation) {
-      const brushGroup = d3
-        .select(`g.scatter#${id}`)
-        .append("g")
-        .attr("class", "brush");
+    const brushGroup = d3
+      .select(`g.scatter#${id}`)
+      .append("g")
+      .attr("class", "brush");
 
-      const brush = d3
-        .brush()
-        .extent([
-          [margin[3], margin[0]],
-          [width - margin[1], height - margin[2]],
-        ])
-        .on("start", function (event) {
-          brushGroup.call(brush.move, null);
-        })
-        .on("end", function (event) {
-          const selection = event.selection;
-          if (!selection) {
-            setSelectedIndices([]);
-            d3.selectAll(`g.scatter#${id} .points circle`).attr("opacity", 0.8);
-            return;
-          }
-          const brushedIndices: number[] = [];
-          const [[x0, y0], [x1, y1]] = selection;
+    const brush = d3
+      .brush()
+      .extent([
+        [margin[3], margin[0]],
+        [width - margin[1], height - margin[2]],
+      ])
+      .on("start", function (event) {
+        brushGroup.call(brush.move, null);
+      })
+      .on("end", function (event) {
+        const selection = event.selection;
+        if (!selection) {
+          setSelectedIndices([]);
+          d3.selectAll(`g.scatter#${id} .points circle`).attr("opacity", 0.8);
+          return;
+        }
+        const brushedIndices: number[] = [];
+        const [[x0, y0], [x1, y1]] = selection;
 
-          d3.selectAll(`g.scatter#${id} .points circle`)
-            .attr("opacity", (d: any, i: number) => {
-              const x = xScale(xValues[i]);
-              const y = yScale(yValues[i]);
-              const isInBrush = x0 <= x && x <= x1 && y0 <= y && y <= y1;
-              return isInBrush ? 0.8 : 0.3;
-            })
-            .each(function (d: any, i: number) {
-              const x = xScale(xValues[i]);
-              const y = yScale(yValues[i]);
-              if (x0 <= x && x <= x1 && y0 <= y && y <= y1) {
-                brushedIndices.push(i);
-              }
-            });
+        d3.selectAll(`g.scatter#${id} .points circle`)
+          .attr("opacity", (d: any, i: number) => {
+            const x = xScale(xValues[i]);
+            const y = yScale(yValues[i]);
+            const isInBrush = x0 <= x && x <= x1 && y0 <= y && y <= y1;
+            return isInBrush ? 0.8 : 0.3;
+          })
+          .each(function (d: any, i: number) {
+            const x = xScale(xValues[i]);
+            const y = yScale(yValues[i]);
+            if (x0 <= x && x <= x1 && y0 <= y && y <= y1) {
+              brushedIndices.push(i);
+            }
+          });
 
-          setSelectedIndices(brushedIndices);
-        });
+        setSelectedIndices(brushedIndices);
+      });
 
-      brushGroup
-        .call(brush)
-        .selectAll(".selection")
-        .style("fill", "rgba(128, 128, 128, 0.2)")
-        .style("stroke", "rgba(128, 128, 128, 0.2)");
+    brushGroup
+      .call(brush)
+      .selectAll(".selection")
+      .style("fill", "rgba(128, 128, 128, 0.2)")
+      .style("stroke", "rgba(128, 128, 128, 0.2)");
 
-      return () => {
-        d3.select(`g.scatter#${id} .brush`).remove();
-      };
-    }
+    return () => {
+      d3.select(`g.scatter#${id} .brush`).remove();
+    };
   }, [
     xValues,
     yValues,

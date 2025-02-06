@@ -320,18 +320,25 @@ export default function Heatmap({
           |Avg. SHAP|
         </text>
 
-        {truncatedLabels.map((label, idx) => (
-          <text
-            key={idx}
-            x={left - 7.5}
-            y={top + idx * (rectHeight + rowSpace) + rectHeight / 2}
-            textAnchor="end"
-            alignmentBaseline="middle"
-            fontSize={labelFontSizePx}
-          >
-            {label}
-          </text>
-        ))}
+        {truncatedLabels.map((label, idx) => {
+          // Check if this feature is among the selectedIndexes
+          const isSelected =
+            selectedIndexes.length > 0 && selectedIndexes.includes(idx);
+
+          return (
+            <text
+              key={idx}
+              x={left - 7.5}
+              y={top + idx * (rectHeight + rowSpace) + rectHeight / 2}
+              textAnchor="end"
+              alignmentBaseline="middle"
+              fontSize={labelFontSizePx}
+              fontWeight={isSelected ? "bold" : "normal"} // Bold the label if selected
+            >
+              {label}
+            </text>
+          );
+        })}
       </g>
     </svg>
   );

@@ -42,7 +42,7 @@ Variables: An array of variables with the format:
 {
   featureName: string,
   transform: "average" | "deviations to the" | ""
-  type: "value of" | "contribution of" | "number of instances of <restriction> for" 
+  type: "value of" | "contribution to the prediction of" | "number of instances of <restriction> for" 
 }
 
 Note: For the "number of instances of <restriction> of", there would be a restriction that you should include in the value. for example, you might suggest "number of instances above 5 of" or "number of instances below 3 of". 
@@ -121,18 +121,18 @@ Here’s an example of the full JSON:
 Suppose that the user input statement was “BMI is more important than age for predicting diabetes progression.” 
 In this case, since we are looking at a bivariate comparison between features, this would belong to Category 2.
 
-There are two variables: BMI and Age. Even though it is not specified, it is clear that this statement is referring to these on “average”. We want contributions rather than feature values, so variable type for both of these would be “contribution of”.
+There are two variables: BMI and Age. Even though it is not specified, it is clear that this statement is referring to these on “average”. We want contributions rather than feature values, so variable type for both of these would be “contribution to the prediction of”.
  
 Variables: [
         {
           featureName: "bmi",
           transform: "average",
-          type: "contribution of",
+          type: "contribution to the value of",
         },
         {
           featureName: "age",
           transform: "average",
-          type: "contribution of",
+          type: "contribution to the value of",
         },
       ]
 Numbers: []
@@ -160,7 +160,7 @@ Variables: [
   {
     featureName: "bmi",
     transform: undefined,
-    type: "contribution of",
+    type: "contribution to the value of",
   },
 ]
 Numbers: []
@@ -216,7 +216,7 @@ blood sugar level:
 total average SHAP value (across ALL features): 0.15
 
 For example, if someone was to provide a statement along the lines of "serum triglycerides has a higher than average contribution to the prediction", 
-this could get parsed as "the average contribution of serum triglycerides level is greater than [average SHAP value for ALL features = 0.15]". 
+this could get parsed as "the average contribution to the prediction of serum triglycerides level is greater than [average SHAP value for ALL features = 0.15]". 
 
 Similarly, if a sentence is referring to the average/median SHAP value for a particular feature, insert the value from this table.
 

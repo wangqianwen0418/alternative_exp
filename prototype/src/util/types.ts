@@ -1,6 +1,6 @@
 type TPageBase = {
   userText: string;
-  initVis: "beeswarm" | "bar" | "scatter" | string;
+  initVis: TGraph;
   secondVis: "beeswarm" | "bar" | "scatter" | string | undefined;
   insight: TInsight;
 };
@@ -22,12 +22,12 @@ export type TQuestion = TPageBase & {
 
 export type TAnnotation = 
   | { type: "highlightDataPoints"; dataPoints: number[], label?: string} // An array of data points to highlight
-  | { type: "highlightRange"; xRange?: [number, number], yRange?: [number, number], label?: string} // A range along X axis
+  | { type: "highlightRange"; xRange?: [number, number], yRange?: [number, number], label?: string, feature?: string} // A range along X axis
   | { type: "singleLine"; xValue?: number, yValue?: number, label?: string}; // A vertical line at a specific X value
 
 
 export type TGraph = {
-  graphType: string;
+  graphType: "Swarm" | "Scatter" | "Bar" | "Heatmap";
   xValues: string;
   yValues: string;
   annotation?: TAnnotation[];
@@ -77,9 +77,6 @@ export type TInsight4 = {
 
 export type TVariable = {
   featureName: string;
-  transform: "average" | "deviation" | "" | undefined; //relax
-  type: "value of" | "contribution of" | `number of instances ${string} of`;
+  transform: "average" | "deviation of" | "" | undefined; //relax
+  type: "value of" | "contribution to the prediction of" | `number of instances ${string} of` | "";
 };
-
-
-

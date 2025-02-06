@@ -145,6 +145,7 @@ export const diabetesShapValues = [
   diabetes_bp_shapValues,
   diabetes_age_shapValues,
   diabetes_sex_shapValues,
+  diabetes_s2_shapValues
 ];
 
 export const diabetesFeatureValues = [
@@ -153,6 +154,7 @@ export const diabetesFeatureValues = [
   diabetes_bp_featureValues,
   diabetes_age_featureValues,
   diabetes_sex_featureValues,
+  diabetes_s2_featureValues
 ];
 
 export const diabetesLabels = [
@@ -161,6 +163,7 @@ export const diabetesLabels = [
   diabetes_bp,
   diabetes_age,
   diabetes_sex,
+  diabetes_s2
 ];
 
 function getRandomPoints(arr: number[]) {
@@ -194,3 +197,29 @@ export const test_swarm_featureValues = [
   diabetes_s5_featureValues,
 ];
 export const test_swarm_labels = [diabetes_bmi, diabetes_s5];
+
+export const variableMapping: { [key: string]: number[] } = {
+  "BMI feature values": diabetes_bmi_featureValues,
+  "BMI SHAP values": diabetes_bmi_shapValues,
+  "Age feature values": diabetes_age_featureValues,
+  "Age SHAP values": diabetes_age_shapValues,
+  "Serum triglycerides feature values": diabetes_s5_featureValues,
+  "Serum triglycerides SHAP values": diabetes_s5_shapValues,
+  "Blood pressure feature values": diabetes_bp_featureValues,
+  "Blood pressure SHAP values" : diabetes_bp_shapValues,
+  "Sex feature values": diabetes_sex_featureValues,
+  "Sex SHAP values" : diabetes_sex_shapValues,
+  "HDL feature values" : diabetes_s3_featureValues,
+  "HDL SHAP values" : diabetes_s3_shapValues,
+  "Blood sugar feature values" : diabetes_s6_featureValues,
+  "Blood sugar SHAP values" : diabetes_s6_shapValues,
+  "LDL feature values" : diabetes_s2_featureValues,
+  "LDL SHAP values" : diabetes_s2_shapValues,
+  "Serum cholesterol feature values" : diabetes_s1_featureValues,
+  "Serum cholesterol SHAP values" : diabetes_s1_shapValues,
+  "Cholesterol ratio feature values" : diabetes_s4_featureValues,
+  "Cholesterol ratio SHAP values" : diabetes_s4_shapValues,
+};
+
+export const variableList = Object.keys(variableMapping);
+ 

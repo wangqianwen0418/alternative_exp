@@ -5,19 +5,24 @@ export const CASES: TCase[] = [
     href: "/case1",
     userText:
       "BMI is the more important than age for predicting diabetes progression.",
-    initVis: "beeswarm",
+    initVis: {
+      graphType: "Swarm",
+      xValues: "None",
+      yValues: "None",
+      features: ["age", "bmi"],
+    },
     secondVis: undefined,
     insight: {
       variables: [
         {
           featureName: "bmi",
           transform: "average",
-          type: "contribution of",
+          type: "contribution to the prediction of",
         },
         {
           featureName: "age",
           transform: "average",
-          type: "contribution of",
+          type: "contribution to the prediction of",
         },
       ],
       type: "comparison",
@@ -36,13 +41,18 @@ export const CASES: TCase[] = [
     href: "/case2",
     userText:
       "bmi always contributes positively for predicting diabetes progression.",
-    initVis: "bar",
+    initVis: {
+      graphType: "Bar",
+      xValues: "None",
+      yValues: "None",
+      features: ["bmi"],
+    },
     secondVis: undefined,
     insight: {
       variables: [
         {
           featureName: "bmi",
-          type: "contribution of",
+          type: "contribution to the prediction of",
           transform: undefined,
         },
         0 as number,
@@ -66,14 +76,18 @@ export const CASES: TCase[] = [
     href: "/case3",
     userText:
       "the larger the age, the more likely to have greater diabetes progression.",
-    initVis: "scatter",
+    initVis: {
+      graphType: "Scatter",
+      xValues: "Age feature values",
+      yValues: "Age SHAP values",
+    },
     secondVis: undefined,
     insight: {
       variables: [
         { featureName: "age", type: "value of", transform: undefined },
         {
           featureName: "age",
-          type: "contribution of",
+          type: "contribution to the prediction of",
           transform: undefined,
         },
       ],
@@ -91,7 +105,12 @@ export const CASES: TCase[] = [
     pageName: "Case 4",
     href: "/case4",
     userText: "bp contributes more to the prediction than age.",
-    initVis: "heatmap",
+    initVis: {
+      graphType: "Heatmap",
+      xValues: "None",
+      yValues: "None",
+      features: ["blood pressure, age"],
+    },
     secondVis: undefined,
     insight: undefined,
   },
@@ -99,7 +118,11 @@ export const CASES: TCase[] = [
     pageName: "Free Exploration",
     href: "/free",
     userText: "",
-    initVis: "scatter",
+    initVis: {
+      graphType: "Scatter",
+      xValues: "None",
+      yValues: "None",
+    },
     secondVis: undefined,
     insight: undefined,
   },

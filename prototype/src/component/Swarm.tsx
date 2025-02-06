@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { TAnnotation } from "../util/types";
 
 interface SwarmProps {
@@ -12,14 +12,11 @@ interface SwarmProps {
   annotation?: TAnnotation;
   featuresToShow?: string[];
   setSelectedIndices: (index: number[]) => void;
-
 }
 
 export default function Swarm(props: SwarmProps) {
-  
-  // let margin = useMemo(() => [10, 40, 40, 10], []);
-  // const radius = 2;
-  // const leftTitleMargin = 40;
+  const svgRef = useRef<SVGGElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [selectedPoints, setSelectedPoints] = useState<number[]>([]);
   const [brushSelection, setBrushSelection] = useState<[number, number] | null>(
     null
@@ -36,7 +33,7 @@ export default function Swarm(props: SwarmProps) {
     featuresToShow,
     annotation,
   } = props;
-
+  console.log("IDs: " + ids);
 
   const labelFontSize = 11;
   const maxLabelWidth = 50;
@@ -48,20 +45,11 @@ export default function Swarm(props: SwarmProps) {
     return null;
   }, []);
 
-  // Filter features based on the `featuresToShow` prop (if provided)
+  // // Filter features based on the `featuresToShow` prop (if provided)
   const filteredFeaturesIndices = useMemo(() => {
     // If featuresToShow is not provided or is empty, show all features
-    if (!featuresToShow || featuresToShow.length === 0) {
-      return ids.map((_, index) => index);
-    }
-
-    // Otherwise, filter based on the provided `featuresToShow`
-    return ids
-      .map((id, index) => (featuresToShow.includes(id) ? index : null))
-      .filter((index) => index !== null) as number[];
+    return ids.map((_, index) => index);
   }, [featuresToShow, ids]);
-
-  
 
   const truncatedLabels = useMemo(() => {
     if (!canvasContext) {
@@ -84,6 +72,31 @@ export default function Swarm(props: SwarmProps) {
     });
   }, [ids, canvasContext, labelFontSize, maxLabelWidth]);
 
+  const truncatedSelectedLabels = useMemo(() => {
+    if (!canvasContext) {
+      return featuresToShow?.map((id) =>
+        id.length > 5 ? id.slice(0, 5) + "..." : id
+      );
+    }
+
+    canvasContext.font = `${labelFontSize}px sans-serif`;
+    return featuresToShow?.map((id) => {
+      let label = id;
+      while (
+        canvasContext.measureText(label).width > maxLabelWidth &&
+        label.length > 1
+      ) {
+        label = label.slice(0, -1);
+      }
+      if (label !== id) {
+        label = label.slice(0, -3) + "...";
+      }
+      return label;
+    });
+  }, [ids, canvasContext, labelFontSize, maxLabelWidth, featuresToShow]);
+  console.log("TRUNCATED SELECTED LABELS:");
+  console.log(truncatedSelectedLabels);
+
   const leftTitleMargin = maxLabelWidth + 10;
   const margin = useMemo(
     () => [35, 80, 45, leftTitleMargin],
@@ -101,18 +114,12 @@ export default function Swarm(props: SwarmProps) {
 
   // Use filtered xValues and colorValues
   const flatXValues = useMemo(
-    () =>
-      filteredFeaturesIndices
-        .map((i) => xValues[i])
-        .flat(),
+    () => filteredFeaturesIndices.map((i) => xValues[i]).flat(),
     [xValues, filteredFeaturesIndices]
   );
 
   const flatColorValues = useMemo(
-    () =>
-      filteredFeaturesIndices
-        .map((i) => colorValues[i])
-        .flat(),
+    () => filteredFeaturesIndices.map((i) => colorValues[i]).flat(),
     [colorValues, filteredFeaturesIndices]
   );
 
@@ -150,6 +157,7 @@ export default function Swarm(props: SwarmProps) {
   }, [xValues, filteredFeaturesIndices]);
 
   const numDatasets = filteredFeaturesIndices.length;
+  console.log("number of datasets: " + numDatasets);
 
   const maxPlotHeight = 50;
   const plotHeight = useMemo(() => {
@@ -256,6 +264,8 @@ export default function Swarm(props: SwarmProps) {
   const highlightedIndices = useMemo(() => {
     if (annotation) {
       const dataIndex = ids.indexOf(annotation.label!);
+      console.log("LABEL: ");
+      console.log(annotation.label!);
       if (dataIndex !== -1) {
         const datasetXValues = xValues[dataIndex];
         let indices: number[] = [];
@@ -287,6 +297,9 @@ export default function Swarm(props: SwarmProps) {
         }
         return indices;
       }
+      else{
+        console.log("Annotation logic not executed oops")
+      }
     }
     return [];
   }, [annotation, ids, xValues, xScale]);
@@ -317,6 +330,7 @@ export default function Swarm(props: SwarmProps) {
 
   useEffect(() => {
     d3.select("g.swarm g.x-axis").remove();
+    d3.select("g.swarm text.x-axis-label").remove();
     d3.selectAll("g.swarm .brush").remove();
 
     const svg = d3.select("svg");
@@ -587,6 +601,8 @@ export default function Swarm(props: SwarmProps) {
         const isAnnotationForDataset =
           annotation && annotation.label === datasetID;
 
+        console.log("next check: " + annotation + ", label: " + annotation?.label);
+
         return (
           <g
             className={`points points-${datasetIndex}`}
@@ -598,6 +614,16 @@ export default function Swarm(props: SwarmProps) {
               textAnchor="end"
               alignmentBaseline="middle"
               fontSize={labelFontSize}
+              fontWeight={
+                truncatedSelectedLabels?.includes(truncatedLabel)
+                  ? "bold"
+                  : "normal"
+              }
+              fill={
+                truncatedSelectedLabels?.includes(truncatedLabel)
+                  ? "black"
+                  : "gray"
+              }
             >
               {truncatedLabel}
             </text>

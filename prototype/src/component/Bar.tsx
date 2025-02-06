@@ -251,6 +251,10 @@ export default function Bar(props: BarProps) {
         {sortedAvgShapeValues.map(([featureName, value]) => {
           const isSelected =
             selectedBars.length > 0 ? selectedBars.includes(featureName) : true;
+          const textStyle = isSelected
+            ? {fill: "black", fontWeight: "bold"}
+            : {fill: "gray", fontWeight: "normal"};
+        
           console.log(featureName);
           console.log(isSelected);
           return (
@@ -264,6 +268,7 @@ export default function Bar(props: BarProps) {
                 x={margin[0] - 2}
                 y={(yScale(featureName) as number) + yScale.bandwidth() * 0.8}
                 textAnchor="end"
+                style={textStyle}
                 fontSize={labelFontSize}
               >
                 {truncatedLabelsMap[featureName]}
