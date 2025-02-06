@@ -50,12 +50,9 @@ export default function Explanation() {
   let [initVis] = useAtom(initVisAtom);
   const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
   const initialVisRef = useRef<SVGGElement>(null);
-  const additionalVisRef = useRef<SVGGElement>(null)
+  const additionalVisRef = useRef<SVGGElement>(null);
   const [secondVisTranslateY, setSecondVisTranslateY] = useState(0);
 
-
-  const [initialVisYPos, setInitialVisYPos] = useState(0);
-  const [additionalVisYPos, setAdditionalVisYPos] = useState(0); 
   useEffect(() => {
     if (initialVisRef.current) {
       const bbox = initialVisRef.current.getBBox();
@@ -75,9 +72,6 @@ export default function Explanation() {
 
   const open = Boolean(anchorEl);
 
-
-
-
   let initialVisualization;
   if (initVis == undefined) {
     initVis = {
@@ -87,19 +81,6 @@ export default function Explanation() {
       features: ["bmi"],
     };
   }
-  const initialVisHeight = getVisualizationHeight(
-    (initVis as TGraph).graphType || "Scatter"
-  );
-  const additionalVisHeight = insight?.graph?.graphType
-    ? getVisualizationHeight(insight.graph.graphType)
-    : 0;
-
-  const SPACING = 50;
-
-  const totalHeight =
-    initialVisHeight +
-    (isSubmitted ? SPACING + additionalVisHeight : 0) +
-    SPACING;
 
   switch ((initVis as TGraph).graphType) {
     case "Swarm":
@@ -258,15 +239,16 @@ export default function Explanation() {
         console.log("Swarm");
         let swarmFeatureValues = [[0.0]];
         let swarmFeatureShapValues = [[0]];
-        if (insight.graph?.features){
-          const featureIndices = insight?.graph.features.map(feature => shap_diabetes["feature_names"].indexOf(feature));
-          swarmFeatureValues = shap_diabetes["feature_values"].map(row =>
-            featureIndices.map(index => row[index])
+        if (insight.graph?.features) {
+          const featureIndices = insight?.graph.features.map((feature) =>
+            shap_diabetes["feature_names"].indexOf(feature)
           );
-          const featureShapValues = shap_diabetes["shap_values"].map(row =>
-            featureIndices.map(index => row[index])
+          swarmFeatureValues = shap_diabetes["feature_values"].map((row) =>
+            featureIndices.map((index) => row[index])
           );
-
+          const featureShapValues = shap_diabetes["shap_values"].map((row) =>
+            featureIndices.map((index) => row[index])
+          );
         }
         additionalVisualizations = isSubmitted && (
           <>
@@ -288,7 +270,7 @@ export default function Explanation() {
           </>
         );
         break;
-      }
+
       case "Heatmap":
         additionalVisualizations = isSubmitted && (
           <Heatmap
@@ -308,7 +290,7 @@ export default function Explanation() {
   }
 
   return (
-    <Paper style={{ padding: "15px" }} ref={containerRef}>
+    <Paper style={{ padding: "15px" }}>
       <Typography variant="h5" gutterBottom>
         Visual Explanation
         <IconButton onClick={handlePopoverOpen} aria-label="help">
@@ -334,23 +316,23 @@ export default function Explanation() {
       >
         <Typography sx={{ p: 2 }}>
           {/* This is the text you can customize */}
-          In many machine learning models, features are adjusted so their average is 0, and the scale is based on standard deviations. <br />
-          A positive value (e.g., BMI 0.1) is above average, and a negative value is below. <br />
-          For example, a blood pressure feature value of 0.2 indicates a higher blood pressure than 0.1, which is higher than -0.05. <br /> 
-          This makes it easier to meaningfully compare features like BMI and blood pressure, even though they use different scales.
+          In many machine learning models, features are adjusted so their
+          average is 0, and the scale is based on standard deviations. <br />
+          A positive value (e.g., BMI 0.1) is above average, and a negative
+          value is below. <br />
+          For example, a blood pressure feature value of 0.2 indicates a higher
+          blood pressure than 0.1, which is higher than -0.05. <br />
+          This makes it easier to meaningfully compare features like BMI and
+          blood pressure, even though they use different scales.
         </Typography>
       </Popover>
-      <svg
-        className="swarm"
-        width="100%"
-        height={totalHeight}
-        style={{
-          display: "block",
-          minHeight: `${totalHeight}px`,
-        }}
-      >
-        <g transform="translate(0, 0)">{initialVisualization}</g>
+      <svg className="swarm" width="100%" height="100vh">
+        {/* Initial Visualization */}
+        <g ref={initialVisRef} transform="translate(0, 0)">
+          {initialVisualization}
+        </g>
 
+        {/* Additional Visualization BELOW the initialVisualization */}
         {isSubmitted && (
           <g
             ref={additionalVisRef}

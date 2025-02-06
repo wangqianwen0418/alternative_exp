@@ -30,7 +30,7 @@ export type TAnnotation =
   | { type: "singleLine"; xValue?: number; yValue?: number; label?: string }; // A vertical line at a specific X value
 
 export type TGraph = {
-  graphType: "Swarm" | "Scatter" | "Bar" | "Heatmap";
+  graphType: "Swarm" | "Scatter" | "Bar" | "Heatmap" | "two-scatter";
   xValues: string;
   yValues: string;
   annotation?: TAnnotation[];
