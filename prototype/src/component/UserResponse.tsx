@@ -31,6 +31,7 @@ import {
 } from "../store";
 import { test_weburl } from "../util/appscript_url";
 import Cookies from "js-cookie";
+import { TGraph } from "../util/types";
 
 const confidenceOptions = [
   { value: "", label: "Please select" },
@@ -107,7 +108,7 @@ export default function UserResponse() {
       currentIndex: currentQuestionIndex,
       questionOrder: questionIndexesArray.toString(),
       freeText,
-      currentVis: initVis,
+      currentVis: (initVis as TGraph).graphType,
       isSecondPart: isSecondPart ? "Yes" : "No",
       userAnswer,
       confidence: confidence.value,
