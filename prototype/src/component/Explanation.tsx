@@ -88,7 +88,8 @@ export default function Explanation() {
         <Swarm
           xValues={diabetesShapValues}
           colorValues={diabetesFeatureValues}
-          ids={diabetesLabels}
+          id="swarm-initVis"
+          labels={diabetesLabels}
           // xValues={[diabetes_s5_shapValues]}
           // colorValues={[diabetes_s5_featureValues]}
           // ids={["serum triglycerides level"]}
@@ -114,7 +115,7 @@ export default function Explanation() {
           }
           width={450}
           height={350}
-          id="bmi"
+          id="scatter-initVis"
           offsets={[0, 0]}
           selectedIndices={selectedIndices}
           setSelectedIndices={setSelectedIndices}
@@ -196,7 +197,7 @@ export default function Explanation() {
             featureNames={shap_diabetes["feature_names"].slice(0, 100)}
             width={600}
             height={400}
-            id="bar"
+            id="bar-secondVis"
             offsets={[0, 0]}
             annotation={
               insight?.graph.annotation
@@ -221,7 +222,7 @@ export default function Explanation() {
               }
               width={600}
               height={400}
-              id="bmi-scatter"
+              id="scatter-secondVis"
               offsets={[0, 0]}
               selectedIndices={selectedIndices}
               setSelectedIndices={setSelectedIndices}
@@ -258,7 +259,8 @@ export default function Explanation() {
               xValues={diabetesShapValues}
               width={600}
               height={400}
-              ids={diabetesLabels}
+              id="swarm-secondVis"
+              labels={diabetesLabels}
               featuresToShow={insight.graph?.features}
               selectedIndices={selectedIndices}
               setSelectedIndices={setSelectedIndices}

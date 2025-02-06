@@ -31,7 +31,8 @@ export function SwarmTutorialGraph() {
           <Swarm
             xValues={diabetesShapValues}
             colorValues={diabetesFeatureValues}
-            ids={diabetesLabels}
+            id="swarm-tutorial"
+            labels={diabetesLabels}
             width={600}
             height={400}
             selectedIndices={selectedIndices}
@@ -61,7 +62,7 @@ export function ScatterTutorialGraph() {
             xValues={diabetes_bmi_featureValues}
             width={600}
             height={400}
-            id="bmi"
+            id="scatter-tutorial"
             xLabel="Feature Values (BMI)"
             yLabel="SHAP Values (BMI)"
             offsets={[0, 0]}

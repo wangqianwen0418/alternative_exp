@@ -7,7 +7,8 @@ interface SwarmProps {
   colorValues: number[][];
   width: number;
   height: number;
-  ids: string[];
+  id: string;
+  labels: string[];
   selectedIndices: number[];
   annotation?: TAnnotation;
   featuresToShow?: string[];
@@ -28,7 +29,8 @@ export default function Swarm(props: SwarmProps) {
     colorValues,
     width,
     height,
-    ids,
+    id,
+    labels,
     selectedIndices,
     setSelectedIndices,
     featuresToShow,
@@ -48,52 +50,54 @@ export default function Swarm(props: SwarmProps) {
   // // Filter features based on the `featuresToShow` prop (if provided)
   const filteredFeaturesIndices = useMemo(() => {
     // If featuresToShow is not provided or is empty, show all features
-    return ids.map((_, index) => index);
-  }, [featuresToShow, ids]);
+    return labels.map((_, index) => index);
+  }, [featuresToShow, labels]);
 
   const truncatedLabels = useMemo(() => {
     if (!canvasContext) {
-      return ids.map((id) => (id.length > 5 ? id.slice(0, 5) + "..." : id));
-    }
-
-    canvasContext.font = `${labelFontSize}px sans-serif`;
-    return ids.map((id) => {
-      let label = id;
-      while (
-        canvasContext.measureText(label).width > maxLabelWidth &&
-        label.length > 1
-      ) {
-        label = label.slice(0, -1);
-      }
-      if (label !== id) {
-        label = label.slice(0, -3) + "...";
-      }
-      return label;
-    });
-  }, [ids, canvasContext, labelFontSize, maxLabelWidth]);
-
-  const truncatedSelectedLabels = useMemo(() => {
-    if (!canvasContext) {
-      return featuresToShow?.map((id) =>
-        id.length > 5 ? id.slice(0, 5) + "..." : id
+      return labels.map((label) =>
+        label.length > 5 ? label.slice(0, 5) + "..." : label
       );
     }
 
     canvasContext.font = `${labelFontSize}px sans-serif`;
-    return featuresToShow?.map((id) => {
-      let label = id;
+    return labels.map((label) => {
+      let truncatedLabel = label;
       while (
-        canvasContext.measureText(label).width > maxLabelWidth &&
-        label.length > 1
+        canvasContext.measureText(truncatedLabel).width > maxLabelWidth &&
+        truncatedLabel.length > 1
       ) {
-        label = label.slice(0, -1);
+        truncatedLabel = truncatedLabel.slice(0, -1);
       }
-      if (label !== id) {
-        label = label.slice(0, -3) + "...";
+      if (truncatedLabel !== label) {
+        truncatedLabel = truncatedLabel.slice(0, -3) + "...";
       }
-      return label;
+      return truncatedLabel;
     });
-  }, [ids, canvasContext, labelFontSize, maxLabelWidth, featuresToShow]);
+  }, [labels, canvasContext, labelFontSize, maxLabelWidth]);
+
+  const truncatedSelectedLabels = useMemo(() => {
+    if (!canvasContext) {
+      return featuresToShow?.map((label) =>
+        label.length > 5 ? label.slice(0, 5) + "..." : label
+      );
+    }
+
+    canvasContext.font = `${labelFontSize}px sans-serif`;
+    return featuresToShow?.map((label) => {
+      let truncatedLabel = label;
+      while (
+        canvasContext.measureText(truncatedLabel).width > maxLabelWidth &&
+        truncatedLabel.length > 1
+      ) {
+        truncatedLabel = truncatedLabel.slice(0, -1);
+      }
+      if (truncatedLabel !== label) {
+        truncatedLabel = truncatedLabel.slice(0, -3) + "...";
+      }
+      return truncatedLabel;
+    });
+  }, [labels, canvasContext, labelFontSize, maxLabelWidth, featuresToShow]);
   // console.log("TRUNCATED SELECTED LABELS:");
   // console.log(truncatedSelectedLabels);
 
@@ -263,7 +267,7 @@ export default function Swarm(props: SwarmProps) {
 
   const highlightedIndices = useMemo(() => {
     if (annotation) {
-      const dataIndex = ids.indexOf(annotation.label!);
+      const dataIndex = labels.indexOf(annotation.label!);
       // console.log("LABEL: ");
       // console.log(annotation.label!);
       if (dataIndex !== -1) {
@@ -299,12 +303,12 @@ export default function Swarm(props: SwarmProps) {
       }
     }
     return [];
-  }, [annotation, ids, xValues, xScale]);
+  }, [annotation, labels, xValues, xScale]);
 
   useEffect(() => {
     if (annotation) {
       if (highlightedIndices.length > 0) {
-        const dataIndex = ids.indexOf(annotation.label!);
+        const dataIndex = labels.indexOf(annotation.label!);
         if (dataIndex !== -1) {
           const datasetXValues = xValues[dataIndex];
           const xHighlightedValues = highlightedIndices.map(
@@ -323,21 +327,21 @@ export default function Swarm(props: SwarmProps) {
         setDatasetStats(null);
       }
     }
-  }, [annotation, highlightedIndices, ids, xValues]);
+  }, [annotation, highlightedIndices, labels, xValues]);
 
   useEffect(() => {
-    d3.select("g.swarm g.x-axis").remove();
-    d3.select("g.swarm text.x-axis-label").remove();
-    d3.selectAll("g.swarm .brush").remove();
+    d3.select(`g.swarm#${id} g.x-axis`).remove();
+    d3.select(`g.swarm#${id} text.x-axis-label`).remove();
+    d3.selectAll(`g.swarm#${id} .brush`).remove();
 
     const xAxis = d3.axisBottom(xScale);
-    d3.select("g.swarm")
+    d3.select(`g.swarm#${id}`)
       .append("g")
       .attr("class", "x-axis")
       .attr("transform", `translate(0,${totalPlotHeight - margin[2] + 5})`)
       .call(xAxis);
 
-    d3.select("g.swarm")
+    d3.select(`g.swarm#${id}`)
       .append("text")
       .attr("class", "x-axis-label")
       .attr("x", (width - margin[1] - margin[3]) / 2 + margin[3])
@@ -346,9 +350,9 @@ export default function Swarm(props: SwarmProps) {
       .attr("font-size", labelFontSize)
       .text("SHAP Value");
 
-    const defs = d3.select("g.swarm").select("defs");
+    const defs = d3.select(`g.swarm#${id}`).select("defs");
     if (defs.empty()) {
-      const newDefs = d3.select("g.swarm").append("defs");
+      const newDefs = d3.select(`g.swarm#${id}`).append("defs");
       const gradient = newDefs
         .append("linearGradient")
         .attr("id", "color-legend-gradient")
@@ -373,11 +377,11 @@ export default function Swarm(props: SwarmProps) {
     const middleY = margin[0] + (totalPlotHeight - margin[0] - margin[2]) / 2;
     const legendY = middleY - legendHeight / 2;
 
-    d3.select("g.swarm .legend").remove();
-    d3.select("g.swarm .legend-title").remove();
-    d3.select("g.swarm .legend-label").remove();
+    d3.select(`g.swarm#${id} .legend`).remove();
+    d3.select(`g.swarm#${id} .legend-title`).remove();
+    d3.select(`g.swarm#${id} .legend-label`).remove();
 
-    d3.select("g.swarm")
+    d3.select(`g.swarm#${id}`)
       .append("rect")
       .attr("class", "legend")
       .attr("x", legendX)
@@ -386,7 +390,7 @@ export default function Swarm(props: SwarmProps) {
       .attr("height", legendHeight)
       .attr("fill", "url(#color-legend-gradient)");
 
-    d3.select("g.swarm")
+    d3.select(`g.swarm#${id}`)
       .append("text")
       .attr("class", "legend-title")
       .attr("x", legendX + legendWidth / 2)
@@ -399,7 +403,7 @@ export default function Swarm(props: SwarmProps) {
       )
       .text("Feature Value");
 
-    d3.select("g.swarm")
+    d3.select(`g.swarm#${id}`)
       .append("text")
       .attr("class", "legend-label")
       .attr("x", legendX + legendWidth / 2)
@@ -408,7 +412,7 @@ export default function Swarm(props: SwarmProps) {
       .attr("font-size", labelFontSize)
       .text(formatValue(colorScale.domain()[0]));
 
-    d3.select("g.swarm")
+    d3.select(`g.swarm#${id}`)
       .append("text")
       .attr("class", "legend-label")
       .attr("x", legendX + legendWidth / 2)
@@ -434,7 +438,7 @@ export default function Swarm(props: SwarmProps) {
           .on("start", function (event) {
             brushes.forEach((b, i) => {
               if (i !== datasetIndex) {
-                d3.select(`g.swarm .brush-${i}`).call(b.move, null);
+                d3.select(`g.swarm#${id} .brush-${i}`).call(b.move, null);
               }
             });
           })
@@ -444,7 +448,7 @@ export default function Swarm(props: SwarmProps) {
               if (!selection) {
                 setSelectedIndices([]);
                 setSelectedDatasetIndex(null);
-                d3.selectAll("g.swarm .points circle").attr("opacity", 1);
+                d3.selectAll(`g.swarm#${id} .points circle`).attr("opacity", 1);
                 setDatasetStats(null);
                 return;
               }
@@ -471,7 +475,7 @@ export default function Swarm(props: SwarmProps) {
               });
 
               sortedDatasetIndices.forEach((dataIdx, idx) => {
-                d3.selectAll(`g.swarm .points-${idx} circle`).attr(
+                d3.selectAll(`g.swarm#${id} .points-${idx} circle`).attr(
                   "opacity",
                   (d, i) => {
                     return brushedIndices.includes(i) ? 1 : 0.3;
@@ -486,7 +490,7 @@ export default function Swarm(props: SwarmProps) {
         brushes.push(brush);
 
         const brushGroup = d3
-          .select("g.swarm")
+          .select(`g.swarm#${id}`)
           .append("g")
           .attr("class", `brush brush-${datasetIndex}`);
 
@@ -499,7 +503,7 @@ export default function Swarm(props: SwarmProps) {
     }
 
     return () => {
-      d3.selectAll("g.swarm .brush").remove();
+      d3.selectAll(`g.swarm#${id} .brush`).remove();
     };
   }, [
     xValues,
@@ -521,7 +525,7 @@ export default function Swarm(props: SwarmProps) {
   useEffect(() => {
     if (annotation && highlightedIndices.length > 0) {
       sortedDatasetIndices.forEach((dataIdx, idx) => {
-        d3.selectAll(`g.swarm .points-${idx} circle`).attr(
+        d3.selectAll(`g.swarm#${id} .points-${idx} circle`).attr(
           "opacity",
           (d, i) => {
             return highlightedIndices.includes(i) ? 1 : 0.3;
@@ -530,7 +534,7 @@ export default function Swarm(props: SwarmProps) {
       });
     } else if (selectedIndices.length > 0 && selectedDatasetIndex !== null) {
       sortedDatasetIndices.forEach((dataIdx, idx) => {
-        d3.selectAll(`g.swarm .points-${idx} circle`).attr(
+        d3.selectAll(`g.swarm#${id} .points-${idx} circle`).attr(
           "opacity",
           (d, i) => {
             return selectedIndices.includes(i) ? 1 : 0.3;
@@ -538,7 +542,7 @@ export default function Swarm(props: SwarmProps) {
         );
       });
     } else {
-      d3.selectAll("g.swarm .points circle").attr("opacity", 1);
+      d3.selectAll(`g.swarm#${id} .points circle`).attr("opacity", 1);
     }
   }, [
     annotation,
@@ -588,7 +592,7 @@ export default function Swarm(props: SwarmProps) {
         const datasetXValues = xValues[dataIndex];
         const datasetYVals = yValsArray[dataIndex];
         const datasetColorValues = colorValues[dataIndex];
-        const datasetID = ids[dataIndex];
+        const datasetID = labels[dataIndex];
         const truncatedLabel = truncatedLabels[dataIndex];
 
         const yScale = yScales[datasetIndex];
