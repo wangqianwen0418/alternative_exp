@@ -553,7 +553,7 @@ export default function Swarm(props: SwarmProps) {
   ]);
 
   return (
-    <g className="swarm">
+    <g className="swarm" id={id}>
       <rect
         className="background"
         width={width}
