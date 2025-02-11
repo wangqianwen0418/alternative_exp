@@ -4,7 +4,7 @@ export const QuestionList: TQuestion[] = [
   {
     index: 0,
     pageName: "question",
-    userText: "BMI contributes at least 20 to diabetes risk",
+    userText: "On average, BMI contributes at least 20 to diabetes risk",
     initVis: {
       graphType: "Swarm",
       xValues: "None",
@@ -54,19 +54,20 @@ export const QuestionList: TQuestion[] = [
   {
     index: 1,
     pageName: "question",
-    userText: "blood pressure contributes more than 5 to diabetes risk.",
+    userText:
+      "On average, serum triglycerides are more important than blood sugar for diabetes risk.",
     initVis: {
       graphType: "Swarm",
       xValues: "None",
       yValues: "None",
-      features: ["blood pressure"],
+      features: ["serum triglycerides level", "blood sugar"],
     },
     secondVis: "bar",
     newVis: {
       graphType: "Bar",
       xValues: "None",
       yValues: "None",
-      features: ["blood pressure"],
+      features: ["serum "],
       annotation: [
         {
           type: "singleLine",
@@ -90,7 +91,7 @@ export const QuestionList: TQuestion[] = [
         graphType: "Bar",
         xValues: "None",
         yValues: "None",
-        features: ["blood pressure"],
+        features: ["serum triglycerides level", "blood sugar"],
         annotation: [
           {
             type: "singleLine",
@@ -105,7 +106,8 @@ export const QuestionList: TQuestion[] = [
   {
     index: 2,
     pageName: "question",
-    userText: "Serum Triglycerides contributes 30+ to the prediction",
+    userText:
+      "On average, serum tryglycerides level contributes 30+ to diabetes risk",
     initVis: {
       graphType: "Swarm",
       xValues: "None",
@@ -160,12 +162,13 @@ export const QuestionList: TQuestion[] = [
   {
     index: 3,
     pageName: "question",
-    userText: "Serum cholesterol contributes more than 2.5",
+    userText:
+      "There is a positive correlation between blood sugar values and the contribution of blood sugar values to diabetes risk",
     initVis: {
       graphType: "Swarm",
       xValues: "None",
       yValues: "None",
-      //features: ["serum cholesterol"],
+      features: ["blood sugar"],
     },
     secondVis: "bar",
     newVis: {
@@ -193,16 +196,9 @@ export const QuestionList: TQuestion[] = [
       relation: "greater than",
       condition: undefined,
       graph: {
-        graphType: "Bar",
-        xValues: "None",
-        yValues: "None",
-        features: ["serum cholesterol"],
-        annotation: [
-          {
-            type: "singleLine",
-            xValue: 2.5,
-          },
-        ],
+        graphType: "Scatter",
+        xValues: "Blood sugar feature values",
+        yValues: "Blood sugar SHAP values",
       },
     },
     testCondition: "ours",
@@ -211,7 +207,8 @@ export const QuestionList: TQuestion[] = [
   {
     index: 4,
     pageName: "question",
-    userText: "BP is more important than age",
+    userText:
+      "On average, blood pressure is more important than age for diabetes risk",
     initVis: {
       graphType: "Heatmap",
       xValues: "none",
@@ -261,7 +258,8 @@ export const QuestionList: TQuestion[] = [
   {
     index: 5,
     pageName: "question",
-    userText: "bmi has more instances above 0 than sex.",
+    userText:
+      "BMI contributes positively to diabetes risk for more patients than sex does.",
     initVis: {
       graphType: "Scatter",
       xValues: "BMI feature values",
@@ -276,7 +274,7 @@ export const QuestionList: TQuestion[] = [
       annotation: [
         {
           type: "singleLine",
-          xValue: 0,
+          xValue: 1,
         },
       ],
     },
@@ -360,7 +358,8 @@ export const QuestionList: TQuestion[] = [
   {
     index: 7,
     pageName: "question",
-    userText: "the deviations for BP are larger than they are for age",
+    userText:
+      "Blood pressure has larger deviations in its contribution to diabetes risk compared to age",
     initVis: {
       graphType: "Scatter",
       xValues: "Blood pressure feature values",
@@ -414,7 +413,8 @@ export const QuestionList: TQuestion[] = [
   {
     index: 8,
     pageName: "question",
-    userText: "bp contribution goes up as bp values go up",
+    userText:
+      "There is a positive correlation between blood pressure and its contribution to diabetes risk",
     initVis: {
       graphType: "Heatmap",
       xValues: "None",
@@ -456,7 +456,7 @@ export const QuestionList: TQuestion[] = [
     index: 9,
     pageName: "question",
     userText:
-      "Age has a negative correlation with diabetes risk when age is between -0.1 and 0",
+      "Blood pressure is correlated more strongly to diabetes risk when the BMI is between 0.1 and 0.2 versus -0.05 to 0.05",
     initVis: {
       graphType: "Heatmap",
       xValues: "None",
@@ -491,6 +491,21 @@ export const QuestionList: TQuestion[] = [
       type: "correlation",
       relation: "negatively correlated",
       condition: { featureName: "age", range: [-0.1, 0] },
+      // graph: {
+      //   graphType: "two-scatter",
+      //   xValues: "Blood pressure feature values",
+      //   yValues: "Blood pressure SHAP values",
+      //   colorValues: "BMI feature values",
+      //   annotation: [
+      //     {
+      //       type: "twoColorRange",
+      //       range: [
+      //         [0.2,0.5],
+      //         [0,0.1]
+      //       ]
+      //     },
+      //   ],
+      // },
       graph: {
         graphType: "Scatter",
         xValues: "Age feature values",
@@ -564,7 +579,7 @@ export const QuestionList: TQuestion[] = [
     index: 11,
     pageName: "question",
     userText:
-      "BMI has a stronger correlation with predictions when age is between 0.05 to 0.1 versus 0 to 0.02",
+      "BMI is correlated more strongly to diabetes risk when the age is between 0.05 to 0.1 versus 0 to 0.02",
     initVis: {
       graphType: "Heatmap",
       xValues: "None",
@@ -592,11 +607,27 @@ export const QuestionList: TQuestion[] = [
       ],
       type: "featureInteraction",
       relation: "different",
-      condition: {featureName: "age", range: [[0.05, 0.1], [0,0.02]]},
+      condition: {
+        featureName: "age",
+        range: [
+          [0.05, 0.1],
+          [0, 0.02],
+        ],
+      },
       graph: {
-        graphType: "Scatter",
+        graphType: "two-scatter",
         xValues: "BMI feature values",
         yValues: "BMI SHAP values",
+        colorValues: "Age feature values",
+        annotation: [
+          {
+            type: "twoColorRange",
+            range: [
+              [0.05, 0.1],
+              [0, 0.02],
+            ],
+          },
+        ],
       },
     },
     testCondition: "ours",

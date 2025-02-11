@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { TAnnotation } from "../util/types";
 
 interface TwoColorScatterProps {
   xValues: number[];
@@ -7,9 +8,13 @@ interface TwoColorScatterProps {
   colorValues: number[];
   width: number;
   height: number;
-  label: string;
+  id: string;
+  xLabel: string;
+  yLabel: string;
   colorLabel: string;
-  annotation?: Array<[number, number]>; // [[low, high]] or [[low1, high1], [low2, high2]]
+  annotation?: TAnnotation;
+
+  //annotation?: Array<[number, number]>; // [[low, high]] or [[low1, high1], [low2, high2]]
 }
 
 export default function TwoColorScatter(props: TwoColorScatterProps) {
@@ -19,10 +24,16 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
     colorValues,
     width,
     height,
-    label,
+    id,
+    xLabel,
+    yLabel,
     colorLabel,
     annotation,
   } = props;
+  const annotationArray: Array<[number, number]> = 
+  annotation?.type === "twoColorRange" 
+    ? annotation.range 
+    : [];
 
   const margin = [22.5, 10, 40, 52.5];
   const labelFontSize = 13;
@@ -57,10 +68,10 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
   ]);
 
   useEffect(() => {
-    if (annotation) {
+    if (annotationArray) {
       setSliderRange([minColor, maxColor]);
     }
-  }, [annotation, minColor, maxColor]);
+  }, [annotationArray, minColor, maxColor]);
 
   const legendWidth = 20;
   const legendHeight = height - margin[0] - margin[2];
@@ -95,7 +106,7 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
   }
 
   useEffect(() => {
-    if (!annotation) {
+    if (!annotationArray) {
       if (handleMinRef.current) {
         d3.select(handleMinRef.current).call(createDragHandle(true));
       }
@@ -103,10 +114,10 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
         d3.select(handleMaxRef.current).call(createDragHandle(false));
       }
     }
-  }, [annotation, createDragHandle]);
+  }, [annotationArray, createDragHandle]);
 
   useEffect(() => {
-    const container = d3.select(`g.twoColorScatter#${label}`);
+    const container = d3.select(`g.twoColorScatter#${id}`);
     container.selectAll("g.x-axis").remove();
     container.selectAll("g.y-axis").remove();
 
@@ -123,7 +134,7 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
       .attr("y", 30)
       .attr("fill", "black")
       .attr("font-size", labelFontSize)
-      .text(`Feature Value (${label})`);
+      .text(xLabel);
 
     const yAxisGroup = container
       .append("g")
@@ -139,11 +150,12 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
       .attr("y", -27.5)
       .attr("fill", "black")
       .attr("font-size", labelFontSize)
-      .text(`SHAP Value (${label})`);
+      .text(yLabel);
   }, [
     xScale,
     yScale,
-    label,
+    xLabel,
+    yLabel,
     height,
     margin,
     chartLeft,
@@ -152,8 +164,8 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
   ]);
 
   function getCircleOpacity(val: number) {
-    if (annotation) {
-      for (let [low, high] of annotation) {
+    if (annotationArray) {
+      for (let [low, high] of annotationArray) {
         if (val >= low && val <= high) return 0.8;
       }
       return 0.1;
@@ -166,7 +178,7 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
   const ticks = legendScale.ticks(10);
 
   return (
-    <g className="twoColorScatter" id={label}>
+    <g className="twoColorScatter" id={id}>
       <rect width={width} height={height} fill="white" stroke="black" />
       <g className="points">
         {xValues.map((x, i) => {
@@ -188,7 +200,7 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
       <g transform={`translate(${legendX}, ${legendY})`}>
         <defs>
           <linearGradient
-            id={`color-gradient-${label}`}
+            id={`color-gradient-${id}`}
             x1="0"
             y1="1"
             x2="0"
@@ -216,11 +228,11 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
           y={0}
           width={legendWidth}
           height={legendHeight}
-          fill={`url(#color-gradient-${label})`}
+          fill={`url(#color-gradient-${id})`}
         />
-        {annotation
+        {annotationArray
           ? (() => {
-              let intervals = annotation.map(([low, high]) => {
+              let intervals = annotationArray.map(([low, high]) => {
                 const t = legendScale(Math.max(low, high));
                 const b = legendScale(Math.min(low, high));
                 return [
@@ -300,8 +312,8 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
               }
               return overlays;
             })()}
-        {annotation ? (
-          annotation.map(([low, high], i) => {
+        {annotationArray ? (
+          annotationArray.map(([low, high], i) => {
             const yTop = legendScale(high) - 2;
             const yBottom = legendScale(low) - 2;
             return (
@@ -353,7 +365,7 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
           transform={`rotate(-90, ${legendWidth + 40}, ${legendHeight / 2})`}
           dy=".35em"
         >
-          SHAP Value ({colorLabel})
+          {colorLabel}
         </text>
       </g>
     </g>

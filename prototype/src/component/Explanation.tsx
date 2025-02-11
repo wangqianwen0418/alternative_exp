@@ -12,6 +12,7 @@ import {
   diabetes_bmi_featureValues,
   diabetes_bmi_shapValues,
   diabetes_age_shapValues,
+  diabetes_age_featureValues,
   // diabetes_s5_shapValues,
   // diabetes_s5_featureValues,
 } from "../util/diabetesData";
@@ -24,6 +25,7 @@ import { useAtom } from "jotai";
 import { initVisAtom, insightAtom, isSubmittedAtom } from "../store";
 import TwoColorScatter from "./TwoColorScatter";
 import { TGraph } from "../util/types";
+import { yellow } from "@mui/material/colors";
 
 function getRandomPoints(arr: number[]) {
   if (arr.length < 25) {
@@ -143,6 +145,7 @@ export default function Explanation() {
           height={400}
           id="bar"
           offsets={[0, 0]}
+          highlightedFeatures={(initVis as TGraph).features}
         />
       );
       break;
@@ -167,7 +170,9 @@ export default function Explanation() {
           colorValues={diabetes_age_shapValues}
           width={600}
           height={400}
-          label="two-color-scatter"
+          id="two-color-initial"
+          xLabel="BMI feature values"
+          yLabel="BMI SHAP values"
           colorLabel="age"
           // annotation={[
           //   [-5, 0],
@@ -281,6 +286,37 @@ export default function Explanation() {
             height={350}
             title="Diabetes Heatmap"
             boldFeatureNames={insight?.graph.features}
+          />
+        );
+        break;
+
+      case "two-scatter":
+        additionalVisualizations = isSubmitted && (
+          <TwoColorScatter
+            xValues={
+              variableMapping[insight?.graph.xValues] ||
+              diabetes_bmi_featureValues
+            }
+            yValues={
+              variableMapping[insight?.graph.yValues] ||
+              diabetes_bmi_featureValues
+            }
+            colorValues={
+              variableMapping[
+                insight?.graph.colorValues ?? "Age feature values"
+              ]
+            }
+            width={600}
+            height={400}
+            id="two-color-additional"
+            xLabel={insight?.graph?.xValues ?? ""}
+            yLabel={insight?.graph?.yValues ?? ""}
+            colorLabel={insight?.graph?.colorValues ?? ""}
+            annotation={
+              insight?.graph.annotation
+                ? insight?.graph.annotation[0]
+                : undefined
+            }
           />
         );
         break;

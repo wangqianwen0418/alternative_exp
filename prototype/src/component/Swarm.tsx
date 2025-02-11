@@ -598,7 +598,9 @@ export default function Swarm(props: SwarmProps) {
         const isAnnotationForDataset =
           annotation && annotation.label === datasetID;
 
-        console.log("next check: " + annotation + ", label: " + annotation?.label);
+        console.log(
+          "next check: " + annotation + ", label: " + annotation?.label
+        );
 
         return (
           <g
@@ -624,20 +626,23 @@ export default function Swarm(props: SwarmProps) {
             >
               {truncatedLabel}
             </text>
+            <>
+              {annotation &&
+                annotation.type === "singleLine" &&
+                annotation.xValue !== undefined && (
+                  <line
+                    x1={xScale(annotation.xValue!)}
+                    x2={xScale(annotation.xValue!)}
+                    y1={yCenters[datasetIndex] - plotHeight / 2}
+                    y2={yCenters[datasetIndex] + plotHeight / 2}
+                    stroke="black"
+                    strokeDasharray="4,2"
+                  />
+                )}
+            </>
 
             {isAnnotationForDataset && annotation && (
               <>
-                {annotation.type === "singleLine" &&
-                  annotation.xValue !== undefined && (
-                    <line
-                      x1={xScale(annotation.xValue!)}
-                      x2={xScale(annotation.xValue!)}
-                      y1={yCenters[datasetIndex] - plotHeight / 2}
-                      y2={yCenters[datasetIndex] + plotHeight / 2}
-                      stroke="black"
-                      strokeDasharray="4,2"
-                    />
-                  )}
                 {annotation.type === "highlightRange" && (
                   <>
                     {isFinite(annotation.xRange![0]) && (
