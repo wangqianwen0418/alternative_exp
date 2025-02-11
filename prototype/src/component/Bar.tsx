@@ -260,12 +260,14 @@ export default function Bar(props: BarProps) {
         {sortedAvgShapeValues.map(([featureName, value]) => {
           const isSelected =
             selectedBars.length > 0 ? selectedBars.includes(featureName) : true;
-          const textStyle = isSelected
-            ? {fill: "black", fontWeight: "bold"}
-            : {fill: "gray", fontWeight: "normal"};
-        
-          console.log(featureName);
-          console.log(isSelected);
+          const textStyle =
+            highlightedFeatures && highlightedFeatures.length > 0
+              ? isSelected
+                ? { fill: "black", fontWeight: "bold" }
+                : { fill: "gray", fontWeight: "normal" }
+              : { fill: "black", fontWeight: "normal" };
+          // console.log(featureName);
+          // console.log(isSelected);
           return (
             <g
               key={featureName}

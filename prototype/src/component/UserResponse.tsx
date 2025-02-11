@@ -31,6 +31,7 @@ import {
 } from "../store";
 import { test_weburl } from "../util/appscript_url";
 import Cookies from "js-cookie";
+import { TGraph } from "../util/types";
 
 const confidenceOptions = [
   { value: "", label: "Please select" },
@@ -107,7 +108,7 @@ export default function UserResponse() {
       currentIndex: currentQuestionIndex,
       questionOrder: questionIndexesArray.toString(),
       freeText,
-      currentVis: initVis,
+      currentVis: (initVis as TGraph).graphType,
       isSecondPart: isSecondPart ? "Yes" : "No",
       userAnswer,
       confidence: confidence.value,
@@ -178,11 +179,11 @@ export default function UserResponse() {
           aria-labelledby="demo-row-radio-buttons-group-label"
           name="row-radio-buttons-group"
         >
-          <div
+          <label
             style={{
               display: "flex",
               alignItems: "center",
-              marginRight: "16px",
+              cursor: "pointer",
             }}
           >
             <Radio
@@ -192,13 +193,13 @@ export default function UserResponse() {
             <span>
               <b>Correct</b>: the visualization clearly supports this statement.
             </span>
-          </div>
+          </label>
 
-          <div
+          <label
             style={{
               display: "flex",
               alignItems: "center",
-              marginRight: "16px",
+              cursor: "pointer",
             }}
           >
             <Radio
@@ -208,9 +209,15 @@ export default function UserResponse() {
             <span>
               <b>Incorrect</b>: the visualization contradicts this statement.
             </span>
-          </div>
+          </label>
 
-          <div style={{ display: "flex", alignItems: "center" }}>
+          <label
+            style={{
+              display: "flex",
+              alignItems: "center",
+              cursor: "pointer",
+            }}
+          >
             <Radio
               checked={userAnswer === "unsure"}
               onChange={() => setUserAnswer("unsure")}
@@ -219,11 +226,11 @@ export default function UserResponse() {
               <b>Irrelevant</b>: the visualization does not provide enough
               information to confirm or refute this statement.
             </span>
-          </div>
+          </label>
         </RadioGroup>
 
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <span style={{ marginTop: "20px" }}>
+          <span>
             <b>Part 2:</b>{" "}
             {isSecondPart
               ? "Given the new visualization, please rate your confidence"

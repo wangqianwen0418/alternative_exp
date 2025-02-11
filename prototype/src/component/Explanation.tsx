@@ -6,7 +6,6 @@ import {
   diabetesFeatureValues,
   diabetesLabels,
   variableMapping,
-  variableList,
   // test_random_feature,
   // test_random_shap,
   diabetes_bmi_featureValues,
@@ -86,12 +85,13 @@ export default function Explanation() {
 
   switch ((initVis as TGraph).graphType) {
     case "Swarm":
-      console.log("Explanation IDs: " + diabetesLabels);
+      // console.log("Explanation IDs: " + diabetesLabels);
       initialVisualization = (
         <Swarm
           xValues={diabetesShapValues}
           colorValues={diabetesFeatureValues}
-          ids={diabetesLabels}
+          id="swarm-initVis"
+          labels={diabetesLabels}
           // xValues={[diabetes_s5_shapValues]}
           // colorValues={[diabetes_s5_featureValues]}
           // ids={["serum triglycerides level"]}
@@ -117,7 +117,7 @@ export default function Explanation() {
           }
           width={450}
           height={350}
-          id="bmi"
+          id="scatter-initVis"
           offsets={[0, 0]}
           selectedIndices={selectedIndices}
           setSelectedIndices={setSelectedIndices}
@@ -143,7 +143,7 @@ export default function Explanation() {
           featureNames={shap_diabetes["feature_names"].slice(0, 100)}
           width={600}
           height={400}
-          id="bar"
+          id="bar-initVis"
           offsets={[0, 0]}
           highlightedFeatures={(initVis as TGraph).features}
         />
@@ -155,10 +155,10 @@ export default function Explanation() {
           shapValuesArray={diabetesShapValues}
           featureValuesArray={diabetesFeatureValues}
           labels={diabetesLabels}
-          // boldFeatureNames={["sex", "age"]}
           width={600}
           height={350}
           title="Diabetes Heatmap"
+          // featuresToShow={["sex", "age"]}
         />
       );
       break;
@@ -200,7 +200,7 @@ export default function Explanation() {
             featureNames={shap_diabetes["feature_names"].slice(0, 100)}
             width={600}
             height={400}
-            id="bar"
+            id="bar-secondVis"
             offsets={[0, 0]}
             annotation={
               insight?.graph.annotation
@@ -225,7 +225,7 @@ export default function Explanation() {
               }
               width={600}
               height={400}
-              id="bmi-scatter"
+              id="scatter-secondVis"
               offsets={[0, 0]}
               selectedIndices={selectedIndices}
               setSelectedIndices={setSelectedIndices}
@@ -241,7 +241,7 @@ export default function Explanation() {
         );
         break;
       case "Swarm":
-        console.log("Swarm");
+        // console.log("Swarm");
         let swarmFeatureValues = [[0.0]];
         let swarmFeatureShapValues = [[0]];
         if (insight.graph?.features) {
@@ -262,7 +262,8 @@ export default function Explanation() {
               xValues={diabetesShapValues}
               width={600}
               height={400}
-              ids={diabetesLabels}
+              id="swarm-secondVis"
+              labels={diabetesLabels}
               featuresToShow={insight.graph?.features}
               selectedIndices={selectedIndices}
               setSelectedIndices={setSelectedIndices}
