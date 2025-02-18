@@ -113,8 +113,8 @@ export default function Explanation() {
             variableMapping[(initVis as TGraph).yValues] ||
             diabetes_bmi_shapValues
           }
-          width={450}
-          height={350}
+          width={600}
+          height={400}
           id="scatter-initVis"
           offsets={[0, 0]}
           selectedIndices={selectedIndices}

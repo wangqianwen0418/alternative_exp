@@ -145,7 +145,6 @@ export const diabetesShapValues = [
   diabetes_bp_shapValues,
   diabetes_age_shapValues,
   diabetes_sex_shapValues,
-  diabetes_s2_shapValues
 ];
 
 export const diabetesFeatureValues = [
@@ -154,7 +153,6 @@ export const diabetesFeatureValues = [
   diabetes_bp_featureValues,
   diabetes_age_featureValues,
   diabetes_sex_featureValues,
-  diabetes_s2_featureValues
 ];
 
 export const diabetesLabels = [
@@ -163,7 +161,6 @@ export const diabetesLabels = [
   diabetes_bp,
   diabetes_age,
   diabetes_sex,
-  diabetes_s2
 ];
 
 function getRandomPoints(arr: number[]) {

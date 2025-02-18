@@ -231,16 +231,28 @@ export default function Scatter(props: ScatterProps) {
       )}, Min: ${formatValue(yMinVal)}, Max: ${formatValue(yMaxVal)}`;
 
       elements.push(
-        <text
-          key="highlightStats"
-          x={(margin[3] + (width - margin[1])) / 2}
-          y={margin[0] / 2 + 3}
-          fill="black"
-          fontSize={labelFontSize}
-          textAnchor="middle"
-        >
-          {statsText}
-        </text>
+        <>
+          <text
+            key="highlightSelectedCount"
+            x={(margin[3] + (width - margin[1])) / 2}
+            y={margin[0] / 2 + 3} // Adjust to position it above
+            fill="black"
+            fontSize={labelFontSize}
+            textAnchor="middle"
+          >
+            Selected Points: {selectedIndices.length}
+          </text>
+          <text
+            key="highlightStats"
+            x={(margin[3] + (width - margin[1])) / 2}
+            y={margin[0] / 2 + 17}
+            fill="black"
+            fontSize={labelFontSize}
+            textAnchor="middle"
+          >
+            {statsText}
+          </text>
+        </>
       );
     } else {
       elements.push(

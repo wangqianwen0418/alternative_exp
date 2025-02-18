@@ -52,7 +52,7 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
     return d3
       .scaleLinear<string>()
       .domain([minColor, maxColor])
-      .range(["#008bfc", "#ff0051"]);
+      .range(["#add8e6", "#ff0051"]);
   }, [minColor, maxColor]);
 
   const [sliderRange, setSliderRange] = useState<[number, number]>([
@@ -161,10 +161,10 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
       for (let [low, high] of annotation) {
         if (val >= low && val <= high) return 0.8;
       }
-      return 0.1;
+      return 0;
     } else {
       const [low, high] = sliderRange;
-      return val >= low && val <= high ? 0.8 : 0.1;
+      return val >= low && val <= high ? 0.8 : 0;
     }
   }
 
@@ -199,7 +199,7 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
             x2="0"
             y2="0"
           >
-            <stop offset="0%" stopColor="#008bfc" />
+            <stop offset="0%" stopColor="#add8e6" />
             <stop offset="100%" stopColor="#ff0051" />
           </linearGradient>
         </defs>

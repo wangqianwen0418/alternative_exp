@@ -564,17 +564,28 @@ export default function Swarm(props: SwarmProps) {
 
       <g className="annotations">
         {datasetStats ? (
-          <text
-            x={(width - margin[1] - margin[3]) / 2 + margin[3]}
-            y={margin[0] - 10}
-            textAnchor="middle"
-            fontSize={labelFontSize}
-            fill="black"
-          >
-            {`X - Avg: ${formatValue(datasetStats.avg)}, Min: ${formatValue(
-              datasetStats.min
-            )}, Max: ${formatValue(datasetStats.max)}`}
-          </text>
+          <>
+            <text
+              x={(width - margin[1] - margin[3]) / 2 + margin[3]}
+              y={margin[0] - 18}
+              textAnchor="middle"
+              fontSize={labelFontSize}
+              fill="black"
+            >
+              Selected Points: {selectedIndices.length}
+            </text>
+            <text
+              x={(width - margin[1] - margin[3]) / 2 + margin[3]}
+              y={margin[0] - 4}
+              textAnchor="middle"
+              fontSize={labelFontSize}
+              fill="black"
+            >
+              {`X - Avg: ${formatValue(datasetStats.avg)}, Min: ${formatValue(
+                datasetStats.min
+              )}, Max: ${formatValue(datasetStats.max)}`}
+            </text>
+          </>
         ) : (
           <text
             x={(width - margin[1] - margin[3]) / 2 + margin[3]}
