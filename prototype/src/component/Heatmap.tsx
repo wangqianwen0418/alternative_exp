@@ -180,7 +180,7 @@ export default function Heatmap({
 
   const legendHeight = totalBarAreaHeight;
   const legendBarWidth = 10;
-  const legendXOffset = textXOffset + 45;
+  const legendXOffset = textXOffset + 20;
   const legendYStart = centerY - legendHeight / 2;
 
   const legendTopLabelY = legendYStart - 5;
@@ -274,15 +274,6 @@ export default function Heatmap({
                   />
                 );
               })}
-              <text
-                x={textXOffset}
-                y={textY}
-                textAnchor="start"
-                fontSize={labelFontSizePx}
-                fill="black"
-              >
-                {averageShap.toFixed(2)}
-              </text>
             </g>
           );
         })}
@@ -326,14 +317,6 @@ export default function Heatmap({
           transform={`rotate(-90, ${shapValuesLabelX}, ${legendMidY})`}
         >
           SHAP Values
-        </text>
-        <text
-          x={10 + textXOffset}
-          y={top + totalBarAreaHeight + 20}
-          textAnchor="middle"
-          fontSize={labelFontSizePx}
-        >
-          |Avg. SHAP|
         </text>
 
         {truncatedLabels.map((label, idx) => {
