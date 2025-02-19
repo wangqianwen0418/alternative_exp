@@ -27,7 +27,7 @@ export type TAnnotation =
       yRange?: [number, number];
       label?: string, feature?: string;
     } // A range along X axis
-  | { type: "singleLine"; xValue?: number; yValue?: number; label?: string } // A vertical line at a specific X value
+  | { type: "singleLine"; xValue?: number; yValue?: number; label?: string } // A vertical line at a specific X/Y value
   | { type: "twoColorRange"; range: Array<[number,number]>, label?: string };
 
 export type TGraph = {
@@ -35,7 +35,8 @@ export type TGraph = {
   xValues: string;
   yValues: string;
   annotation?: TAnnotation[];
-  features?: string[];
+  featuresToHighlight?: string[];
+  featuresToShow?: string[];
   colorValues?: string;
 };
 

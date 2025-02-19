@@ -42,6 +42,7 @@ import { v4 as uuidv4 } from "uuid";
 import Cookies from "js-cookie";
 import { generateQuestionOrder } from "./util/questionBalance";
 import Tutorial from "./component/Tutorial";
+import Demographics from "./component/Demographics";
 
 function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
   const [open, setOpen] = useState(false); // sider drawer
@@ -55,12 +56,22 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
   const [, setQuestionOrder] = useAtom(questionOrderAtom);
   const [showTutorial, setShowTutorial] = useAtom(tutorialAtom);
 
+  const [demographics, setDemographics] = useState<any>(null);
+  const [showDemographics, setShowDemographics] = useState(false)
+
   let uuid = Cookies.get("uuid");
 
   if (!uuid) {
     uuid = uuidv4();
     Cookies.set("uuid", uuid);
   }
+
+  useEffect(() => {
+    const demographicsSubmitted = Cookies.get("demographicsSubmitted");
+    if (!demographicsSubmitted) {
+      setShowDemographics(true);
+    }
+  }, [])
 
   useEffect(() => {
     const tutorialSeen = Cookies.get("showTutorial");
@@ -71,6 +82,7 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
       setShowTutorial(false);
     }
   }, [setShowTutorial]);
+
 
   useEffect(() => {
     setUUID(uuid);
@@ -216,7 +228,19 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
           <CounterbalanceButton />
         </Paper> */}
       </Grid>
-      {"index" in appProps && (
+
+      {"index" in appProps && showDemographics && (
+        <Demographics
+          show={showDemographics}
+          onSubmit={(data) => {
+            setDemographics(data);
+            setShowDemographics(false);
+            Cookies.set("demographicsSubmitted", "true", { expires: 365 });
+          }}
+        />
+      )}
+      
+      {"index" in appProps && !showDemographics && (
         <Tutorial
           show={showTutorial}
           onClose={() => {

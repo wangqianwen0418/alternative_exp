@@ -10,7 +10,8 @@ interface BarProps {
   id: string;
   offsets: number[];
   annotation?: TAnnotation;
-  highlightedFeatures?: string[];
+  featuresToHighlight?: string[];
+  featuresToShow?: string[];
 }
 
 export default function Bar(props: BarProps) {
@@ -28,7 +29,8 @@ export default function Bar(props: BarProps) {
     id,
     offsets,
     annotation,
-    highlightedFeatures,
+    featuresToHighlight: featuresToHighlight,
+    featuresToShow: featuresToShow,
   } = props;
 
   const [selectedBars, setSelectedBars] = useState<string[]>([]);
@@ -44,15 +46,37 @@ export default function Bar(props: BarProps) {
     return null;
   }, []);
 
+  const effectiveFeaturesToShow = useMemo(() => {
+    return (featuresToShow && featuresToShow.length > 0)
+      ? featuresToShow
+      : ["serum triglycerides level", "bmi", "blood pressure", "age", "sex", "low-density lipoproteins"]; //default array
+  }, [featuresToShow]);
+
+  const filteredIndices = useMemo(() => {
+    return featureNames.reduce((acc: number[], name, idx) => {
+      if (effectiveFeaturesToShow.includes(name)) {
+        acc.push(idx);
+      }
+      return acc;
+    }, []);
+  }, [featureNames, effectiveFeaturesToShow]);
+
+  const filteredFeatureNames = useMemo(() => {
+    return filteredIndices.map((i) => featureNames[i]);
+  }, [filteredIndices, featureNames]);
+
+  const filteredShapValues = useMemo(() => {
+    return allShapValues.map((row) => filteredIndices.map((i) => row[i]));
+  }, [allShapValues, filteredIndices]);
+
   const truncatedLabels = useMemo(() => {
     if (!canvasContext) {
-      return featureNames.map((f) =>
+      return filteredFeatureNames.map((f) =>
         f.length > 5 ? f.slice(0, 5) + "..." : f
       );
     }
-
     canvasContext.font = `${labelFontSize}px sans-serif`;
-    return featureNames.map((f) => {
+    return filteredFeatureNames.map((f) => {
       let label = f;
       while (
         canvasContext.measureText(label).width > maxLabelWidth &&
@@ -71,29 +95,28 @@ export default function Bar(props: BarProps) {
       }
       return label;
     });
-  }, [featureNames, canvasContext, labelFontSize, maxLabelWidth]);
+  }, [filteredFeatureNames, canvasContext, labelFontSize, maxLabelWidth]);
 
   const truncatedLabelsMap = useMemo(() => {
     const map: { [key: string]: string } = {};
-    featureNames.forEach((f, i) => {
+    filteredFeatureNames.forEach((f, i) => {
       map[f] = truncatedLabels[i];
     });
     return map;
-  }, [featureNames, truncatedLabels]);
+  }, [filteredFeatureNames, truncatedLabels]);
 
   const sortedAvgShapeValues = useMemo(() => {
     let avgShapeValues: { [featureName: string]: number } = {};
-    for (let i = 0; i < featureNames.length; i++) {
-      avgShapeValues[featureNames[i]] =
-        allShapValues
-          .map((val) => Math.abs(val[i]))
-          .reduce((a, b) => a + b, 0) / allShapValues.length;
+    for (let j = 0; j < filteredFeatureNames.length; j++) {
+      const featureName = filteredFeatureNames[j];
+      const values = filteredShapValues.map((row) => Math.abs(row[j]));
+      avgShapeValues[featureName] =
+        values.reduce((a, b) => a + b, 0) / values.length;
     }
 
     return Object.entries(avgShapeValues)
-      .sort((a, b) => a[1] - b[1])
-      .reverse();
-  }, [allShapValues, featureNames]);
+      .sort((a, b) => b[1] - a[1]); // Sorted descending by average value
+  }, [filteredFeatureNames, filteredShapValues]);
 
   const yScale = useMemo(
     () =>
@@ -122,8 +145,8 @@ export default function Bar(props: BarProps) {
 
   const confidenceIntervals = useMemo(() => {
     const intervals: { [key: string]: [number, number] } = {};
-    featureNames.forEach((featureName, index) => {
-      const values = allShapValues.map((val) => Math.abs(val[index]));
+    filteredFeatureNames.forEach((featureName, j) => {
+      const values = filteredShapValues.map((row) => Math.abs(row[j]));
       const mean = d3.mean(values) as number;
       const stdDev = d3.deviation(values) as number;
       const n = values.length;
@@ -135,7 +158,12 @@ export default function Bar(props: BarProps) {
       ];
     });
     return intervals;
-  }, [featureNames, allShapValues]);
+  }, [filteredFeatureNames, filteredShapValues]);
+
+  const maxXValue = useMemo(() => {
+    const flatValues = filteredShapValues.flat();
+    return flatValues.length ? Math.max(...flatValues.map((d) => Math.abs(d))) : 0;
+  }, [filteredShapValues]);
 
   useEffect(() => {
     d3.select(`g.bar#${id}`).selectAll("g.x-axis").remove();
@@ -151,7 +179,7 @@ export default function Bar(props: BarProps) {
   useEffect(() => {
     if (
       !annotation &&
-      (!highlightedFeatures || highlightedFeatures.length === 0)
+      (!featuresToHighlight || featuresToHighlight.length === 0)
     ) {
       if (!brushGroupRef.current) {
         const brushGroup = d3
@@ -227,12 +255,12 @@ export default function Bar(props: BarProps) {
 
   useEffect(() => {
     // If there are highlighted features, set them as selected bars
-    if (highlightedFeatures && highlightedFeatures.length > 0) {
+    if (featuresToHighlight && featuresToHighlight.length > 0) {
       // console.log("FEATURES TO HIGHLIGHT: " + highlightedFeatures);
-      setSelectedBars(highlightedFeatures);
+      setSelectedBars(featuresToHighlight);
       d3.selectAll(`g.bar#${id} .bars g.bar-group`).each(function () {
         const featureName = d3.select(this).attr("data-feature-name");
-        const isSelected = highlightedFeatures.includes(featureName);
+        const isSelected = featuresToHighlight.includes(featureName);
         d3.select(this).attr("opacity", isSelected ? 1 : 0.3);
       });
     } else {
@@ -240,7 +268,7 @@ export default function Bar(props: BarProps) {
       setSelectedBars([]);
       d3.selectAll(`g.bar#${id} .bars g.bar-group`).attr("opacity", 1);
     }
-  }, [highlightedFeatures, id]);
+  }, [featuresToHighlight, id]);
 
   return (
     <g
@@ -261,7 +289,7 @@ export default function Bar(props: BarProps) {
           const isSelected =
             selectedBars.length > 0 ? selectedBars.includes(featureName) : true;
           const textStyle =
-            highlightedFeatures && highlightedFeatures.length > 0
+            featuresToHighlight && featuresToHighlight.length > 0
               ? isSelected
                 ? { fill: "black", fontWeight: "bold" }
                 : { fill: "gray", fontWeight: "normal" }
@@ -311,7 +339,7 @@ export default function Bar(props: BarProps) {
         textAnchor="middle"
         fontSize={labelFontSize}
       >
-        Average SHAP Value
+        Average SHAP (Contribution) Value
       </text>
 
       {annotation?.type === "singleLine" && (

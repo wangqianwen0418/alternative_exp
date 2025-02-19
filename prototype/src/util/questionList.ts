@@ -9,13 +9,14 @@ export const QuestionList: TQuestion[] = [
       graphType: "Swarm",
       xValues: "None",
       yValues: "None",
-      features: ["bmi"],
+      featuresToHighlight: ["bmi"],
+      featuresToShow: ["bmi", "serum triglycerides level", "blood pressure"],
     },
     secondVis: "scatter", // randomly chosen
     newVis: {
       graphType: "Scatter",
       xValues: "BMI feature values",
-      yValues: "BMI SHAP values",
+      yValues: "BMI SHAP (Contribution) values",
       annotation: [
         {
           type: "singleLine",
@@ -39,7 +40,8 @@ export const QuestionList: TQuestion[] = [
         graphType: "Bar",
         xValues: "None",
         yValues: "None",
-        features: ["bmi"],
+        featuresToHighlight: ["bmi"],
+        featuresToShow: ["bmi", "serum triglycerides level", "blood pressure"],
         annotation: [
           {
             type: "singleLine",
@@ -60,14 +62,15 @@ export const QuestionList: TQuestion[] = [
       graphType: "Swarm",
       xValues: "None",
       yValues: "None",
-      features: ["serum triglycerides level", "blood sugar"],
+      featuresToHighlight: ["serum triglycerides level", "blood sugar"],
+      featuresToShow: ["serum triglycerides level", "blood sugar", "bmi", "age"],
     },
     secondVis: "bar",
     newVis: {
       graphType: "Bar",
       xValues: "None",
       yValues: "None",
-      features: ["serum "],
+      featuresToHighlight: ["serum "],
       annotation: [
         {
           type: "singleLine",
@@ -91,7 +94,8 @@ export const QuestionList: TQuestion[] = [
         graphType: "Bar",
         xValues: "None",
         yValues: "None",
-        features: ["serum triglycerides level", "blood sugar"],
+        featuresToHighlight: ["serum triglycerides level", "blood sugar"],
+        featuresToShow: ["serum triglycerides level", "blood sugar", "bmi", "age"],
         annotation: [
           {
             type: "singleLine",
@@ -112,7 +116,8 @@ export const QuestionList: TQuestion[] = [
       graphType: "Swarm",
       xValues: "None",
       yValues: "None",
-      features: ["serum triglycerides level"],
+      featuresToHighlight: ["serum triglycerides level"],
+      featuresToShow: ["serum triglycerides level", "bmi", "blood sugar"],
       // annotation: [
       //   {type: "singleLine",
       //     xValue: 30,
@@ -123,7 +128,7 @@ export const QuestionList: TQuestion[] = [
     newVis: {
       graphType: "Scatter",
       xValues: "Serum triglycerides feature values",
-      yValues: "Serum triglycerides SHAP values",
+      yValues: "Serum triglycerides SHAP (Contribution) values",
       annotation: [
         {
           type: "singleLine",
@@ -146,8 +151,9 @@ export const QuestionList: TQuestion[] = [
       graph: {
         graphType: "Scatter",
         xValues: "Serum triglycerides feature values",
-        yValues: "Serum triglycerides SHAP values",
-        features: ["serum triglycerides level"],
+        yValues: "Serum triglycerides SHAP (Contribution) values",
+        featuresToHighlight: ["serum triglycerides level"],
+        //featuresToShow: ["serum triglycerides level", "bmi", "blood sugar"]
         annotation: [
           {
             type: "singleLine",
@@ -168,14 +174,15 @@ export const QuestionList: TQuestion[] = [
       graphType: "Swarm",
       xValues: "None",
       yValues: "None",
-      features: ["blood sugar"],
+      featuresToHighlight: ["blood sugar"],
+      featuresToShow: ["blood sugar", "age", "sex", "bmi", "serum triglycerides level"],
     },
     secondVis: "bar",
     newVis: {
       graphType: "Bar",
       xValues: "None",
       yValues: "None",
-      features: ["serum cholesterol"],
+      featuresToHighlight: ["serum cholesterol"],
       annotation: [
         {
           type: "singleLine",
@@ -198,7 +205,7 @@ export const QuestionList: TQuestion[] = [
       graph: {
         graphType: "Scatter",
         xValues: "Blood sugar feature values",
-        yValues: "Blood sugar SHAP values",
+        yValues: "Blood sugar SHAP (Contribution) values",
       },
     },
     testCondition: "ours",
@@ -213,14 +220,15 @@ export const QuestionList: TQuestion[] = [
       graphType: "Heatmap",
       xValues: "none",
       yValues: "none",
-      features: ["blood pressure", "age"],
+      featuresToHighlight: ["blood pressure", "age"],
+      featuresToShow: ["blood pressure", "age", "sex", "blood sugar", "low-density lipoproteins"], 
     },
     secondVis: "beeswarm", // randomly chosen
     newVis: {
       graphType: "Swarm",
       xValues: "none",
       yValues: "none",
-      features: ["blood pressure, age"],
+      featuresToHighlight: ["blood pressure, age"],
       annotation: [
         {
           type: "singleLine",
@@ -248,7 +256,8 @@ export const QuestionList: TQuestion[] = [
         graphType: "Swarm",
         xValues: "blood pressure",
         yValues: "none",
-        features: ["blood pressure", "age"],
+        featuresToHighlight: ["blood pressure", "age"],
+        featuresToShow: ["blood pressure", "age", "sex", "blood sugar"],
         annotation: [{ type: "singleLine", xValue: 5 }],
       },
     },
@@ -263,14 +272,14 @@ export const QuestionList: TQuestion[] = [
     initVis: {
       graphType: "Scatter",
       xValues: "BMI feature values",
-      yValues: "BMI SHAP values",
+      yValues: "BMI SHAP (Contribution) values",
     },
     secondVis: "bar", // randomly chosen
     newVis: {
       graphType: "Bar",
       xValues: "None",
       yValues: "None",
-      features: ["bmi", "sex"],
+      featuresToHighlight: ["bmi", "sex"],
       annotation: [
         {
           type: "singleLine",
@@ -298,7 +307,8 @@ export const QuestionList: TQuestion[] = [
         graphType: "Bar",
         xValues: "None",
         yValues: "None",
-        features: ["bmi", "sex"],
+        featuresToHighlight: ["bmi", "sex"],
+        featuresToShow: ["blood pressure", "bmi", "sex", "blood sugar"],
         annotation: [
           {
             type: "singleLine",
@@ -318,7 +328,7 @@ export const QuestionList: TQuestion[] = [
     initVis: {
       graphType: "Scatter",
       xValues: "LDL feature values",
-      yValues: "LDL SHAP values",
+      yValues: "LDL SHAP (Contribution) values",
     },
     secondVis: "beeswarm",
     newVis: {
@@ -348,8 +358,9 @@ export const QuestionList: TQuestion[] = [
         graphType: "Swarm",
         xValues: "None",
         yValues: "None",
-        features: ["age", "low-density lipoproteins"],
-        annotation: [{ type: "singleLine", xValue: 0 }],
+        featuresToHighlight: ["age", "low-density lipoproteins"],
+        featuresToShow: ["low-density lipoproteins", "age", "sex", "blood sugar", "serum triglycerides level"],
+        //annotation: [{ type: "singleLine", xValue: 0 }],
       },
     },
     testCondition: "ours",
@@ -363,14 +374,15 @@ export const QuestionList: TQuestion[] = [
     initVis: {
       graphType: "Scatter",
       xValues: "Blood pressure feature values",
-      yValues: "Blood pressure SHAP values",
+      yValues: "Blood pressure SHAP (Contribution) values",
     },
     secondVis: "bar", // randomly chosen
     newVis: {
       graphType: "Bar",
       xValues: "None",
       yValues: "None",
-      features: ["blood pressure", "age"],
+      featuresToHighlight: ["blood pressure", "age"],
+      featuresToShow: ["blood pressure", "age", "sex", "blood sugar"],
       annotation: [
         {
           type: "singleLine",
@@ -398,7 +410,8 @@ export const QuestionList: TQuestion[] = [
         graphType: "Bar",
         xValues: "BMI",
         yValues: "BMI",
-        features: ["blood pressure", "age"],
+        featuresToHighlight: ["blood pressure", "age"],
+        featuresToShow: ["blood pressure", "age", "sex", "blood sugar"],
         annotation: [
           {
             type: "singleLine",
@@ -419,13 +432,14 @@ export const QuestionList: TQuestion[] = [
       graphType: "Heatmap",
       xValues: "None",
       yValues: "None",
-      features: ["blood pressure"],
+      featuresToHighlight: ["blood pressure"],
+      featuresToShow: ["blood pressure", "age", "sex", "blood sugar"],
     },
     secondVis: "scatter",
     newVis: {
       graphType: "Scatter",
       xValues: "Blood pressure feature values",
-      yValues: "Blood pressure SHAP values",
+      yValues: "Blood pressure SHAP (Contribution) values",
     },
     insight: {
       variables: [
@@ -446,7 +460,7 @@ export const QuestionList: TQuestion[] = [
       graph: {
         graphType: "Scatter",
         xValues: "blood pressure feature values",
-        yValues: "blood pressure SHAP values",
+        yValues: "blood pressure SHAP (Contribution) values",
       },
     },
     testCondition: "ours",
@@ -461,13 +475,14 @@ export const QuestionList: TQuestion[] = [
       graphType: "Heatmap",
       xValues: "None",
       yValues: "None",
-      features: ["age"],
+      featuresToHighlight: ["age"],
+      featuresToShow: ["blood pressure", "age", "sex", "blood sugar"],
     },
     secondVis: "scatter", // randomly chosen
     newVis: {
       graphType: "Scatter",
       xValues: "Age feature values",
-      yValues: "Age SHAP values",
+      yValues: "Age SHAP (Contribution) values",
       annotation: [
         {
           type: "highlightRange",
@@ -509,7 +524,7 @@ export const QuestionList: TQuestion[] = [
       graph: {
         graphType: "Scatter",
         xValues: "Age feature values",
-        yValues: "Age SHAP values",
+        yValues: "Age SHAP (Contribution) values",
         annotation: [
           {
             type: "highlightRange",
@@ -530,13 +545,14 @@ export const QuestionList: TQuestion[] = [
       graphType: "Heatmap",
       xValues: "None",
       yValues: "None",
-      features: ["bmi"],
+      featuresToHighlight: ["bmi"],
+      featuresToShow: ["blood pressure", "age", "sex", "blood sugar"],
     },
     secondVis: "scatter",
     newVis: {
       graphType: "Scatter",
       xValues: "BMI feature values",
-      yValues: "BMI SHAP values",
+      yValues: "BMI SHAP (Contribution) values",
       annotation: [
         {
           type: "highlightRange",
@@ -563,7 +579,7 @@ export const QuestionList: TQuestion[] = [
       graph: {
         graphType: "Scatter",
         xValues: "BMI feature values",
-        yValues: "BMI SHAP values",
+        yValues: "BMI SHAP (Contribution) values",
         annotation: [
           {
             type: "highlightRange",
@@ -584,13 +600,14 @@ export const QuestionList: TQuestion[] = [
       graphType: "Heatmap",
       xValues: "None",
       yValues: "None",
-      features: ["bmi", "age"],
+      featuresToHighlight: ["bmi", "age"],
+      featuresToShow: ["blood pressure", "bmi", "sex", "blood sugar"],
     },
     secondVis: "scatter",
     newVis: {
       graphType: "Scatter",
       xValues: "BMI feature values",
-      yValues: "BMI SHAP values",
+      yValues: "BMI SHAP (Contribution) values",
     },
     insight: {
       variables: [
@@ -617,7 +634,7 @@ export const QuestionList: TQuestion[] = [
       graph: {
         graphType: "two-scatter",
         xValues: "BMI feature values",
-        yValues: "BMI SHAP values",
+        yValues: "BMI SHAP (Contribution) values",
         colorValues: "Age feature values",
         annotation: [
           {
