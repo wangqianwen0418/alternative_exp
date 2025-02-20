@@ -6,16 +6,12 @@ import {
   diabetesFeatureValues,
   diabetesLabels,
   variableMapping,
-  // test_random_feature,
-  // test_random_shap,
   diabetes_bmi_featureValues,
   diabetes_bmi_shapValues,
   diabetes_age_shapValues,
   s2DiabetesFeatureValues,
   s2DiabetesShapValues,
   s2DiabetesLabels,
-  // diabetes_s5_shapValues,
-  // diabetes_s5_featureValues,
 } from "../util/diabetesData";
 import { useState, useEffect, useRef } from "react";
 import Heatmap from "./Heatmap";
@@ -26,25 +22,6 @@ import { useAtom } from "jotai";
 import { initVisAtom, insightAtom, isSubmittedAtom } from "../store";
 import TwoColorScatter from "./TwoColorScatter";
 import { TGraph } from "../util/types";
-
-function getRandomPoints(arr: number[]) {
-  if (arr.length < 25) {
-    throw new Error("Array has fewer than 25 points.");
-  }
-
-  const randomPoints = [];
-  const randomIndices = new Set();
-
-  while (randomIndices.size < 25) {
-    const randomIndex = Math.floor(Math.random() * arr.length);
-    if (!randomIndices.has(randomIndex)) {
-      randomIndices.add(randomIndex);
-      randomPoints.push(arr[randomIndex]);
-    }
-  }
-
-  return randomPoints;
-}
 
 export default function Explanation() {
   const [isSubmitted] = useAtom(isSubmittedAtom);

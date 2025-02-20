@@ -594,7 +594,7 @@ export default function Swarm(props: SwarmProps) {
             fontSize={labelFontSize}
             fill="black"
           >
-            No data selected
+            {annotation ? "" : "No data selected"}
           </text>
         )}
       </g>
