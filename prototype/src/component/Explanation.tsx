@@ -11,7 +11,9 @@ import {
   diabetes_bmi_featureValues,
   diabetes_bmi_shapValues,
   diabetes_age_shapValues,
-  diabetes_age_featureValues,
+  s2DiabetesFeatureValues,
+  s2DiabetesShapValues,
+  s2DiabetesLabels,
   // diabetes_s5_shapValues,
   // diabetes_s5_featureValues,
 } from "../util/diabetesData";
@@ -24,7 +26,6 @@ import { useAtom } from "jotai";
 import { initVisAtom, insightAtom, isSubmittedAtom } from "../store";
 import TwoColorScatter from "./TwoColorScatter";
 import { TGraph } from "../util/types";
-import { yellow } from "@mui/material/colors";
 
 function getRandomPoints(arr: number[]) {
   if (arr.length < 25) {
@@ -251,19 +252,31 @@ export default function Explanation() {
           swarmFeatureValues = shap_diabetes["feature_values"].map((row) =>
             featureIndices.map((index) => row[index])
           );
-          const featureShapValues = shap_diabetes["shap_values"].map((row) =>
+          swarmFeatureShapValues = shap_diabetes["shap_values"].map((row) =>
             featureIndices.map((index) => row[index])
           );
         }
         additionalVisualizations = isSubmitted && (
           <>
             <Swarm
-              colorValues={diabetesFeatureValues}
-              xValues={diabetesShapValues}
+              colorValues={
+                insight.graph?.features?.includes("low-density lipoproteins")
+                  ? s2DiabetesFeatureValues
+                  : diabetesFeatureValues
+              }
+              xValues={
+                insight.graph?.features?.includes("low-density lipoproteins")
+                  ? s2DiabetesShapValues
+                  : diabetesShapValues
+              }
               width={600}
               height={400}
               id="swarm-secondVis"
-              labels={diabetesLabels}
+              labels={
+                insight.graph?.features?.includes("low-density lipoproteins")
+                  ? s2DiabetesLabels
+                  : diabetesLabels
+              }
               featuresToShow={insight.graph?.features}
               selectedIndices={selectedIndices}
               setSelectedIndices={setSelectedIndices}
