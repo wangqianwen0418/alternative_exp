@@ -339,7 +339,7 @@ export default function Bar(props: BarProps) {
         textAnchor="middle"
         fontSize={labelFontSize}
       >
-        Average SHAP (Contribution) Value
+        |Average SHAP (Contribution)| Value
       </text>
 
       {annotation?.type === "singleLine" && (

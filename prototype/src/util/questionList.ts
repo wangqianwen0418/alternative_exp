@@ -4,7 +4,7 @@ export const QuestionList: TQuestion[] = [
   {
     index: 0,
     pageName: "question",
-    userText: "On average, BMI contributes at least 20 to diabetes risk",
+    userText: "On average, the absolute contribution of BMI to diabetes risk is at least 25",
     initVis: {
       graphType: "Swarm",
       xValues: "None",
@@ -20,7 +20,7 @@ export const QuestionList: TQuestion[] = [
       annotation: [
         {
           type: "singleLine",
-          xValue: 20,
+          xValue: 25,
         },
       ],
     },
@@ -45,13 +45,13 @@ export const QuestionList: TQuestion[] = [
         annotation: [
           {
             type: "singleLine",
-            xValue: 20,
+            xValue: 25,
           },
         ],
       },
     },
     testCondition: "random vis",
-    groundTruth: true,
+    groundTruth: false, //need to check
   },
   {
     index: 1,
@@ -62,15 +62,15 @@ export const QuestionList: TQuestion[] = [
       graphType: "Swarm",
       xValues: "None",
       yValues: "None",
-      featuresToHighlight: ["serum triglycerides level", "blood sugar"],
-      featuresToShow: ["serum triglycerides level", "blood sugar", "bmi", "age"],
+      featuresToHighlight: ["serum triglycerides level", "blood sugar level"],
+      featuresToShow: ["serum triglycerides level", "blood sugar level", "bmi", "age"],
     },
     secondVis: "bar",
     newVis: {
       graphType: "Bar",
       xValues: "None",
       yValues: "None",
-      featuresToHighlight: ["serum "],
+      featuresToHighlight: ["serum triglycer"],
       annotation: [
         {
           type: "singleLine",
@@ -94,8 +94,8 @@ export const QuestionList: TQuestion[] = [
         graphType: "Bar",
         xValues: "None",
         yValues: "None",
-        featuresToHighlight: ["serum triglycerides level", "blood sugar"],
-        featuresToShow: ["serum triglycerides level", "blood sugar", "bmi", "age"],
+        featuresToHighlight: ["serum triglycerides level", "blood sugar level"],
+        featuresToShow: ["serum triglycerides level", "blood sugar level", "bmi", "age"],
         annotation: [
           {
             type: "singleLine",
@@ -111,13 +111,13 @@ export const QuestionList: TQuestion[] = [
     index: 2,
     pageName: "question",
     userText:
-      "On average, serum tryglycerides level contributes 30+ to diabetes risk",
+      "On average, the absolute contribution of serum triglycerides to diabetes risk is over 30",
     initVis: {
       graphType: "Swarm",
       xValues: "None",
       yValues: "None",
       featuresToHighlight: ["serum triglycerides level"],
-      featuresToShow: ["serum triglycerides level", "bmi", "blood sugar"],
+      featuresToShow: ["serum triglycerides level", "bmi", "blood sugar level"],
       // annotation: [
       //   {type: "singleLine",
       //     xValue: 30,
@@ -169,13 +169,13 @@ export const QuestionList: TQuestion[] = [
     index: 3,
     pageName: "question",
     userText:
-      "There is a positive correlation between blood sugar values and the contribution of blood sugar values to diabetes risk",
+      "There is a positive correlation between blood sugar values and the contribution of blood sugar to diabetes risk when the blood sugar value is between -0.05 and 0.05",
     initVis: {
       graphType: "Swarm",
       xValues: "None",
       yValues: "None",
-      featuresToHighlight: ["blood sugar"],
-      featuresToShow: ["blood sugar", "age", "sex", "bmi", "serum triglycerides level"],
+      featuresToHighlight: ["blood sugar level"],
+      featuresToShow: ["blood sugar level", "age", "sex", "bmi", "serum triglycerides level"],
     },
     secondVis: "bar",
     newVis: {
@@ -206,22 +206,26 @@ export const QuestionList: TQuestion[] = [
         graphType: "Scatter",
         xValues: "Blood sugar feature values",
         yValues: "Blood sugar SHAP (Contribution) values",
+        annotation: [{
+          type: "highlightRange",
+          xRange: [-0.05, 0.05]
+        }]
       },
     },
     testCondition: "ours",
-    groundTruth: false,
+    groundTruth: false, //needs to be checked 
   },
   {
     index: 4,
     pageName: "question",
     userText:
-      "On average, blood pressure is more important than age for diabetes risk",
+      "On average, the absolute contribution to diabetes progression of blood pressure is less than it is for age.",
     initVis: {
       graphType: "Heatmap",
       xValues: "none",
       yValues: "none",
       featuresToHighlight: ["blood pressure", "age"],
-      featuresToShow: ["blood pressure", "age", "sex", "blood sugar", "low-density lipoproteins"], 
+      featuresToShow: ["blood pressure", "age", "sex", "blood sugar level", "bmi"], 
     },
     secondVis: "beeswarm", // randomly chosen
     newVis: {
@@ -250,19 +254,19 @@ export const QuestionList: TQuestion[] = [
         },
       ],
       type: "comparison",
-      relation: "greater than",
+      relation: "less than",
       condition: undefined,
       graph: {
         graphType: "Swarm",
         xValues: "blood pressure",
         yValues: "none",
         featuresToHighlight: ["blood pressure", "age"],
-        featuresToShow: ["blood pressure", "age", "sex", "blood sugar"],
+        featuresToShow: ["blood pressure", "age", "sex", "bmi"],
         annotation: [{ type: "singleLine", xValue: 5 }],
       },
     },
     testCondition: "random vis",
-    groundTruth: true,
+    groundTruth: false,
   },
   {
     index: 5,
@@ -308,7 +312,7 @@ export const QuestionList: TQuestion[] = [
         xValues: "None",
         yValues: "None",
         featuresToHighlight: ["bmi", "sex"],
-        featuresToShow: ["blood pressure", "bmi", "sex", "blood sugar"],
+        featuresToShow: ["blood pressure", "bmi", "sex", "blood sugar level"],
         annotation: [
           {
             type: "singleLine",
@@ -359,7 +363,7 @@ export const QuestionList: TQuestion[] = [
         xValues: "None",
         yValues: "None",
         featuresToHighlight: ["age", "low-density lipoproteins"],
-        featuresToShow: ["low-density lipoproteins", "age", "sex", "blood sugar", "serum triglycerides level"],
+        featuresToShow: ["low-density lipoproteins", "age", "sex", "blood sugar level", "serum triglycerides level"],
         //annotation: [{ type: "singleLine", xValue: 0 }],
       },
     },
@@ -382,7 +386,7 @@ export const QuestionList: TQuestion[] = [
       xValues: "None",
       yValues: "None",
       featuresToHighlight: ["blood pressure", "age"],
-      featuresToShow: ["blood pressure", "age", "sex", "blood sugar"],
+      featuresToShow: ["blood pressure", "age", "blood sugar level", "bmi"],
       annotation: [
         {
           type: "singleLine",
@@ -411,7 +415,7 @@ export const QuestionList: TQuestion[] = [
         xValues: "BMI",
         yValues: "BMI",
         featuresToHighlight: ["blood pressure", "age"],
-        featuresToShow: ["blood pressure", "age", "sex", "blood sugar"],
+        featuresToShow: ["blood pressure", "age", "blood sugar level", "low-density lipoproteins"],
         annotation: [
           {
             type: "singleLine",
@@ -433,7 +437,7 @@ export const QuestionList: TQuestion[] = [
       xValues: "None",
       yValues: "None",
       featuresToHighlight: ["blood pressure"],
-      featuresToShow: ["blood pressure", "age", "sex", "blood sugar"],
+      featuresToShow: ["blood pressure", "age", "sex", "blood sugar level"],
     },
     secondVis: "scatter",
     newVis: {
@@ -459,8 +463,8 @@ export const QuestionList: TQuestion[] = [
       condition: undefined,
       graph: {
         graphType: "Scatter",
-        xValues: "blood pressure feature values",
-        yValues: "blood pressure SHAP (Contribution) values",
+        xValues: "BMI feature values",
+        yValues: "BMI SHAP (Contribution) values",
       },
     },
     testCondition: "ours",
@@ -475,8 +479,8 @@ export const QuestionList: TQuestion[] = [
       graphType: "Heatmap",
       xValues: "None",
       yValues: "None",
-      featuresToHighlight: ["age"],
-      featuresToShow: ["blood pressure", "age", "sex", "blood sugar"],
+      featuresToHighlight: ["blood pressure", "bmi"],
+      featuresToShow: ["blood pressure", "bmi", "high-density lipoproteins", "blood sugar level"],
     },
     secondVis: "scatter", // randomly chosen
     newVis: {
@@ -523,18 +527,18 @@ export const QuestionList: TQuestion[] = [
       // },
       graph: {
         graphType: "Scatter",
-        xValues: "Age feature values",
-        yValues: "Age SHAP (Contribution) values",
-        annotation: [
-          {
-            type: "highlightRange",
-            xRange: [-0.1, 0],
-          },
-        ],
+        xValues: "Blood pressure feature values",
+        yValues: "Blood pressure SHAP (Contribution) values",
+        // annotation: [
+        //   {
+        //     type: "highlightRange",
+        //     xRange: [-0.1, 0],
+        //   },
+        // ],
       },
     },
     testCondition: "random vis",
-    groundTruth: true,
+    groundTruth: true, //Need to check
   },
   {
     index: 10,
@@ -546,7 +550,7 @@ export const QuestionList: TQuestion[] = [
       xValues: "None",
       yValues: "None",
       featuresToHighlight: ["bmi"],
-      featuresToShow: ["blood pressure", "age", "sex", "blood sugar"],
+      featuresToShow: ["blood pressure", "age", "bmi", "blood sugar level"],
     },
     secondVis: "scatter",
     newVis: {
@@ -601,7 +605,7 @@ export const QuestionList: TQuestion[] = [
       xValues: "None",
       yValues: "None",
       featuresToHighlight: ["bmi", "age"],
-      featuresToShow: ["blood pressure", "bmi", "sex", "blood sugar"],
+      featuresToShow: ["blood pressure", "bmi", "sex", "blood sugar level"],
     },
     secondVis: "scatter",
     newVis: {
