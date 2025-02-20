@@ -1,3 +1,4 @@
+import { NoEncryption } from "@mui/icons-material";
 import { TCase } from "./types";
 export const CASES: TCase[] = [
   {
@@ -126,6 +127,36 @@ export const CASES: TCase[] = [
     },
     secondVis: undefined,
     insight: undefined,
+  },
+  {
+    pageName: "Visualization Generation",
+    href: "/generator",
+    userText: "BMI contributes positively to diabetes risk for more patients than sex does",
+    initVis:{
+      graphType: "Bar",
+      xValues: "none",
+      yValues: "none",
+      features: ["serum triglycerides level", "blood sugar level"],
+    },
+    secondVis: undefined,
+    insight: {
+      variables: [
+        {
+          featureName: "bmi",
+          transform: "average",
+          type: "contribution to the prediction of",
+        },
+        20,
+      ],
+      type: "read",
+      relation: "greater than",
+      condition: undefined,
+      graph: {
+        graphType: "Scatter",
+        xValues: "Blood pressure feature values",
+        yValues: "Blood pressure SHAP values",
+      }
+    }
   },
   {
     pageName: "Free Exploration",
