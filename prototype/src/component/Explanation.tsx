@@ -227,16 +227,8 @@ export default function Explanation() {
         additionalVisualizations = isSubmitted && (
           <>
             <Swarm
-              colorValues={
-                insight.graph?.features?.includes("low-density lipoproteins")
-                  ? s2DiabetesFeatureValues
-                  : diabetesFeatureValues
-              }
-              xValues={
-                insight.graph?.features?.includes("low-density lipoproteins")
-                  ? s2DiabetesShapValues
-                  : diabetesShapValues
-              }
+              colorValues={diabetesFeatureValues}
+              xValues={diabetesShapValues}
               width={600}
               height={400}
               id="swarm-secondVis"
