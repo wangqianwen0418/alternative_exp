@@ -9,9 +9,10 @@ import {
   diabetes_bmi_featureValues,
   diabetes_bmi_shapValues,
   diabetes_age_shapValues,
-  s2DiabetesFeatureValues,
-  s2DiabetesShapValues,
-  s2DiabetesLabels,
+  diabetes_age_featureValues,
+  diabetes_s2_featureValues,
+  // diabetes_s5_shapValues,
+  // diabetes_s5_featureValues,
 } from "../util/diabetesData";
 import { useState, useEffect, useRef } from "react";
 import Heatmap from "./Heatmap";
@@ -52,7 +53,7 @@ export default function Explanation() {
   const open = Boolean(anchorEl);
 
   let initialVisualization;
-  if (initVis == undefined) {
+  if (initVis === undefined) {
     initVis = {
       graphType: "Swarm",
       xValues: "None",
@@ -78,7 +79,8 @@ export default function Explanation() {
           height={400}
           selectedIndices={selectedIndices}
           setSelectedIndices={setSelectedIndices}
-          featuresToShow={(initVis as TGraph).features}
+          featuresToHighlight={(initVis as TGraph).featuresToHighlight}
+          featuresToShow={(initVis as TGraph).featuresToShow}
         />
       );
       break;
@@ -123,7 +125,8 @@ export default function Explanation() {
           height={400}
           id="bar-initVis"
           offsets={[0, 0]}
-          highlightedFeatures={(initVis as TGraph).features}
+          featuresToHighlight={(initVis as TGraph).featuresToHighlight}
+          featuresToShow={(initVis as TGraph).featuresToShow}
         />
       );
       break;
@@ -136,7 +139,8 @@ export default function Explanation() {
           width={600}
           height={350}
           title="Diabetes Heatmap"
-          // featuresToShow={["sex", "age"]}
+          featuresToHighlight={(initVis as TGraph).featuresToHighlight}
+          featuresToShow={(initVis as TGraph).featuresToShow}
         />
       );
       break;
@@ -185,7 +189,8 @@ export default function Explanation() {
                 ? insight?.graph.annotation[0]
                 : undefined
             }
-            highlightedFeatures={insight?.graph.features}
+            featuresToHighlight={insight?.graph.featuresToHighlight}
+            featuresToShow={insight?.graph.featuresToShow}
           />
         );
         break;
@@ -219,20 +224,6 @@ export default function Explanation() {
         );
         break;
       case "Swarm":
-        // console.log("Swarm");
-        let swarmFeatureValues = [[0.0]];
-        let swarmFeatureShapValues = [[0]];
-        if (insight.graph?.features) {
-          const featureIndices = insight?.graph.features.map((feature) =>
-            shap_diabetes["feature_names"].indexOf(feature)
-          );
-          swarmFeatureValues = shap_diabetes["feature_values"].map((row) =>
-            featureIndices.map((index) => row[index])
-          );
-          swarmFeatureShapValues = shap_diabetes["shap_values"].map((row) =>
-            featureIndices.map((index) => row[index])
-          );
-        }
         additionalVisualizations = isSubmitted && (
           <>
             <Swarm
@@ -249,12 +240,9 @@ export default function Explanation() {
               width={600}
               height={400}
               id="swarm-secondVis"
-              labels={
-                insight.graph?.features?.includes("low-density lipoproteins")
-                  ? s2DiabetesLabels
-                  : diabetesLabels
-              }
-              featuresToShow={insight.graph?.features}
+              labels={diabetesLabels}
+              featuresToHighlight={insight.graph?.featuresToHighlight}
+              featuresToShow={insight?.graph.featuresToShow}
               selectedIndices={selectedIndices}
               setSelectedIndices={setSelectedIndices}
               annotation={
@@ -276,7 +264,8 @@ export default function Explanation() {
             width={600}
             height={350}
             title="Diabetes Heatmap"
-            boldFeatureNames={insight?.graph.features}
+            featuresToHighlight={insight?.graph.featuresToHighlight}
+            featuresToShow={insight?.graph.featuresToShow}
           />
         );
         break;

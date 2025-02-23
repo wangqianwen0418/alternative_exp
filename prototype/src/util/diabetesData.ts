@@ -72,7 +72,7 @@ export const diabetes_s2 = "low-density lipoproteins",
 
 export const diabetes_sex = "sex",
   diabetes_sex_featureIndex =
-    shap_diabetes["feature_names"].indexOf(diabetes_s2),
+    shap_diabetes["feature_names"].indexOf(diabetes_sex),
   diabetes_sex_featureValues = shap_diabetes["feature_values"].map(
     (row) => row[diabetes_sex_featureIndex]
   ),
@@ -104,28 +104,91 @@ export const diabetesShapValues = [
   diabetes_s5_shapValues,
   diabetes_bmi_shapValues,
   diabetes_bp_shapValues,
+  diabetes_s3_shapValues,
+  diabetes_s6_shapValues,
   diabetes_age_shapValues,
+  diabetes_s2_shapValues,
   diabetes_sex_shapValues,
+  diabetes_s1_shapValues,
+  diabetes_s4_shapValues,
 ];
 
 export const diabetesFeatureValues = [
   diabetes_s5_featureValues,
   diabetes_bmi_featureValues,
   diabetes_bp_featureValues,
+  diabetes_s3_featureValues,
+  diabetes_s6_featureValues,
   diabetes_age_featureValues,
+  diabetes_s2_featureValues,
   diabetes_sex_featureValues,
+  diabetes_s1_featureValues,
+  diabetes_s4_featureValues,
 ];
 
 export const diabetesLabels = [
   diabetes_s5,
   diabetes_bmi,
   diabetes_bp,
+  diabetes_s3,
+  diabetes_s6,
   diabetes_age,
+  diabetes_s2,
   diabetes_sex,
+  diabetes_s1,
+  diabetes_s4,
 ];
 
-export const s2DiabetesShapValues = [
-  diabetes_s5_shapValues,
+// export const diabetesShapValues = [
+//   diabetes_s5_shapValues,
+//   diabetes_bmi_shapValues,
+//   diabetes_bp_shapValues,
+//   diabetes_age_shapValues,
+//   diabetes_sex_shapValues,
+//   diabetes_s2_shapValues
+// ];
+
+// export const diabetesFeatureValues = [
+//   diabetes_s5_featureValues,
+//   diabetes_bmi_featureValues,
+//   diabetes_bp_featureValues,
+//   diabetes_age_featureValues,
+//   diabetes_sex_featureValues,
+//   diabetes_s2_featureValues
+// ];
+
+// export const diabetesLabels = [
+//   diabetes_s5,
+//   diabetes_bmi,
+//   diabetes_bp,
+//   diabetes_age,
+//   diabetes_sex,
+//   diabetes_s2
+// ];
+
+function getRandomPoints(arr: number[]) {
+  if (arr.length < 25) {
+    throw new Error("Array has fewer than 25 points.");
+  }
+
+  const randomPoints = [];
+  const randomIndices = new Set();
+
+  while (randomIndices.size < 25) {
+    const randomIndex = Math.floor(Math.random() * arr.length);
+    if (!randomIndices.has(randomIndex)) {
+      randomIndices.add(randomIndex);
+      randomPoints.push(arr[randomIndex]);
+    }
+  }
+
+  return randomPoints;
+}
+
+export const test_random_shap = getRandomPoints(diabetes_bmi_shapValues);
+export const test_random_feature = getRandomPoints(diabetes_bmi_featureValues);
+
+export const test_swarm_shapValues = [
   diabetes_bmi_shapValues,
   diabetes_bp_shapValues,
   diabetes_age_shapValues,
@@ -153,25 +216,25 @@ export const s2DiabetesLabels = [
 
 export const variableMapping: { [key: string]: number[] } = {
   "BMI feature values": diabetes_bmi_featureValues,
-  "BMI SHAP values": diabetes_bmi_shapValues,
+  "BMI SHAP (Contribution) values": diabetes_bmi_shapValues,
   "Age feature values": diabetes_age_featureValues,
-  "Age SHAP values": diabetes_age_shapValues,
+  "Age SHAP (Contribution) values": diabetes_age_shapValues,
   "Serum triglycerides feature values": diabetes_s5_featureValues,
-  "Serum triglycerides SHAP values": diabetes_s5_shapValues,
+  "Serum triglycerides SHAP (Contribution) values": diabetes_s5_shapValues,
   "Blood pressure feature values": diabetes_bp_featureValues,
-  "Blood pressure SHAP values" : diabetes_bp_shapValues,
+  "Blood pressure SHAP (Contribution) values" : diabetes_bp_shapValues,
   "Sex feature values": diabetes_sex_featureValues,
-  "Sex SHAP values" : diabetes_sex_shapValues,
+  "Sex SHAP (Contribution) values" : diabetes_sex_shapValues,
   "HDL feature values" : diabetes_s3_featureValues,
-  "HDL SHAP values" : diabetes_s3_shapValues,
+  "HDL SHAP (Contribution) values" : diabetes_s3_shapValues,
   "Blood sugar feature values" : diabetes_s6_featureValues,
-  "Blood sugar SHAP values" : diabetes_s6_shapValues,
+  "Blood sugar SHAP (Contribution) values" : diabetes_s6_shapValues,
   "LDL feature values" : diabetes_s2_featureValues,
-  "LDL SHAP values" : diabetes_s2_shapValues,
+  "LDL SHAP (Contribution) values" : diabetes_s2_shapValues,
   "Serum cholesterol feature values" : diabetes_s1_featureValues,
-  "Serum cholesterol SHAP values" : diabetes_s1_shapValues,
+  "Serum cholesterol SHAP (Contribution) values" : diabetes_s1_shapValues,
   "Cholesterol ratio feature values" : diabetes_s4_featureValues,
-  "Cholesterol ratio SHAP values" : diabetes_s4_shapValues,
+  "Cholesterol ratio SHAP (Contribution) values" : diabetes_s4_shapValues,
 };
 
 export const variableList = Object.keys(variableMapping);

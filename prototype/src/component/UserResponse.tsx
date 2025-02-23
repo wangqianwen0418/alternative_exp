@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Typography,
@@ -14,6 +14,7 @@ import {
   FormControl,
   InputLabel,
   MenuItem,
+  TextField,
 } from "@mui/material";
 import { QuestionList } from "../util/questionList";
 import { useAtom } from "jotai";
@@ -54,6 +55,10 @@ export default function UserResponse() {
   const [uuid] = useAtom(uuidAtom);
   const [questionIndexesArray] = useAtom(questionOrderAtom);
   const [, setShowTutorial] = useAtom(tutorialAtom);
+  const [firstVisFeedback, setFirstVisFeedback] = useState("");
+  const [secondVisFeedback, setSecondVisFeedback] = useState("");
+  const [difficultQuestions, setDifficultQuestions] = useState("");
+  const [difficultGraphs, setDifficultGraphs] = useState("");
 
   const [modalVisible, setModalVisible] = React.useState(false);
   const [userAnswer, setUserAnswer] = React.useState<
@@ -142,6 +147,32 @@ export default function UserResponse() {
       setIsSubmitted(true);
       Cookies.set("isSecondPart", "true");
     }
+  };
+
+  const handleFinalSubmit = async () => {
+    const feedbackData = {
+      uuid,
+      timestamp: new Date().toLocaleString(),
+      firstVisFeedback,
+      secondVisFeedback,
+    };
+
+    try {
+      console.log("Submitting feedback:", JSON.stringify(feedbackData));
+      await fetch(test_weburl!, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(feedbackData),
+      });
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
+    }
+
+    // Optionally, you can reset the feedback fields or close the modal
+    setModalVisible(false);
   };
 
   const onStepperNext = () => {
@@ -330,7 +361,7 @@ export default function UserResponse() {
         </Box>
       </Paper>
 
-      {/* Thank You Modal */}
+      {/* Thank You and Feedback Modal */}
       <Modal open={modalVisible} onClose={() => {}}>
         <Box
           sx={{
@@ -348,6 +379,75 @@ export default function UserResponse() {
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 800 }}>
             Thank you for your participation!
           </Typography>
+          <Typography variant="subtitle1" gutterBottom>
+            We would appreciate your feedback:
+          </Typography>
+          <Typography variant="body1" sx={{ mb: 1 }}>
+            How frequently was the first visualization sufficient to determine
+            your answer?
+          </Typography>
+          <TextField
+            label="First Visualization"
+            multiline
+            rows={3}
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            value={firstVisFeedback}
+            onChange={(e) => setFirstVisFeedback(e.target.value)}
+          />
+          <Typography variant="body1" sx={{ mb: 1 }}>
+            How frequently was the second (additional) visualization helpful in
+            increasing your confidence in your answer?
+          </Typography>
+          <TextField
+            label="Second Visualization"
+            multiline
+            rows={3}
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            value={secondVisFeedback}
+            onChange={(e) => setSecondVisFeedback(e.target.value)}
+          />
+          <Typography variant="body1" sx={{ mb: 1 }}>
+            Were there particular questions that were especially tricky or
+            difficult? If so, which ones?
+          </Typography>
+
+          <TextField
+            label="Questions"
+            multiline
+            rows={3}
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            value={difficultQuestions}
+            onChange={(e) => setDifficultQuestions(e.target.value)}
+          />
+          <Typography variant="body1" sx={{ mb: 1 }}>
+            Were there particular types of graphs that were not helpful or
+            difficult to use? If so, which ones?
+          </Typography>
+
+          <TextField
+            label="Graphs"
+            multiline
+            rows={3}
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            value={difficultGraphs}
+            onChange={(e) => setDifficultGraphs(e.target.value)}
+          />
+
+          <Button
+            variant="contained"
+            onClick={handleFinalSubmit}
+            sx={{ mt: 2 }}
+          >
+            Submit Feedback
+          </Button>
         </Box>
       </Modal>
     </>

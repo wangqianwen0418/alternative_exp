@@ -5,13 +5,12 @@ interface HeatmapProps {
   shapValuesArray: number[][];
   featureValuesArray: number[][];
   labels: string[];
-  boldFeatureNames?: string[];
   width: number;
   height: number;
   title: string;
+  featuresToHighlight?: string[];
   featuresToShow?: string[];
 }
-
 export default function Heatmap({
   shapValuesArray,
   featureValuesArray,
@@ -19,7 +18,8 @@ export default function Heatmap({
   width: totalWidth,
   height: totalHeight,
   title,
-  featuresToShow,
+  featuresToHighlight: featuresToHighlight,
+  featuresToShow: featuresToShow
 }: HeatmapProps) {
   const svgRef = useRef(null);
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
@@ -39,17 +39,29 @@ export default function Heatmap({
     [minShap, maxShap]
   );
 
-  const datasets = useMemo(() => {
-    // Filter shapValuesArray and featureValuesArray to keep only the selected features
-    const averageShapValues = shapValuesArray.map(
-      (shapValues) => d3.mean(shapValues.map(Math.abs)) ?? 0
-    );
+  const effectiveFeaturesToShow = useMemo(() => {
+    return (featuresToShow && featuresToShow.length > 0)
+      ? featuresToShow
+      : ["serum triglycerides level", "bmi", "blood pressure", "age", "sex", "low-density lipoproteins"]; //default array
+  }, [featuresToShow]);
 
-    const combinedDatasets = shapValuesArray.map((shapValues, idx) => ({
-      shapValues,
+
+  const datasets = useMemo(() => {
+
+    const indicesToKeep = d3.range(labels.length).filter(idx =>
+      effectiveFeaturesToShow.includes(labels[idx])
+    );
+    // Filter shapValuesArray and featureValuesArray to keep only the selected features
+    const averageShapValues = indicesToKeep.map(idx =>
+      d3.mean(shapValuesArray[idx].map(Math.abs)) ?? 0
+    );
+    
+
+    const combinedDatasets = indicesToKeep.map((idx, i) => ({
+      shapValues: shapValuesArray[idx],
       featureValues: featureValuesArray[idx],
       label: labels[idx],
-      averageShap: averageShapValues[idx],
+      averageShap: averageShapValues[i],
     }));
 
     combinedDatasets.sort((a, b) => b.averageShap - a.averageShap);
@@ -69,7 +81,7 @@ export default function Heatmap({
     });
 
     return combinedDatasets;
-  }, [shapValuesArray, featureValuesArray, labels]);
+  }, [shapValuesArray, featureValuesArray, labels, effectiveFeaturesToShow]);
 
   const [sortedShapValuesArray, , sortedLabels] = useMemo(
     () => [
@@ -140,7 +152,7 @@ export default function Heatmap({
 
   const truncatedSelectedLabels = useMemo(() => {
     if (typeof document === "undefined") {
-      return featuresToShow;
+      return featuresToHighlight;
     }
 
     const canvas = document.createElement("canvas");
@@ -148,10 +160,10 @@ export default function Heatmap({
     if (!ctx) return sortedLabels;
 
     ctx.font = `${labelFontSizePx}px sans-serif`;
-    if (!featuresToShow || featuresToShow.length === 0) {
+    if (!featuresToHighlight || featuresToHighlight.length === 0) {
       return [];
     }
-    return featuresToShow.map((label) => {
+    return featuresToHighlight.map((label) => {
       let truncated = label;
       while (
         ctx.measureText(truncated).width > maxLabelWidth &&
@@ -316,7 +328,7 @@ export default function Heatmap({
           textAnchor="middle"
           transform={`rotate(-90, ${shapValuesLabelX}, ${legendMidY})`}
         >
-          SHAP Values
+          SHAP (Contribution) Values
         </text>
 
         {truncatedLabels.map((label, idx) => {

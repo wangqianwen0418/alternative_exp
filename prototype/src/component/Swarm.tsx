@@ -11,14 +11,12 @@ interface SwarmProps {
   labels: string[];
   selectedIndices: number[];
   annotation?: TAnnotation;
+  featuresToHighlight?: string[];
   featuresToShow?: string[];
   setSelectedIndices: (index: number[]) => void;
 }
 
 export default function Swarm(props: SwarmProps) {
-  // let margin = useMemo(() => [10, 40, 40, 10], []);
-  // const radius = 2;
-  // const leftTitleMargin = 40;
   const [selectedPoints, setSelectedPoints] = useState<number[]>([]);
   const [brushSelection, setBrushSelection] = useState<[number, number] | null>(
     null
@@ -33,6 +31,7 @@ export default function Swarm(props: SwarmProps) {
     labels,
     selectedIndices,
     setSelectedIndices,
+    featuresToHighlight,
     featuresToShow,
     annotation,
   } = props;
@@ -47,11 +46,24 @@ export default function Swarm(props: SwarmProps) {
     return null;
   }, []);
 
-  // // Filter features based on the `featuresToShow` prop (if provided)
-  const filteredFeaturesIndices = useMemo(() => {
-    // If featuresToShow is not provided or is empty, show all features
-    return labels.map((_, index) => index);
-  }, [featuresToShow, labels]);
+  const effectiveFeaturesToShow = useMemo(() => {
+    return (featuresToShow && featuresToShow.length > 0)
+      ? featuresToShow
+      : ["serum triglycerides level", "bmi", "blood pressure", "age", "sex", "low-density lipoproteins"]; //default array
+  }, [featuresToShow]);
+
+  const filteredIndices = useMemo(() => {
+    return labels.reduce((acc: number[], name, idx) => {
+      if (effectiveFeaturesToShow.includes(name)) {
+        acc.push(idx);
+      }
+      return acc;
+    }, []);
+  }, [labels, effectiveFeaturesToShow]);
+
+
+
+
 
   const truncatedLabels = useMemo(() => {
     if (!canvasContext) {
@@ -78,13 +90,13 @@ export default function Swarm(props: SwarmProps) {
 
   const truncatedSelectedLabels = useMemo(() => {
     if (!canvasContext) {
-      return featuresToShow?.map((label) =>
+      return featuresToHighlight?.map((label) =>
         label.length > 5 ? label.slice(0, 5) + "..." : label
       );
     }
 
     canvasContext.font = `${labelFontSize}px sans-serif`;
-    return featuresToShow?.map((label) => {
+    return featuresToHighlight?.map((label) => {
       let truncatedLabel = label;
       while (
         canvasContext.measureText(truncatedLabel).width > maxLabelWidth &&
@@ -97,7 +109,7 @@ export default function Swarm(props: SwarmProps) {
       }
       return truncatedLabel;
     });
-  }, [labels, canvasContext, labelFontSize, maxLabelWidth, featuresToShow]);
+  }, [labels, canvasContext, labelFontSize, maxLabelWidth, featuresToHighlight]);
   // console.log("TRUNCATED SELECTED LABELS:");
   // console.log(truncatedSelectedLabels);
 
@@ -118,13 +130,13 @@ export default function Swarm(props: SwarmProps) {
 
   // Use filtered xValues and colorValues
   const flatXValues = useMemo(
-    () => filteredFeaturesIndices.map((i) => xValues[i]).flat(),
-    [xValues, filteredFeaturesIndices]
+    () => filteredIndices.map((i) => xValues[i]).flat(),
+    [xValues, filteredIndices]
   );
 
   const flatColorValues = useMemo(
-    () => filteredFeaturesIndices.map((i) => colorValues[i]).flat(),
-    [colorValues, filteredFeaturesIndices]
+    () => filteredIndices.map((i) => colorValues[i]).flat(),
+    [colorValues, filteredIndices]
   );
 
   const xScale = useMemo(
@@ -152,15 +164,15 @@ export default function Swarm(props: SwarmProps) {
 
   const sortedDatasetIndices = useMemo(() => {
     // Sort using only the filtered features
-    const datasetIndices = filteredFeaturesIndices;
+    const datasetIndices = filteredIndices;
     return datasetIndices.sort((a, b) => {
       const avgA = d3.mean(xValues[a], (d) => Math.abs(d)) || 0;
       const avgB = d3.mean(xValues[b], (d) => Math.abs(d)) || 0;
       return avgB - avgA;
     });
-  }, [xValues, filteredFeaturesIndices]);
+  }, [xValues, filteredIndices]);
 
-  const numDatasets = filteredFeaturesIndices.length;
+  const numDatasets = filteredIndices.length;
   // console.log("number of datasets: " + numDatasets);
 
   const maxPlotHeight = 50;
@@ -348,7 +360,7 @@ export default function Swarm(props: SwarmProps) {
       .attr("y", totalPlotHeight - margin[2] + 35)
       .attr("text-anchor", "middle")
       .attr("font-size", labelFontSize)
-      .text("SHAP Value");
+      .text("SHAP (Contribution) Value");
 
     const defs = d3.select(`g.swarm#${id}`).select("defs");
     if (defs.empty()) {

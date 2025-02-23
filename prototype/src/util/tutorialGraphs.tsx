@@ -63,8 +63,8 @@ export function ScatterTutorialGraph() {
             width={600}
             height={400}
             id="scatter-tutorial"
-            xLabel="Feature Values (BMI)"
-            yLabel="SHAP Values (BMI)"
+            xLabel="BMI Feature Values"
+            yLabel="BMI SHAP (Contribution) Values"
             offsets={[0, 0]}
             selectedIndices={selectedIndices}
             setSelectedIndices={setSelectedIndices}

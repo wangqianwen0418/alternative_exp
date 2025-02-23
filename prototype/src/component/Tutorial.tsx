@@ -46,7 +46,7 @@ const tutorialSteps = [
     ),
   },
   {
-    title: "Step 1a: Background Info",
+    title: "Step 1: Background Info",
     content: (
       <>
         <Typography variant="body1">
@@ -83,12 +83,12 @@ const tutorialSteps = [
     ),
   },
   {
-    title: "Step 1b: Background Info",
+    title: "Step 2a: Visualizations",
     content: (
       <>
         <Typography variant="body1" sx={{ mb: 2 }}>
           Now, we'd like to go over the five different visualizations you will
-          see in the user study. The first viusalization you will see is the
+          see in the user study. The first visualization you will see is the
           Swarm plot. Each data point represents a SHAP value corresponding to
           the feature type for a particular instance. The data points are
           colored on feature values.
@@ -96,8 +96,8 @@ const tutorialSteps = [
         <SwarmTutorialGraph />
         <Typography variant="body1">
           To interact with this visualization, you can click and drag a
-          selection box to highlight data points to see additional info and the
-          same instance across features. Additionally, visualizations without
+          selection box to highlight data points from a particular feature. This allows you to see additional info and the
+          same instances across features (Give it a try!). Additionally, visualizations without
           annotations are interactive, while visualizations with annotations are
           not.
         </Typography>
@@ -105,7 +105,7 @@ const tutorialSteps = [
     ),
   },
   {
-    title: "Step 1c: Background Info",
+    title: "Step 2b: Visualizations",
     content: (
       <>
         <Typography variant="body1" sx={{ mb: 2 }}>
@@ -121,7 +121,7 @@ const tutorialSteps = [
     ),
   },
   {
-    title: "Step 1d: Background Info",
+    title: "Step 2c: Visualizations",
     content: (
       <>
         <Typography variant="body1" sx={{ mb: 2 }}>
@@ -138,7 +138,7 @@ const tutorialSteps = [
     ),
   },
   {
-    title: "Step 1e: Background Info",
+    title: "Step 2d: Visualization",
     content: (
       <>
         <Typography variant="body1" sx={{ mb: 2 }}>
@@ -156,7 +156,7 @@ const tutorialSteps = [
     ),
   },
   {
-    title: "Step 1f: Background Info",
+    title: "Step 1e: Visualizations",
     content: (
       <>
         <Typography variant="body1" sx={{ mb: 2 }}>
@@ -166,7 +166,7 @@ const tutorialSteps = [
           in the (x, y) plane. However, points are colored based on another
           feature in the Two-Color Scatter. In this case, the additional feature
           is the SHAP values for age.
-        </Typography>
+        </Typography> 
         <TwoColorTutorialGraph />
         <Typography variant="body1" sx={{ mt: 2 }}>
           To interactive with this visualization, you can drag the two black
@@ -176,7 +176,7 @@ const tutorialSteps = [
     ),
   },
   {
-    title: "Step 2: The Insight and First Visualization",
+    title: "Step 3: The Insight and First Visualization",
     content: (
       <>
         <Typography variant="body1" sx={{ mb: 1 }}>
@@ -192,13 +192,13 @@ const tutorialSteps = [
         </Typography>
         <Typography variant="body1" sx={{ mt: 1 }}>
           Now, an example insight you may be given is:{" "}
-          <i>"age contributes at least 5 to the prediction."</i>
+          <i>"age contributes at least 5 (SHAP Value) to the prediction."</i>
         </Typography>
       </>
     ),
   },
   {
-    title: "Step 3: Selecting an Answer and Rating Confidence",
+    title: "Step 4: Selecting an Answer and Rating Confidence",
     content: (
       <>
         <Typography variant="body1">
@@ -298,7 +298,7 @@ const tutorialSteps = [
     ),
   },
   {
-    title: "Step 4: Second Visualization",
+    title: "Step 5: Second Visualization",
     content: (
       <>
         <Typography variant="body1">

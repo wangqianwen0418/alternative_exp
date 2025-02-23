@@ -22,12 +22,13 @@ Next, determine the Category of the insight based on these descriptions:
     Bivariate comparison (Feature1, Feature2):
     Possible Examples: 
     Feature1 contributes more to the prediction than Feature2
-    Feature1 influences a greater number of instances than Feature2
+    Feature1 influences more instances positively than Feature2
 
     Category 3:
     Attribution [DV1] by Feature Value [IV1] 
     Possible Examples:
     There is a positive correlation between the contribution of Feature1 to predictions and the Feature1 values when values are above 15
+
 
     Category 4:
     Multivariate Attribution by Feature Values
@@ -36,18 +37,16 @@ Next, determine the Category of the insight based on these descriptions:
 
 The first value in the JSON file you provide will be the category that the given insight belongs to (1,2,3,4). This will determine how we parse the rest of the insight going forward. 
 
-
 Once the category is determined, the JSON should contain: 
 Variables: An array of variables with the format: 
 {
   featureName: string,
-  transform: "average" | "deviations to the" | ""
-  type: "value of" | "contribution to the prediction of" | "number of instances of <restriction> for" 
+  transform: "average" | "deviations of" | "" | undefined
+  type: "value of" | "contribution to the prediction of" | "number of instances <restriction> for" 
 }
 
 Note: For the "number of instances of <restriction> of", there would be a restriction that you should include in the value. for example, you might suggest "number of instances above 5 of" or "number of instances below 3 of". 
 For Category 2, you may have "number of instances <condition> for" -- for example, for the input prompt "age has more instances above 3 than s2", type would be "number of instances above 3 for".
-
 Note: if the type is "number of instances", there is no additional transformation (average, etc) that is provided.
 
 If "correlation" (category 3) involves both value and contribution of the same feature, include both in the array. 
@@ -89,23 +88,28 @@ Heatmap (note: shows how each feature contributes to the output for individual s
 When you want to see how different features impact the prediction for individual instances 
 
 XValues and YValues: This depends on the GraphType
-Swarm and Scatter: XValues and YValues are the name of one of the features we are looking at
-Bar and Heatmap: Set both to "None".
-Features: A string array ["Feature 1", "Feature 2",...] of the names of the features to highlight. This should be be populated for Bar and Swarm Plots - otherwise, the value will be "None". Whenever you provide a feature name, make sure it is provided in Lower Case.
+Scatter: XValues and YValues both indicate what data to display on the graph for this insight. Use the following format: "<FeatureName> <Feature/SHAP (Contribution)> values". For example, your XValues can be "BMI feature Values" and your YValues can be "BMI SHAP (Contribution) values" 
+Swarm, Bar and Heatmap: Set both to "None".
+Features: A string array ["Feature 1", "Feature 2",...] of the names of the features to highlight in the graph. This should be be populated for Bar and Swarm Plots - otherwise, the value will be "None". Whenever you provide a feature name, make sure it is provided the same way it was in the feature list above.
 
-Annotation and AnnotationParams are the next two values in the JSON. Here are the options for Annotation:
-SingleLine: When comparing to a single value (in either X or Y direction). AnnotationParams would be an array of two elements. The first element will be "X" or "Y", (If the line is vertical, use 'X' - if the line is horizontal, use 'Y'.). The second element will be a number (the value the line should be drawn at).
-HighlightRange: When highlighting a range in the X,Y, or both directions. AnnotationParams would be an array [[x_min, x_max], [y_min, y_max]]. If the range is only in one direction, the other array will be empty.  In the case where one end of the range is infinity/neg. infity, please use "100" (or -100) for the value. 
-HighlightDataPoints: When highlighting specific datapoints that may not fit a range. AnnotationParams would be an string "Specific Data Points".
-
+Annotation is the next value in the JSON. Here are the options for Annotation:
+type TAnnotation =
+  | { type: "highlightDataPoints"; dataPoints: number[]; label?: string } // An array of data points to highlight
+  | {
+      type: "highlightRange";
+      xRange?: [number, number];
+      yRange?: [number, number];
+      label?: string, feature?: string;
+    } // A range along X axis
+  | { type: "singleLine"; xValue?: number; yValue?: number; label?: string } // A vertical line at a specific X/Y value
 
 The optimal annotation to use will be based on constants/conditions included in the insight statement.
 
 
 Lines are more useful when we are comparing against a single value, HighlightRange is more useful when we want to highlight data points within a range (so it will not be used for Bar Graphs), and HighlightDataPoints is useful when examining a condition that does not fit neatly into a range. 
-For Heatmaps, there will be no annotations, so if the GraphType is Heatmap then both Annotation and AnnotationParams will be "None".
-For Barplots, the only annotations that are allowed are vertical lines (so make sure to use 'X' for the first value). 
-For Swarms, there can be no range in the Y direction, only in the X direction.
+For Heatmaps, there will be no annotations, so if the GraphType is Heatmap then Annotation will be an empty JSON object ({}).
+For Barplots, the only annotations that are allowed are vertical lines (so make sure to provide an xValue). 
+For Swarms, there can be no range or line in the Y direction, only in the X direction.
 
 For example, suppose the user input statement was "The average contribution of the bmi to the prediction is larger than 20". Since we are looking at the average contribution of each feature, the GraphType value would be "Bar".
 Then, XValues and YValues would both be "None". Features would be ["BMI"]. Annotation would be "SingleLine" and AnnotationParams would be ["X", 20].
@@ -276,7 +280,7 @@ export const parseInput = async (
             yValues: jsonObject.YValues,
             ...(jsonObject.Features &&
               jsonObject.Features !== "None" && {
-                features: jsonObject.Features,
+                featuresToHighlight: jsonObject.Features,
               }),
             ...(jsonObject.Annotation !== "None" && {
               annotation: (() => {
