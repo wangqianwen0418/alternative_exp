@@ -306,7 +306,7 @@ export default function Bar(props: BarProps) {
             >
               <text
                 x={margin[0] - 2}
-                y={(yScale(featureName) as number) + yScale.bandwidth() * 0.8}
+                y={(yScale(featureName) as number) + yScale.bandwidth() * 0.6}
                 textAnchor="end"
                 style={textStyle}
                 fontSize={labelFontSize}
