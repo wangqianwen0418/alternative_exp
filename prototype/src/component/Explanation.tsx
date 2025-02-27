@@ -149,17 +149,20 @@ export default function Explanation() {
         <TwoColorScatter
           yValues={diabetes_bmi_shapValues}
           xValues={diabetes_bmi_featureValues}
-          colorValues={diabetes_age_shapValues}
+          colorValues={diabetes_age_featureValues}
           width={600}
           height={400}
           id="two-color-initial"
-          xLabel="BMI feature values"
-          yLabel="BMI SHAP values"
-          colorLabel="age"
-          // annotation={[
-          //   [-5, 0],
-          //   [15, 25],
-          // ]}
+          xLabel="BMI Feature Values"
+          yLabel="BMI SHAP Values"
+          colorLabel="Age Feature Values"
+          // annotation={{
+          //   type: "twoColorRange",
+          //   range: [
+          //     [0, 0.02],
+          //     [0.05, 0.1],
+          //   ],
+          // }}
         />
       );
       break;
@@ -284,11 +287,11 @@ export default function Explanation() {
             xLabel={insight?.graph?.xValues ?? ""}
             yLabel={insight?.graph?.yValues ?? ""}
             colorLabel={insight?.graph?.colorValues ?? ""}
-            annotation={
-              insight?.graph.annotation
-                ? insight?.graph.annotation[0]
-                : undefined
-            }
+            // annotation={
+            //   insight?.graph.annotation
+            //     ? insight?.graph.annotation[0]
+            //     : undefined
+            // }
           />
         );
         break;

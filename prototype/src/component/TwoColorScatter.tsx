@@ -12,9 +12,7 @@ interface TwoColorScatterProps {
   xLabel: string;
   yLabel: string;
   colorLabel: string;
-  annotation?: TAnnotation;
-
-  //annotation?: Array<[number, number]>; // [[low, high]] or [[low1, high1], [low2, high2]]
+  annotation?: TAnnotation; // [[low, high]] or [[low1, high1], [low2, high2]]
 }
 
 export default function TwoColorScatter(props: TwoColorScatterProps) {
@@ -30,10 +28,8 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
     colorLabel,
     annotation,
   } = props;
-  const annotationArray: Array<[number, number]> = 
-  annotation?.type === "twoColorRange" 
-    ? annotation.range 
-    : [];
+  const annotationArray: Array<[number, number]> | undefined =
+    annotation?.type === "twoColorRange" ? annotation.range : undefined;
 
   const margin = [22.5, 10, 40, 52.5];
   const labelFontSize = 13;
@@ -55,11 +51,16 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
   }, [yValues, height, margin]);
 
   const [minColor, maxColor] = d3.extent(colorValues) as [number, number];
+  const zeroOffset = (0 - minColor) / (maxColor - minColor);
   const colorScale = useMemo(() => {
     return d3
-      .scaleLinear<string>()
-      .domain([minColor, maxColor])
-      .range(["#add8e6", "#ff0051"]);
+      .scaleDiverging<string>()
+      .domain([minColor, 0, maxColor])
+      .interpolator((t) =>
+        t < 0.5
+          ? d3.interpolateRgb("#008bfc", "#f2faff")(t * 2)
+          : d3.interpolateRgb("#f2faff", "#ff0051")((t - 0.5) * 2)
+      );
   }, [minColor, maxColor]);
 
   const [sliderRange, setSliderRange] = useState<[number, number]>([
@@ -206,7 +207,8 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
             x2="0"
             y2="0"
           >
-            <stop offset="0%" stopColor="#add8e6" />
+            <stop offset="0%" stopColor="#008bfc" />
+            <stop offset={`${zeroOffset * 100}%`} stopColor="#f2faff" />
             <stop offset="100%" stopColor="#ff0051" />
           </linearGradient>
         </defs>
@@ -293,7 +295,7 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
                     width={legendWidth}
                     height={yTop}
                     fill="white"
-                    opacity={0.6}
+                    opacity={0.7}
                   />
                 );
               }
@@ -306,7 +308,7 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
                     width={legendWidth}
                     height={legendHeight - yBottom}
                     fill="white"
-                    opacity={0.6}
+                    opacity={0.7}
                   />
                 );
               }
