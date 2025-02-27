@@ -21,6 +21,7 @@ import {
   insightAtom,
   isSubmittedAtom,
   isUserStudyAtom,
+  selectedIndicesAtom,
 } from "../store";
 import TwoColorScatter from "./TwoColorScatter";
 import { TGraph } from "../util/types";
@@ -29,7 +30,7 @@ export default function Explanation() {
   const [isSubmitted] = useAtom(isSubmittedAtom);
   const [insight] = useAtom(insightAtom);
   let [initVis] = useAtom(initVisAtom);
-  const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
+  const [selectedIndices, setSelectedIndices] = useAtom(selectedIndicesAtom);
   const initialVisRef = useRef<SVGGElement>(null);
   const additionalVisRef = useRef<SVGGElement>(null);
   const [secondVisTranslateY, setSecondVisTranslateY] = useState(0);

@@ -64,7 +64,9 @@ export default function Heatmap({
       averageShap: averageShapValues[i],
     }));
 
-    combinedDatasets.sort((a, b) => b.averageShap - a.averageShap);
+    combinedDatasets = uuid
+      ? seededShuffle(combinedDatasets, uuid)
+      : combinedDatasets.sort((a, b) => b.averageShap - a.averageShap);
 
     const sortedIndices = d3
       .range(combinedDatasets[0].shapValues.length)
@@ -79,10 +81,6 @@ export default function Heatmap({
         (i) => dataset.featureValues[i]
       );
     });
-
-    combinedDatasets = uuid
-      ? seededShuffle(combinedDatasets, uuid)
-      : combinedDatasets.sort((a, b) => b.averageShap - a.averageShap);
 
     return combinedDatasets;
   }, [
