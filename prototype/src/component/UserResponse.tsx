@@ -31,7 +31,7 @@ import {
   tutorialAtom,
   selectedIndicesAtom,
 } from "../store";
-import { test_weburl } from "../util/appscript_url";
+import { pilot_weburl, test_weburl } from "../util/appscript_url";
 import Cookies from "js-cookie";
 import { TGraph } from "../util/types";
 
@@ -124,7 +124,7 @@ export default function UserResponse() {
 
     try {
       console.log("Submitting form:", JSON.stringify(data));
-      await fetch(test_weburl!, {
+      await fetch(pilot_weburl!, {
         method: "POST",
         mode: "no-cors",
         headers: {
@@ -308,8 +308,7 @@ export default function UserResponse() {
           >
             {isSecondPart ? (isLastQuestion ? "Submit" : "Next") : "Next"}
           </Button>
-          {/* REMOVE BEFORE USER STUDY */}
-          <Button
+          {/* <Button
             variant="outlined"
             sx={{ ml: 2 }}
             onClick={onStepperNext}
@@ -343,7 +342,7 @@ export default function UserResponse() {
             }}
           >
             Reset UUID
-          </Button>
+          </Button> */}
 
           <Button
             variant="outlined"
