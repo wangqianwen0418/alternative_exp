@@ -88,7 +88,7 @@ Heatmap (note: shows how each feature contributes to the output for individual s
 When you want to see how different features impact the prediction for individual instances 
 
 XValues and YValues: This depends on the GraphType
-Scatter: XValues and YValues both indicate what data to display on the graph for this insight. Use the following format: "<FeatureName> <Feature/SHAP (Contribution)> values". For example, your XValues can be "BMI feature Values" and your YValues can be "BMI SHAP (Contribution) values" 
+Scatter: XValues and YValues both indicate what data to display on the graph for this insight. Use the following format: "<FeatureName> <Feature/SHAP (Contribution)> values". For example, your XValues can be "BMI Feature Values" and your YValues can be "BMI SHAP (Contribution) Values" 
 Swarm, Bar and Heatmap: Set both to "None".
 Features: A string array ["Feature 1", "Feature 2",...] of the names of the features to highlight in the graph. This should be be populated for Bar and Swarm Plots - otherwise, the value will be "None". Whenever you provide a feature name, make sure it is provided the same way it was in the feature list above.
 

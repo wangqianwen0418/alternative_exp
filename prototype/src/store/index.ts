@@ -5,6 +5,7 @@ import { CASES } from "../util/cases";
 export const freeTextAtom = atom(""); // the free text that users input
 export const isSubmittedAtom = atom(false); // whether users have submitted the free text (or Question Part 1) for formatting
 export const tutorialAtom = atom(true); // whether the user should see the tutorial (only applicable to user study)
+export const isUserStudyAtom = atom(false);
 
 export const insightAtom = atom<TInsight>(CASES[0].insight); // the formatted text that users can see
 

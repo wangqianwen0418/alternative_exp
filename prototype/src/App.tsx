@@ -11,6 +11,7 @@ import {
   uuidAtom,
   questionOrderAtom,
   tutorialAtom,
+  isUserStudyAtom,
 } from "./store";
 
 import Explanation from "./component/Explanation";
@@ -55,9 +56,10 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
   const [, setUUID] = useAtom(uuidAtom);
   const [, setQuestionOrder] = useAtom(questionOrderAtom);
   const [showTutorial, setShowTutorial] = useAtom(tutorialAtom);
+  const [isUserStudy] = useAtom(isUserStudyAtom);
 
-  const [demographics, setDemographics] = useState<any>(null);
-  const [showDemographics, setShowDemographics] = useState(false)
+  const [, setDemographics] = useState<any>(null);
+  const [showDemographics, setShowDemographics] = useState(false);
 
   let uuid = Cookies.get("uuid");
 
@@ -71,7 +73,7 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
     if (!demographicsSubmitted) {
       setShowDemographics(true);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     const tutorialSeen = Cookies.get("showTutorial");
@@ -82,7 +84,6 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
       setShowTutorial(false);
     }
   }, [setShowTutorial]);
-
 
   useEffect(() => {
     setUUID(uuid);
@@ -223,13 +224,13 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
       </Grid>
       <Grid item xs={4} className="App-body">
         <Interpretation />
-        {"index" in appProps && <UserResponse />}
+        {isUserStudy && <UserResponse />}
         {/* <Paper style={{ padding: "15px", marginTop: "10px" }}>
           <CounterbalanceButton />
         </Paper> */}
       </Grid>
 
-      {"index" in appProps && showDemographics && (
+      {isUserStudy && showDemographics && (
         <Demographics
           show={showDemographics}
           onSubmit={(data) => {
@@ -239,8 +240,8 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
           }}
         />
       )}
-      
-      {"index" in appProps && !showDemographics && (
+
+      {isUserStudy && !showDemographics && (
         <Tutorial
           show={showTutorial}
           onClose={() => {

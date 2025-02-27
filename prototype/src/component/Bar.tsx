@@ -47,9 +47,9 @@ export default function Bar(props: BarProps) {
   }, []);
 
   const effectiveFeaturesToShow = useMemo(() => {
-    return (featuresToShow && featuresToShow.length > 0)
+    return featuresToShow && featuresToShow.length > 0
       ? featuresToShow
-      : ["serum triglycerides level", "bmi", "blood pressure", "age", "sex", "low-density lipoproteins"]; //default array
+      : ["serum triglycerides level", "bmi", "blood pressure", "age", "sex"]; //default array
   }, [featuresToShow]);
 
   const filteredIndices = useMemo(() => {
@@ -114,8 +114,7 @@ export default function Bar(props: BarProps) {
         values.reduce((a, b) => a + b, 0) / values.length;
     }
 
-    return Object.entries(avgShapeValues)
-      .sort((a, b) => b[1] - a[1]); // Sorted descending by average value
+    return Object.entries(avgShapeValues).sort((a, b) => b[1] - a[1]); // Sorted descending by average value
   }, [filteredFeatureNames, filteredShapValues]);
 
   const yScale = useMemo(
@@ -162,7 +161,9 @@ export default function Bar(props: BarProps) {
 
   const maxXValue = useMemo(() => {
     const flatValues = filteredShapValues.flat();
-    return flatValues.length ? Math.max(...flatValues.map((d) => Math.abs(d))) : 0;
+    return flatValues.length
+      ? Math.max(...flatValues.map((d) => Math.abs(d)))
+      : 0;
   }, [filteredShapValues]);
 
   useEffect(() => {
@@ -355,7 +356,7 @@ export default function Bar(props: BarProps) {
 
           <text
             x={xScale(annotation.xValue ?? 0) + 5} // Position slightly to the right of the line
-            y={margin[1] + 200} // Position slightly below the top
+            y={margin[1] + 100} // Position slightly below the top
             fill="black"
             fontSize="12px"
           >

@@ -34,7 +34,7 @@ export type TGraph = {
   graphType: "Swarm" | "Scatter" | "Bar" | "Heatmap" | "two-scatter";
   xValues: string;
   yValues: string;
-  annotation?: TAnnotation[];
+  annotation?: TAnnotation;
   featuresToHighlight?: string[];
   featuresToShow?: string[];
   colorValues?: string;

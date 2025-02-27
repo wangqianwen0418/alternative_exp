@@ -8,11 +8,7 @@ import {
   variableMapping,
   diabetes_bmi_featureValues,
   diabetes_bmi_shapValues,
-  diabetes_age_shapValues,
   diabetes_age_featureValues,
-  diabetes_s2_featureValues,
-  // diabetes_s5_shapValues,
-  // diabetes_s5_featureValues,
 } from "../util/diabetesData";
 import { useState, useEffect, useRef } from "react";
 import Heatmap from "./Heatmap";
@@ -20,7 +16,12 @@ import Swarm from "./Swarm";
 import Scatter from "./Scatter";
 import Bar from "./Bar";
 import { useAtom } from "jotai";
-import { initVisAtom, insightAtom, isSubmittedAtom } from "../store";
+import {
+  initVisAtom,
+  insightAtom,
+  isSubmittedAtom,
+  isUserStudyAtom,
+} from "../store";
 import TwoColorScatter from "./TwoColorScatter";
 import { TGraph } from "../util/types";
 
@@ -32,6 +33,7 @@ export default function Explanation() {
   const initialVisRef = useRef<SVGGElement>(null);
   const additionalVisRef = useRef<SVGGElement>(null);
   const [secondVisTranslateY, setSecondVisTranslateY] = useState(0);
+  const [isUserStudy] = useAtom(isUserStudyAtom);
 
   useEffect(() => {
     if (initialVisRef.current) {
@@ -64,23 +66,22 @@ export default function Explanation() {
 
   switch ((initVis as TGraph).graphType) {
     case "Swarm":
-      // console.log("Explanation IDs: " + diabetesLabels);
       initialVisualization = (
         <Swarm
           xValues={diabetesShapValues}
           colorValues={diabetesFeatureValues}
           id="swarm-initVis"
           labels={diabetesLabels}
-          // xValues={[diabetes_s5_shapValues]}
-          // colorValues={[diabetes_s5_featureValues]}
-          // ids={["serum triglycerides level"]}
-          // boldFeatureNames={["sex", "age"]}
           width={600}
           height={400}
           selectedIndices={selectedIndices}
           setSelectedIndices={setSelectedIndices}
-          featuresToHighlight={(initVis as TGraph).featuresToHighlight}
-          featuresToShow={(initVis as TGraph).featuresToShow}
+          featuresToHighlight={
+            isUserStudy ? (initVis as TGraph).featuresToHighlight : undefined
+          }
+          featuresToShow={
+            isUserStudy ? (initVis as TGraph).featuresToShow : undefined
+          }
         />
       );
       break;
@@ -122,11 +123,20 @@ export default function Explanation() {
           allShapValues={shap_diabetes["shap_values"].slice(0, 100)}
           featureNames={shap_diabetes["feature_names"].slice(0, 100)}
           width={600}
-          height={400}
+          height={
+            (initVis as TGraph).featuresToShow
+              ? 30 * (initVis as TGraph).featuresToShow!.length
+              : 300
+          }
+          // height={400}
           id="bar-initVis"
           offsets={[0, 0]}
-          featuresToHighlight={(initVis as TGraph).featuresToHighlight}
-          featuresToShow={(initVis as TGraph).featuresToShow}
+          featuresToHighlight={
+            isUserStudy ? (initVis as TGraph).featuresToHighlight : undefined
+          }
+          featuresToShow={
+            isUserStudy ? (initVis as TGraph).featuresToShow : undefined
+          }
         />
       );
       break;
@@ -137,10 +147,18 @@ export default function Explanation() {
           featureValuesArray={diabetesFeatureValues}
           labels={diabetesLabels}
           width={600}
-          height={350}
+          height={
+            (initVis as TGraph).featuresToShow
+              ? 70 * (initVis as TGraph).featuresToShow!.length
+              : 350
+          }
           title="Diabetes Heatmap"
-          featuresToHighlight={(initVis as TGraph).featuresToHighlight}
-          featuresToShow={(initVis as TGraph).featuresToShow}
+          featuresToHighlight={
+            isUserStudy ? (initVis as TGraph).featuresToHighlight : undefined
+          }
+          featuresToShow={
+            isUserStudy ? (initVis as TGraph).featuresToShow : undefined
+          }
         />
       );
       break;
@@ -184,16 +202,16 @@ export default function Explanation() {
             allShapValues={shap_diabetes["shap_values"].slice(0, 100)}
             featureNames={shap_diabetes["feature_names"].slice(0, 100)}
             width={600}
-            height={400}
+            height={
+              insight.graph.featuresToShow
+                ? 60 * insight.graph.featuresToShow.length
+                : 300
+            }
             id="bar-secondVis"
             offsets={[0, 0]}
-            annotation={
-              insight?.graph.annotation
-                ? insight?.graph.annotation[0]
-                : undefined
-            }
-            featuresToHighlight={insight?.graph.featuresToHighlight}
-            featuresToShow={insight?.graph.featuresToShow}
+            annotation={insight.graph.annotation}
+            featuresToHighlight={insight.graph.featuresToHighlight}
+            featuresToShow={insight.graph.featuresToShow}
           />
         );
         break;
@@ -215,13 +233,9 @@ export default function Explanation() {
               offsets={[0, 0]}
               selectedIndices={selectedIndices}
               setSelectedIndices={setSelectedIndices}
-              xLabel={insight?.graph?.xValues ?? ""}
-              yLabel={insight?.graph?.yValues ?? ""}
-              annotation={
-                insight?.graph.annotation
-                  ? insight?.graph.annotation[0]
-                  : undefined
-              }
+              xLabel={insight.graph.xValues}
+              yLabel={insight.graph.yValues}
+              annotation={insight.graph.annotation}
             />
           </>
         );
@@ -236,15 +250,11 @@ export default function Explanation() {
               height={400}
               id="swarm-secondVis"
               labels={diabetesLabels}
-              featuresToHighlight={insight.graph?.featuresToHighlight}
-              featuresToShow={insight?.graph.featuresToShow}
+              featuresToHighlight={insight.graph.featuresToHighlight}
+              featuresToShow={insight.graph.featuresToShow}
               selectedIndices={selectedIndices}
               setSelectedIndices={setSelectedIndices}
-              annotation={
-                insight?.graph.annotation
-                  ? insight?.graph.annotation[0]
-                  : undefined
-              }
+              annotation={insight.graph.annotation}
             />
           </>
         );
@@ -257,10 +267,14 @@ export default function Explanation() {
             featureValuesArray={diabetesFeatureValues}
             labels={diabetesLabels}
             width={600}
-            height={350}
+            height={
+              insight.graph.featuresToShow
+                ? 70 * insight.graph.featuresToShow!.length
+                : 350
+            }
             title="Diabetes Heatmap"
-            featuresToHighlight={insight?.graph.featuresToHighlight}
-            featuresToShow={insight?.graph.featuresToShow}
+            featuresToHighlight={insight.graph.featuresToHighlight}
+            featuresToShow={insight.graph.featuresToShow}
           />
         );
         break;
@@ -269,29 +283,25 @@ export default function Explanation() {
         additionalVisualizations = isSubmitted && (
           <TwoColorScatter
             xValues={
-              variableMapping[insight?.graph.xValues] ||
+              variableMapping[insight.graph.xValues] ||
               diabetes_bmi_featureValues
             }
             yValues={
-              variableMapping[insight?.graph.yValues] ||
+              variableMapping[insight.graph.yValues] ||
               diabetes_bmi_featureValues
             }
             colorValues={
               variableMapping[
-                insight?.graph.colorValues ?? "Age feature values"
+                insight?.graph.colorValues ?? "Age Feature Values"
               ]
             }
             width={600}
             height={400}
             id="two-color-additional"
-            xLabel={insight?.graph?.xValues ?? ""}
-            yLabel={insight?.graph?.yValues ?? ""}
+            xLabel={insight.graph.xValues}
+            yLabel={insight.graph.yValues}
             colorLabel={insight?.graph?.colorValues ?? ""}
-            // annotation={
-            //   insight?.graph.annotation
-            //     ? insight?.graph.annotation[0]
-            //     : undefined
-            // }
+            annotation={insight.graph.annotation}
           />
         );
         break;

@@ -65,10 +65,10 @@ export const CASES: TCase[] = [
         graphType: "Swarm",
         xValues: "BMI",
         yValues: "BMI",
-        annotation: [{
+        annotation: {
           type: "singleLine",
           xValue: 0,
-        }],
+        },
       },
     },
   },
@@ -79,7 +79,7 @@ export const CASES: TCase[] = [
       "the larger the age, the more likely to have greater diabetes progression.",
     initVis: {
       graphType: "Scatter",
-      xValues: "Age feature values",
+      xValues: "Age Feature Values",
       yValues: "Age SHAP values",
     },
     secondVis: undefined,
@@ -153,7 +153,7 @@ export const CASES: TCase[] = [
       condition: undefined,
       graph: {
         graphType: "Scatter",
-        xValues: "Blood pressure feature values",
+        xValues: "Blood Pressure Feature Values",
         yValues: "Blood pressure SHAP values",
       }
     }

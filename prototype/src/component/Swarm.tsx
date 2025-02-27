@@ -47,9 +47,9 @@ export default function Swarm(props: SwarmProps) {
   }, []);
 
   const effectiveFeaturesToShow = useMemo(() => {
-    return (featuresToShow && featuresToShow.length > 0)
+    return featuresToShow && featuresToShow.length > 0
       ? featuresToShow
-      : ["serum triglycerides level", "bmi", "blood pressure", "age", "sex", "low-density lipoproteins"]; //default array
+      : ["serum triglycerides level", "bmi", "blood pressure", "age", "sex"]; //default array
   }, [featuresToShow]);
 
   const filteredIndices = useMemo(() => {
@@ -60,10 +60,6 @@ export default function Swarm(props: SwarmProps) {
       return acc;
     }, []);
   }, [labels, effectiveFeaturesToShow]);
-
-
-
-
 
   const truncatedLabels = useMemo(() => {
     if (!canvasContext) {
@@ -109,7 +105,13 @@ export default function Swarm(props: SwarmProps) {
       }
       return truncatedLabel;
     });
-  }, [labels, canvasContext, labelFontSize, maxLabelWidth, featuresToHighlight]);
+  }, [
+    labels,
+    canvasContext,
+    labelFontSize,
+    maxLabelWidth,
+    featuresToHighlight,
+  ]);
   // console.log("TRUNCATED SELECTED LABELS:");
   // console.log(truncatedSelectedLabels);
 

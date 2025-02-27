@@ -19,7 +19,7 @@ export default function Heatmap({
   height: totalHeight,
   title,
   featuresToHighlight: featuresToHighlight,
-  featuresToShow: featuresToShow
+  featuresToShow: featuresToShow,
 }: HeatmapProps) {
   const svgRef = useRef(null);
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
@@ -40,22 +40,19 @@ export default function Heatmap({
   );
 
   const effectiveFeaturesToShow = useMemo(() => {
-    return (featuresToShow && featuresToShow.length > 0)
+    return featuresToShow && featuresToShow.length > 0
       ? featuresToShow
-      : ["serum triglycerides level", "bmi", "blood pressure", "age", "sex", "low-density lipoproteins"]; //default array
+      : ["serum triglycerides level", "bmi", "blood pressure", "age", "sex"]; //default array
   }, [featuresToShow]);
 
-
   const datasets = useMemo(() => {
-
-    const indicesToKeep = d3.range(labels.length).filter(idx =>
-      effectiveFeaturesToShow.includes(labels[idx])
-    );
+    const indicesToKeep = d3
+      .range(labels.length)
+      .filter((idx) => effectiveFeaturesToShow.includes(labels[idx]));
     // Filter shapValuesArray and featureValuesArray to keep only the selected features
-    const averageShapValues = indicesToKeep.map(idx =>
-      d3.mean(shapValuesArray[idx].map(Math.abs)) ?? 0
+    const averageShapValues = indicesToKeep.map(
+      (idx) => d3.mean(shapValuesArray[idx].map(Math.abs)) ?? 0
     );
-    
 
     const combinedDatasets = indicesToKeep.map((idx, i) => ({
       shapValues: shapValuesArray[idx],
