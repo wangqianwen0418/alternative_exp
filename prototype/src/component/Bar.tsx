@@ -1,6 +1,9 @@
 import * as d3 from "d3";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { TAnnotation } from "../util/types";
+import { seededShuffle } from "../util/questionBalance";
+import { uuidAtom } from "../store";
+import { useAtom } from "jotai";
 
 interface BarProps {
   allShapValues: number[][];
@@ -35,6 +38,7 @@ export default function Bar(props: BarProps) {
 
   const [selectedBars, setSelectedBars] = useState<string[]>([]);
   const brushGroupRef = useRef<any>(null);
+  const [uuid] = useAtom(uuidAtom);
 
   const labelFontSize = 13;
   const maxLabelWidth = 100;
@@ -113,9 +117,12 @@ export default function Bar(props: BarProps) {
       avgShapeValues[featureName] =
         values.reduce((a, b) => a + b, 0) / values.length;
     }
-
-    return Object.entries(avgShapeValues).sort((a, b) => b[1] - a[1]); // Sorted descending by average value
-  }, [filteredFeatureNames, filteredShapValues]);
+    if (uuid) {
+      return seededShuffle(Object.entries(avgShapeValues), uuid);
+    } else {
+      return Object.entries(avgShapeValues).sort((a, b) => b[1] - a[1]);
+    }
+  }, [filteredFeatureNames, filteredShapValues, uuid]);
 
   const yScale = useMemo(
     () =>

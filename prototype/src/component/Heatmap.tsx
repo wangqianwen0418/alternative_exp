@@ -1,5 +1,8 @@
 import { useRef, useState, useMemo } from "react";
 import * as d3 from "d3";
+import { useAtom } from "jotai";
+import { uuidAtom } from "../store";
+import { seededShuffle } from "../util/questionBalance";
 
 interface HeatmapProps {
   shapValuesArray: number[][];
@@ -24,6 +27,7 @@ export default function Heatmap({
   const svgRef = useRef(null);
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
   const groupRef = useRef<SVGGElement>(null);
+  const [uuid] = useAtom(uuidAtom);
 
   const labelFontSizePx = 13;
   const maxLabelWidth = 100;
@@ -54,7 +58,7 @@ export default function Heatmap({
       (idx) => d3.mean(shapValuesArray[idx].map(Math.abs)) ?? 0
     );
 
-    const combinedDatasets = indicesToKeep.map((idx, i) => ({
+    let combinedDatasets = indicesToKeep.map((idx, i) => ({
       shapValues: shapValuesArray[idx],
       featureValues: featureValuesArray[idx],
       label: labels[idx],
@@ -77,8 +81,18 @@ export default function Heatmap({
       );
     });
 
+    combinedDatasets = uuid
+      ? seededShuffle(combinedDatasets, uuid)
+      : combinedDatasets.sort((a, b) => b.averageShap - a.averageShap);
+
     return combinedDatasets;
-  }, [shapValuesArray, featureValuesArray, labels, effectiveFeaturesToShow]);
+  }, [
+    shapValuesArray,
+    featureValuesArray,
+    labels,
+    effectiveFeaturesToShow,
+    uuid,
+  ]);
 
   const [sortedShapValuesArray, , sortedLabels] = useMemo(
     () => [

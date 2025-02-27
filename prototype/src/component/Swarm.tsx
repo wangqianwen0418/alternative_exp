@@ -1,6 +1,9 @@
 import * as d3 from "d3";
 import { useEffect, useState, useMemo, useRef } from "react";
 import { TAnnotation } from "../util/types";
+import { useAtom } from "jotai";
+import { uuidAtom } from "../store";
+import { seededShuffle } from "../util/questionBalance";
 
 interface SwarmProps {
   xValues: number[][];
@@ -21,6 +24,7 @@ export default function Swarm(props: SwarmProps) {
   const [brushSelection, setBrushSelection] = useState<[number, number] | null>(
     null
   );
+  const [uuid] = useAtom(uuidAtom);
 
   const {
     xValues,
@@ -112,8 +116,6 @@ export default function Swarm(props: SwarmProps) {
     maxLabelWidth,
     featuresToHighlight,
   ]);
-  // console.log("TRUNCATED SELECTED LABELS:");
-  // console.log(truncatedSelectedLabels);
 
   const leftTitleMargin = maxLabelWidth + 10;
   const margin = useMemo(
@@ -165,18 +167,18 @@ export default function Swarm(props: SwarmProps) {
   );
 
   const sortedDatasetIndices = useMemo(() => {
-    // Sort using only the filtered features
-    const datasetIndices = filteredIndices;
-    return datasetIndices.sort((a, b) => {
-      const avgA = d3.mean(xValues[a], (d) => Math.abs(d)) || 0;
-      const avgB = d3.mean(xValues[b], (d) => Math.abs(d)) || 0;
-      return avgB - avgA;
-    });
-  }, [xValues, filteredIndices]);
+    if (uuid) {
+      return seededShuffle(filteredIndices, uuid);
+    } else {
+      return filteredIndices.sort((a, b) => {
+        const avgA = d3.mean(xValues[a], (d) => Math.abs(d)) || 0;
+        const avgB = d3.mean(xValues[b], (d) => Math.abs(d)) || 0;
+        return avgB - avgA;
+      });
+    }
+  }, [filteredIndices, xValues, uuid]);
 
   const numDatasets = filteredIndices.length;
-  // console.log("number of datasets: " + numDatasets);
-
   const maxPlotHeight = 50;
   const plotHeight = useMemo(() => {
     const calculatedPlotHeight = (height - margin[0] - margin[2]) / numDatasets;

@@ -318,6 +318,7 @@ export default function UserResponse() {
             onClick={() => {
               Cookies.remove("questionIndex");
               Cookies.remove("isSecondPart");
+              Cookies.remove("uuid");
               setQuestionIndex(0); // Reset to first question
               setIsSecondPart(false); // Reset to Part A
               setIsSubmitted(false);
