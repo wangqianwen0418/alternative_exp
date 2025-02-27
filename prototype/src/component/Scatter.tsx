@@ -61,7 +61,6 @@ export default function Scatter(props: ScatterProps) {
     container.selectAll("g.y-axis").remove();
     container.selectAll("g.brush").remove();
 
-    // X-axis
     const xAxisGroup = container
       .append("g")
       .attr("class", "x-axis")
@@ -83,7 +82,6 @@ export default function Scatter(props: ScatterProps) {
       .append("g")
       .attr("class", "y-axis")
       .attr("transform", `translate(${margin[3]}, 0)`);
-
     yAxisGroup.call(d3.axisLeft(yScale));
 
     yAxisGroup
@@ -97,13 +95,8 @@ export default function Scatter(props: ScatterProps) {
       .attr("font-size", labelFontSize)
       .text(yLabel);
 
-    const brushGroup = d3
-      .select(`g.scatter#${id}`)
-      .append("g")
-      .attr("class", "brush");
+    const brushGroup = container.append("g").attr("class", "brush");
     if (!annotation) {
-      const brushGroup = container.append("g").attr("class", "brush");
-
       const brush = d3
         .brush()
         .extent([
@@ -117,27 +110,17 @@ export default function Scatter(props: ScatterProps) {
           const selection = event.selection;
           if (!selection) {
             setSelectedIndices([]);
-            container.selectAll(`.points circle`).attr("opacity", 0.8);
             return;
           }
           const [[x0, y0], [x1, y1]] = selection;
-
           const brushedIndices: number[] = [];
-          container
-            .selectAll(`.points circle`)
-            .attr("opacity", (d: any, i: number) => {
-              const cx = xScale(xValues[i]);
-              const cy = yScale(yValues[i]);
-              const inBrush = x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1;
-              return inBrush ? 0.8 : 0.3;
-            })
-            .each((d: any, i: number) => {
-              const cx = xScale(xValues[i]);
-              const cy = yScale(yValues[i]);
-              if (x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1) {
-                brushedIndices.push(i);
-              }
-            });
+          xValues.forEach((x, i) => {
+            const cx = xScale(x);
+            const cy = yScale(yValues[i]);
+            if (x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1) {
+              brushedIndices.push(i);
+            }
+          });
           setSelectedIndices(brushedIndices);
         });
 
@@ -162,33 +145,31 @@ export default function Scatter(props: ScatterProps) {
     xScale,
     yScale,
     margin,
+    xLabel,
+    yLabel,
   ]);
 
   function isPointHighlighted(i: number): boolean {
-    if (!annotation) return true;
-
-    const x = xValues[i];
-    const y = yValues[i];
-
-    if (annotation.type === "highlightRange") {
-      let xHighlighted = true;
-      let yHighlighted = true;
-
-      if (annotation.xRange) {
-        const [xMin, xMax] = annotation.xRange;
-        if (Number.isFinite(xMin)) xHighlighted = x >= xMin;
-        if (Number.isFinite(xMax)) xHighlighted = xHighlighted && x <= xMax;
+    if (selectedIndices.length > 0) {
+      return selectedIndices.includes(i);
+    } else if (annotation) {
+      if (annotation.type === "highlightRange") {
+        let xOk = true,
+          yOk = true;
+        if (annotation.xRange) {
+          const [xMin, xMax] = annotation.xRange;
+          if (Number.isFinite(xMin)) xOk = xValues[i] >= xMin;
+          if (Number.isFinite(xMax)) xOk = xOk && xValues[i] <= xMax;
+        }
+        if (annotation.yRange) {
+          const [yMin, yMax] = annotation.yRange;
+          if (Number.isFinite(yMin)) yOk = yValues[i] >= yMin;
+          if (Number.isFinite(yMax)) yOk = yOk && yValues[i] <= yMax;
+        }
+        return xOk && yOk;
+      } else if (annotation.type === "highlightDataPoints") {
+        return annotation.dataPoints.includes(xValues[i]);
       }
-
-      if (annotation.yRange) {
-        const [yMin, yMax] = annotation.yRange;
-        if (Number.isFinite(yMin)) yHighlighted = y >= yMin;
-        if (Number.isFinite(yMax)) yHighlighted = yHighlighted && y <= yMax;
-      }
-
-      return xHighlighted && yHighlighted;
-    } else if (annotation.type === "highlightDataPoints") {
-      return annotation.dataPoints.includes(x);
     }
     return true;
   }
@@ -203,27 +184,23 @@ export default function Scatter(props: ScatterProps) {
     const elements = [];
     let highlightedIndices: number[] = [];
 
-    if (annotation) {
+    if (selectedIndices.length > 0) {
+      highlightedIndices = selectedIndices;
+    } else if (annotation) {
       highlightedIndices = xValues
         .map((_, i) => (isPointHighlighted(i) ? i : -1))
         .filter((i) => i !== -1);
-    }
-    if (selectedIndices.length > 0) {
-      highlightedIndices = selectedIndices;
     }
 
     if (highlightedIndices.length > 0) {
       const xHighlightedValues = highlightedIndices.map((i) => xValues[i]);
       const yHighlightedValues = highlightedIndices.map((i) => yValues[i]);
-
       const xMinVal = d3.min(xHighlightedValues);
       const xMaxVal = d3.max(xHighlightedValues);
       const xAvgVal = d3.mean(xHighlightedValues);
-
       const yMinVal = d3.min(yHighlightedValues);
       const yMaxVal = d3.max(yHighlightedValues);
       const yAvgVal = d3.mean(yHighlightedValues);
-
       const statsText = `X - Avg: ${formatValue(xAvgVal)}, Min: ${formatValue(
         xMinVal
       )}, Max: ${formatValue(xMaxVal)} | Y - Avg: ${formatValue(
@@ -235,7 +212,7 @@ export default function Scatter(props: ScatterProps) {
           <text
             key="highlightSelectedCount"
             x={(margin[3] + (width - margin[1])) / 2}
-            y={margin[0] / 2 + 3} // Adjust to position it above
+            y={margin[0] / 2 + 3}
             fill="black"
             fontSize={labelFontSize}
             textAnchor="middle"
@@ -271,21 +248,17 @@ export default function Scatter(props: ScatterProps) {
 
     if (annotation && annotation.type === "highlightRange") {
       const { xRange, yRange } = annotation;
-
       const hasX = !!xRange;
       const hasY = !!yRange;
-
       if (hasX && hasY) {
         const [xMin, xMax] = xRange as [number, number];
         const [yMin, yMax] = yRange as [number, number];
-
         const xStart = Number.isFinite(xMin) ? xScale(xMin) : margin[3];
         const xEnd = Number.isFinite(xMax) ? xScale(xMax) : width - margin[1];
         const yStart = Number.isFinite(yMin)
           ? yScale(yMin)
           : height - margin[2];
         const yEnd = Number.isFinite(yMax) ? yScale(yMax) : margin[0];
-
         elements.push(
           <rect
             key="highlightRect"
@@ -433,7 +406,7 @@ export default function Scatter(props: ScatterProps) {
             r={3}
             stroke="steelblue"
             fill="steelblue"
-            opacity={isPointHighlighted(i) ? 0.8 : 0.3}
+            opacity={isPointHighlighted(i) ? 0.8 : 0.1}
             onMouseOver={(event) => handleMouseOver(event, i)}
             onMouseOut={handleMouseOut}
           />

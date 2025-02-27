@@ -53,7 +53,6 @@ export default function Heatmap({
     const indicesToKeep = d3
       .range(labels.length)
       .filter((idx) => effectiveFeaturesToShow.includes(labels[idx]));
-    // Filter shapValuesArray and featureValuesArray to keep only the selected features
     const averageShapValues = indicesToKeep.map(
       (idx) => d3.mean(shapValuesArray[idx].map(Math.abs)) ?? 0
     );
@@ -343,14 +342,6 @@ export default function Heatmap({
         </text>
 
         {truncatedLabels.map((label, idx) => {
-          // Check if this feature is among the selectedIndexes
-          const isSelected =
-            selectedIndexes.length > 0 && selectedIndexes.includes(idx);
-
-          // console.log(idx);
-          // console.log("Is selected: " + selectedIndexes.includes(idx));
-          // console.log(selectedIndexes);
-
           return (
             <text
               key={idx}

@@ -46,7 +46,7 @@ import Tutorial from "./component/Tutorial";
 import Demographics from "./component/Demographics";
 
 function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
-  const [open, setOpen] = useState(false); // sider drawer
+  const [open, setOpen] = useState(false);
 
   const [, setInsight] = useAtom(insightAtom);
   const [, setFreetext] = useAtom(freeTextAtom);
@@ -164,7 +164,6 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
           aria-label="open drawer"
           onClick={() => setOpen(true)}
           edge="start"
-          // sx={{ mr: 2, ...(open && { display: 'none' }) }}
         >
           <MenuIcon />
         </IconButton>
@@ -246,7 +245,7 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
           show={showTutorial}
           onClose={() => {
             setShowTutorial(false);
-            Cookies.set("showTutorial", "false", { expires: 365 }); // Ensure it doesn't show again
+            Cookies.set("showTutorial", "false", { expires: 365 });
           }}
         />
       )}

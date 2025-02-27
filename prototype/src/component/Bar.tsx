@@ -18,7 +18,6 @@ interface BarProps {
 }
 
 export default function Bar(props: BarProps) {
-  // Reduced right margin significantly
   const margin = useMemo(
     () => [125, 10, 20, 40] as [number, number, number, number],
     []
@@ -243,13 +242,6 @@ export default function Bar(props: BarProps) {
           .style("stroke", "rgba(128, 128, 128, 0.2)");
       }
     }
-    // else if (annotation.type === "highlightBars") {
-    //   if (brushGroupRef.current) {
-    //     brushGroupRef.current.remove();
-    //     brushGroupRef.current = null;
-    //   }
-    //   setSelectedBars(annotation.labels);
-    // }
   }, [
     id,
     annotation,
@@ -264,7 +256,6 @@ export default function Bar(props: BarProps) {
   useEffect(() => {
     // If there are highlighted features, set them as selected bars
     if (featuresToHighlight && featuresToHighlight.length > 0) {
-      // console.log("FEATURES TO HIGHLIGHT: " + highlightedFeatures);
       setSelectedBars(featuresToHighlight);
       d3.selectAll(`g.bar#${id} .bars g.bar-group`).each(function () {
         const featureName = d3.select(this).attr("data-feature-name");
@@ -302,8 +293,6 @@ export default function Bar(props: BarProps) {
                 ? { fill: "black", fontWeight: "bold" }
                 : { fill: "gray", fontWeight: "normal" }
               : { fill: "black", fontWeight: "normal" };
-          // console.log(featureName);
-          // console.log(isSelected);
           return (
             <g
               key={featureName}
@@ -362,8 +351,8 @@ export default function Bar(props: BarProps) {
           />
 
           <text
-            x={xScale(annotation.xValue ?? 0) + 5} // Position slightly to the right of the line
-            y={margin[1] + 100} // Position slightly below the top
+            x={xScale(annotation.xValue ?? 0) + 5}
+            y={margin[1] + 100}
             fill="black"
             fontSize="12px"
           >

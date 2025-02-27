@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { useEffect, useState, useMemo, useRef } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { TAnnotation } from "../util/types";
 import { useAtom } from "jotai";
 import { uuidAtom } from "../store";
@@ -20,12 +20,10 @@ interface SwarmProps {
 }
 
 export default function Swarm(props: SwarmProps) {
-  const [selectedPoints, setSelectedPoints] = useState<number[]>([]);
-  const [brushSelection, setBrushSelection] = useState<[number, number] | null>(
-    null
-  );
   const [uuid] = useAtom(uuidAtom);
-
+  const [localSelectedIndices, setLocalSelectedIndices] = useState<number[]>(
+    []
+  );
   const {
     xValues,
     colorValues,
@@ -53,7 +51,7 @@ export default function Swarm(props: SwarmProps) {
   const effectiveFeaturesToShow = useMemo(() => {
     return featuresToShow && featuresToShow.length > 0
       ? featuresToShow
-      : ["serum triglycerides level", "bmi", "blood pressure", "age", "sex"]; //default array
+      : ["serum triglycerides level", "bmi", "blood pressure", "age", "sex"];
   }, [featuresToShow]);
 
   const filteredIndices = useMemo(() => {
@@ -71,7 +69,6 @@ export default function Swarm(props: SwarmProps) {
         label.length > 5 ? label.slice(0, 5) + "..." : label
       );
     }
-
     canvasContext.font = `${labelFontSize}px sans-serif`;
     return labels.map((label) => {
       let truncatedLabel = label;
@@ -94,7 +91,6 @@ export default function Swarm(props: SwarmProps) {
         label.length > 5 ? label.slice(0, 5) + "..." : label
       );
     }
-
     canvasContext.font = `${labelFontSize}px sans-serif`;
     return featuresToHighlight?.map((label) => {
       let truncatedLabel = label;
@@ -200,9 +196,8 @@ export default function Swarm(props: SwarmProps) {
     () =>
       xValues.map((datasetXValues) => {
         let yVals = new Array(datasetXValues.length);
-        const buckets: {
-          [key: string]: { value: number; index: number }[];
-        } = {};
+        const buckets: { [key: string]: { value: number; index: number }[] } =
+          {};
         datasetXValues.forEach((val, index) => {
           const bucketKey = Math.floor(val / bucketWidth);
           if (!buckets[bucketKey]) {
@@ -229,12 +224,10 @@ export default function Swarm(props: SwarmProps) {
       sortedDatasetIndices.map((dataIndex, datasetIndex) => {
         const yVals = yValsArray[dataIndex];
         const yExtent = d3.extent(yVals) as [number, number];
-
         if (yExtent[0] === yExtent[1]) {
           yExtent[0] -= 1;
           yExtent[1] += 1;
         }
-
         return d3
           .scaleLinear()
           .domain(yExtent)
@@ -247,13 +240,14 @@ export default function Swarm(props: SwarmProps) {
   );
 
   function handleMouseOver(event: any, datasetIndex: number, i: number) {
-    const dataIndex = sortedDatasetIndices[datasetIndex];
-    const xPos = xScale(xValues[dataIndex][i]);
-    const yPos = yScales[datasetIndex](yValsArray[dataIndex][i]);
+    const xPos = xScale(xValues[sortedDatasetIndices[datasetIndex]][i]);
+    const yPos = yScales[datasetIndex](
+      yValsArray[sortedDatasetIndices[datasetIndex]][i]
+    );
     setTooltip({
       x: xPos,
       y: yPos,
-      dataX: xValues[dataIndex][i],
+      dataX: xValues[sortedDatasetIndices[datasetIndex]][i],
     });
   }
 
@@ -277,15 +271,10 @@ export default function Swarm(props: SwarmProps) {
     avg: number;
   } | null>(null);
 
-  const [selectedDatasetIndex, setSelectedDatasetIndex] = useState<
-    number | null
-  >(null);
-
-  const highlightedIndices = useMemo(() => {
+  // When an annotation is provided, compute the corresponding indices and update the selectedIndices.
+  useEffect(() => {
     if (annotation) {
       const dataIndex = labels.indexOf(annotation.label!);
-      // console.log("LABEL: ");
-      // console.log(annotation.label!);
       if (dataIndex !== -1) {
         const datasetXValues = xValues[dataIndex];
         let indices: number[] = [];
@@ -315,35 +304,37 @@ export default function Swarm(props: SwarmProps) {
         } else if (annotation.type === "singleLine") {
           indices = datasetXValues.map((_, i) => i);
         }
-        return indices;
-      }
-    }
-    return [];
-  }, [annotation, labels, xValues, xScale]);
-
-  useEffect(() => {
-    if (annotation) {
-      if (highlightedIndices.length > 0) {
-        const dataIndex = labels.indexOf(annotation.label!);
-        if (dataIndex !== -1) {
-          const datasetXValues = xValues[dataIndex];
-          const xHighlightedValues = highlightedIndices.map(
-            (i) => datasetXValues[i]
-          );
+        setSelectedIndices(indices);
+        if (indices.length > 0) {
+          const xHighlightedValues = indices.map((i) => datasetXValues[i]);
           const min = d3.min(xHighlightedValues) ?? 0;
           const max = d3.max(xHighlightedValues) ?? 0;
           const avg = d3.mean(xHighlightedValues) ?? 0;
-          setDatasetStats({
-            min,
-            max,
-            avg,
-          });
+          setDatasetStats({ min, max, avg });
+        } else {
+          setDatasetStats(null);
         }
       } else {
         setDatasetStats(null);
       }
     }
-  }, [annotation, highlightedIndices, labels, xValues]);
+  }, [annotation, labels, xValues, xScale, setSelectedIndices]);
+
+  // Update datasetStats when selection comes from brushing.
+  useEffect(() => {
+    if (!annotation && selectedIndices.length > 0) {
+      // Assume the first dataset is the one being brushed.
+      const dataIndex = sortedDatasetIndices[0];
+      const datasetXValues = xValues[dataIndex];
+      const xSelectedValues = selectedIndices.map((i) => datasetXValues[i]);
+      const min = d3.min(xSelectedValues) ?? 0;
+      const max = d3.max(xSelectedValues) ?? 0;
+      const avg = d3.mean(xSelectedValues) ?? 0;
+      setDatasetStats({ min, max, avg });
+    } else if (!annotation) {
+      setDatasetStats(null);
+    }
+  }, [annotation, selectedIndices, sortedDatasetIndices, xValues]);
 
   useEffect(() => {
     d3.select(`g.swarm#${id} g.x-axis`).remove();
@@ -392,7 +383,6 @@ export default function Swarm(props: SwarmProps) {
     const legendX = width - margin[1] + 30;
     const middleY = margin[0] + (totalPlotHeight - margin[0] - margin[2]) / 2;
     const legendY = middleY - legendHeight / 2;
-
     d3.select(`g.swarm#${id} .legend`).remove();
     d3.select(`g.swarm#${id} .legend-title`).remove();
     d3.select(`g.swarm#${id} .legend-label`).remove();
@@ -437,14 +427,13 @@ export default function Swarm(props: SwarmProps) {
       .attr("font-size", labelFontSize)
       .text(formatValue(colorScale.domain()[1]));
 
+    // Only add brushing if there is no annotation.
     if (!annotation) {
       const brushes: any[] = [];
-
       sortedDatasetIndices.forEach((dataIndex, datasetIndex) => {
         const yCenter = yCenters[datasetIndex];
         const yStart = yCenter - plotHeight / 2;
         const yEnd = yCenter + plotHeight / 2;
-
         const brush = d3
           .brushX()
           .extent([
@@ -463,7 +452,7 @@ export default function Swarm(props: SwarmProps) {
               const selection = event.selection;
               if (!selection) {
                 setSelectedIndices([]);
-                setSelectedDatasetIndex(null);
+                setLocalSelectedIndices([]);
                 d3.selectAll(`g.swarm#${id} .points circle`).attr("opacity", 1);
                 setDatasetStats(null);
                 return;
@@ -479,37 +468,26 @@ export default function Swarm(props: SwarmProps) {
                 }
               });
               setSelectedIndices(brushedIndices);
-              setSelectedDatasetIndex(datasetIndex);
-
+              setLocalSelectedIndices(brushedIndices);
               const min = d3.min(brushedValues) ?? 0;
               const max = d3.max(brushedValues) ?? 0;
               const avg = d3.mean(brushedValues) ?? 0;
-              setDatasetStats({
-                min,
-                max,
-                avg,
-              });
-
+              setDatasetStats({ min, max, avg });
               sortedDatasetIndices.forEach((dataIdx, idx) => {
                 d3.selectAll(`g.swarm#${id} .points-${idx} circle`).attr(
                   "opacity",
-                  (d, i) => {
-                    return brushedIndices.includes(i) ? 1 : 0.3;
-                  }
+                  (d, i) => (brushedIndices.includes(i) ? 1 : 0.1)
                 );
               });
             } catch (error) {
               console.error("Brush event error:", error);
             }
           });
-
         brushes.push(brush);
-
         const brushGroup = d3
           .select(`g.swarm#${id}`)
           .append("g")
           .attr("class", `brush brush-${datasetIndex}`);
-
         brushGroup
           .call(brush)
           .selectAll(".selection")
@@ -538,35 +516,19 @@ export default function Swarm(props: SwarmProps) {
     annotation,
   ]);
 
+  // Update point opacity based solely on selectedIndices.
   useEffect(() => {
-    if (annotation && highlightedIndices.length > 0) {
+    if (selectedIndices.length > 0) {
       sortedDatasetIndices.forEach((dataIdx, idx) => {
         d3.selectAll(`g.swarm#${id} .points-${idx} circle`).attr(
           "opacity",
-          (d, i) => {
-            return highlightedIndices.includes(i) ? 1 : 0.3;
-          }
-        );
-      });
-    } else if (selectedIndices.length > 0 && selectedDatasetIndex !== null) {
-      sortedDatasetIndices.forEach((dataIdx, idx) => {
-        d3.selectAll(`g.swarm#${id} .points-${idx} circle`).attr(
-          "opacity",
-          (d, i) => {
-            return selectedIndices.includes(i) ? 1 : 0.3;
-          }
+          (d, i) => (selectedIndices.includes(i) ? 1 : 0.1)
         );
       });
     } else {
       d3.selectAll(`g.swarm#${id} .points circle`).attr("opacity", 1);
     }
-  }, [
-    annotation,
-    highlightedIndices,
-    sortedDatasetIndices,
-    selectedIndices,
-    selectedDatasetIndex,
-  ]);
+  }, [sortedDatasetIndices, selectedIndices, id]);
 
   return (
     <g className="swarm" id={id}>
@@ -577,7 +539,6 @@ export default function Swarm(props: SwarmProps) {
         fill="white"
         stroke="black"
       />
-
       <g className="annotations">
         {datasetStats ? (
           <>
@@ -614,23 +575,15 @@ export default function Swarm(props: SwarmProps) {
           </text>
         )}
       </g>
-
       {sortedDatasetIndices.map((dataIndex, datasetIndex) => {
         const datasetXValues = xValues[dataIndex];
         const datasetYVals = yValsArray[dataIndex];
         const datasetColorValues = colorValues[dataIndex];
         const datasetID = labels[dataIndex];
         const truncatedLabel = truncatedLabels[dataIndex];
-
         const yScale = yScales[datasetIndex];
-
         const isAnnotationForDataset =
           annotation && annotation.label === datasetID;
-
-        // console.log(
-        //   "next check: " + annotation + ", label: " + annotation?.label
-        // );
-
         return (
           <g
             className={`points points-${datasetIndex}`}
@@ -644,14 +597,14 @@ export default function Swarm(props: SwarmProps) {
               fontSize={labelFontSize}
               fontWeight={
                 truncatedSelectedLabels && truncatedSelectedLabels.length > 0
-                  ? truncatedSelectedLabels?.includes(truncatedLabel)
+                  ? truncatedSelectedLabels.includes(truncatedLabel)
                     ? "bold"
                     : "normal"
                   : "normal"
               }
               fill={
                 truncatedSelectedLabels && truncatedSelectedLabels.length > 0
-                  ? truncatedSelectedLabels?.includes(truncatedLabel)
+                  ? truncatedSelectedLabels.includes(truncatedLabel)
                     ? "black"
                     : "gray"
                   : "black"
@@ -659,59 +612,48 @@ export default function Swarm(props: SwarmProps) {
             >
               {truncatedLabel}
             </text>
-            <>
-              {annotation &&
-                annotation.type === "singleLine" &&
-                annotation.xValue !== undefined && (
-                  <line
-                    x1={xScale(annotation.xValue!)}
-                    x2={xScale(annotation.xValue!)}
-                    y1={yCenters[datasetIndex] - plotHeight / 2}
-                    y2={yCenters[datasetIndex] + plotHeight / 2}
-                    stroke="black"
-                    strokeDasharray="4,2"
-                  />
-                )}
-            </>
-
-            {isAnnotationForDataset && annotation && (
-              <>
-                {annotation.type === "highlightRange" && (
-                  <>
-                    {isFinite(annotation.xRange![0]) && (
-                      <line
-                        x1={xScale(annotation.xRange![0])}
-                        x2={xScale(annotation.xRange![0])}
-                        y1={yCenters[datasetIndex] - plotHeight / 2}
-                        y2={yCenters[datasetIndex] + plotHeight / 2}
-                        stroke="black"
-                        strokeDasharray="4,2"
-                      />
-                    )}
-                    {isFinite(annotation.xRange![1]) && (
-                      <line
-                        x1={xScale(annotation.xRange![1])}
-                        x2={xScale(annotation.xRange![1])}
-                        y1={yCenters[datasetIndex] - plotHeight / 2}
-                        y2={yCenters[datasetIndex] + plotHeight / 2}
-                        stroke="black"
-                        strokeDasharray="4,2"
-                      />
-                    )}
-                  </>
-                )}
-              </>
-            )}
-
+            {annotation &&
+              annotation.type === "singleLine" &&
+              annotation.xValue !== undefined && (
+                <line
+                  x1={xScale(annotation.xValue)}
+                  x2={xScale(annotation.xValue)}
+                  y1={yCenters[datasetIndex] - plotHeight / 2}
+                  y2={yCenters[datasetIndex] + plotHeight / 2}
+                  stroke="black"
+                  strokeDasharray="4,2"
+                />
+              )}
+            {isAnnotationForDataset &&
+              annotation &&
+              annotation.type === "highlightRange" && (
+                <>
+                  {isFinite(annotation.xRange![0]) && (
+                    <line
+                      x1={xScale(annotation.xRange![0])}
+                      x2={xScale(annotation.xRange![0])}
+                      y1={yCenters[datasetIndex] - plotHeight / 2}
+                      y2={yCenters[datasetIndex] + plotHeight / 2}
+                      stroke="black"
+                      strokeDasharray="4,2"
+                    />
+                  )}
+                  {isFinite(annotation.xRange![1]) && (
+                    <line
+                      x1={xScale(annotation.xRange![1])}
+                      x2={xScale(annotation.xRange![1])}
+                      y1={yCenters[datasetIndex] - plotHeight / 2}
+                      y2={yCenters[datasetIndex] + plotHeight / 2}
+                      stroke="black"
+                      strokeDasharray="4,2"
+                    />
+                  )}
+                </>
+              )}
             {datasetXValues.map((x, i) => {
-              let isHighlighted = true;
-
-              if (selectedIndices.length > 0 && selectedDatasetIndex !== null) {
-                isHighlighted = selectedIndices.includes(i);
-              } else if (annotation && isAnnotationForDataset) {
-                isHighlighted = highlightedIndices.includes(i);
-              }
-
+              // Use selectedIndices exclusively for determining opacity.
+              const isHighlighted =
+                selectedIndices.length > 0 ? selectedIndices.includes(i) : true;
               return (
                 <circle
                   key={i}
@@ -719,7 +661,7 @@ export default function Swarm(props: SwarmProps) {
                   cy={yScale(datasetYVals[i])}
                   r={radius}
                   fill={colorScale(datasetColorValues[i])}
-                  opacity={isHighlighted ? 1 : 0.3}
+                  opacity={isHighlighted ? 1 : 0.1}
                   onMouseOver={(event) =>
                     handleMouseOver(event, datasetIndex, i)
                   }
@@ -730,7 +672,6 @@ export default function Swarm(props: SwarmProps) {
           </g>
         );
       })}
-
       {tooltip && (
         <g
           className="tooltip"
