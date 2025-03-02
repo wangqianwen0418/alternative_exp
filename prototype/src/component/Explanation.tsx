@@ -195,7 +195,7 @@ export default function Explanation() {
   }
 
   let additionalVisualizations;
-  if (insight?.graph.graphType) {
+  if (insight?.graph.graphType && isUserStudy) {
     switch (insight?.graph.graphType) {
       case "Bar":
         additionalVisualizations = isSubmitted && (
