@@ -30,6 +30,7 @@ import {
   questionOrderAtom,
   tutorialAtom,
   selectedIndicesAtom,
+  isUserStudyAtom,
 } from "../store";
 import { test_weburl } from "../util/appscript_url";
 import Cookies from "js-cookie";
@@ -61,6 +62,7 @@ export default function UserResponse() {
   const [difficultQuestions, setDifficultQuestions] = useState("");
   const [difficultGraphs, setDifficultGraphs] = useState("");
   const [, setSelectedIndices] = useAtom(selectedIndicesAtom);
+  const [isUserStudy] = useAtom(isUserStudyAtom);
 
   const [modalVisible, setModalVisible] = React.useState(false);
   const [userAnswer, setUserAnswer] = React.useState<
@@ -136,7 +138,7 @@ export default function UserResponse() {
       console.error("Error submitting form:", error);
     }
 
-    if (isSecondPart) {
+    if (isSecondPart && isUserStudy) {
       if (isLastQuestion) {
         setModalVisible(true);
       } else {
@@ -180,7 +182,7 @@ export default function UserResponse() {
   };
 
   const onStepperNext = () => {
-    if (isSecondPart) {
+    if (isSecondPart && isUserStudy) {
       if (isLastQuestion) {
         setModalVisible(true);
       } else {
