@@ -28,7 +28,6 @@ interface DemographicsProps {
 }
 
 export default function Demographics({ show, onSubmit }: DemographicsProps) {
-  //const theme = useTheme();
   const [age, setAge] = useState<string>("");
   const [gender, setGender] = useState<string>("");
   const [otherGender, setOtherGender] = useState<string>("");
@@ -37,7 +36,6 @@ export default function Demographics({ show, onSubmit }: DemographicsProps) {
   const [mlExperience, setMlExperience] = useState<string>("");
   const [uuid] = useAtom(uuidAtom);
 
-  // Check if all required fields are filled.
   const isFormValid = () => {
     if (!age || !gender || !educationLevel || !occupation || !mlExperience)
       return false;

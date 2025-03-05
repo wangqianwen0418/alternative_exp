@@ -29,6 +29,7 @@ import {
   uuidAtom,
   questionOrderAtom,
   tutorialAtom,
+  selectedIndicesAtom,
 } from "../store";
 import { pilot_weburl } from "../util/appscript_url";
 import Cookies from "js-cookie";
@@ -59,6 +60,7 @@ export default function UserResponse() {
   const [secondVisFeedback, setSecondVisFeedback] = useState("");
   const [difficultQuestions, setDifficultQuestions] = useState("");
   const [difficultGraphs, setDifficultGraphs] = useState("");
+  const [, setSelectedIndices] = useAtom(selectedIndicesAtom);
 
   const [modalVisible, setModalVisible] = React.useState(false);
   const [userAnswer, setUserAnswer] = React.useState<
@@ -92,6 +94,7 @@ export default function UserResponse() {
     setInitVis(QuestionList[nextQuestionIndex].initVis);
     setSecondVis(QuestionList[nextQuestionIndex].secondVis);
     setName(QuestionList[nextQuestionIndex].pageName);
+    setSelectedIndices([]);
 
     setUserAnswer(undefined);
     setConfidence(confidenceOptions[0]);
@@ -145,6 +148,7 @@ export default function UserResponse() {
       setConfidence(confidenceOptions[0]);
       setIsSecondPart(true);
       setIsSubmitted(true);
+      setSelectedIndices([]);
       Cookies.set("isSecondPart", "true");
     }
   };
@@ -190,6 +194,7 @@ export default function UserResponse() {
       setConfidence(confidenceOptions[0]);
       setIsSecondPart(true);
       setIsSubmitted(true);
+      setSelectedIndices([]);
       Cookies.set("isSecondPart", "true");
     }
   };
@@ -326,6 +331,20 @@ export default function UserResponse() {
             }}
           >
             Reset User Study
+          </Button>
+          <Button
+            variant="outlined"
+            sx={{ ml: 2 }}
+            onClick={() => {
+              Cookies.remove("questionIndex");
+              Cookies.remove("isSecondPart");
+              Cookies.remove("uuid");
+              setQuestionIndex(0); // Reset to first question
+              setIsSecondPart(false); // Reset to Part A
+              setIsSubmitted(false);
+            }}
+          >
+            Reset UUID
           </Button>
 
           <Button

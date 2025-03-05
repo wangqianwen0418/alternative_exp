@@ -15,14 +15,13 @@ export const QuestionList: TQuestion[] = [
     secondVis: "scatter", // randomly chosen
     newVis: {
       graphType: "Scatter",
-      xValues: "BMI feature values",
-      yValues: "BMI SHAP (Contribution) values",
-      annotation: [
+      xValues: "BMI Feature Values",
+      yValues: "BMI SHAP (Contribution) Values",
+      annotation: 
         {
           type: "singleLine",
           xValue: 20,
         },
-      ],
     },
     insight: {
       variables: [
@@ -42,12 +41,11 @@ export const QuestionList: TQuestion[] = [
         yValues: "None",
         featuresToHighlight: ["bmi"],
         featuresToShow: ["bmi", "serum triglycerides level", "blood pressure"],
-        annotation: [
+        annotation: 
           {
             type: "singleLine",
             xValue: 20,
           },
-        ],
       },
     },
     testCondition: "random vis",
@@ -76,7 +74,6 @@ export const QuestionList: TQuestion[] = [
           type: "singleLine",
           xValue: 5,
         },
-      ],
     },
     insight: {
       variables: [
@@ -96,12 +93,11 @@ export const QuestionList: TQuestion[] = [
         yValues: "None",
         featuresToHighlight: ["serum triglycerides level", "blood sugar level"],
         featuresToShow: ["serum triglycerides level", "blood sugar level", "bmi", "age"],
-        annotation: [
+        annotation: 
           {
             type: "singleLine",
             xValue: 5,
           },
-        ],
       },
     },
     testCondition: "ours",
@@ -118,23 +114,22 @@ export const QuestionList: TQuestion[] = [
       yValues: "None",
       featuresToHighlight: ["serum triglycerides level"],
       featuresToShow: ["serum triglycerides level", "bmi", "blood sugar level"],
-      // annotation: [
+      // annotation: 
       //   {type: "singleLine",
       //     xValue: 30,
       //   }
-      // ]
+      // 
     },
     secondVis: "scatter", // randomly chosen
     newVis: {
       graphType: "Scatter",
-      xValues: "Serum triglycerides feature values",
-      yValues: "Serum triglycerides SHAP (Contribution) values",
-      annotation: [
+      xValues: "Serum Triglycerides Feature Values",
+      yValues: "Serum Triglycerides SHAP (Contribution) Values",
+      annotation: 
         {
           type: "singleLine",
           yValue: 30,
         },
-      ],
     },
     insight: {
       variables: [
@@ -150,16 +145,15 @@ export const QuestionList: TQuestion[] = [
       condition: undefined,
       graph: {
         graphType: "Scatter",
-        xValues: "Serum triglycerides feature values",
-        yValues: "Serum triglycerides SHAP (Contribution) values",
+        xValues: "Serum Triglycerides Feature Values",
+        yValues: "Serum Triglycerides SHAP (Contribution) Values",
         featuresToHighlight: ["serum triglycerides level"],
         //featuresToShow: ["serum triglycerides level", "bmi", "blood sugar"]
-        annotation: [
+        annotation:
           {
             type: "singleLine",
             yValue: 30,
           },
-        ],
       },
     },
     testCondition: "random vis",
@@ -183,12 +177,11 @@ export const QuestionList: TQuestion[] = [
       xValues: "None",
       yValues: "None",
       featuresToHighlight: ["serum cholesterol"],
-      annotation: [
+      annotation:
         {
           type: "singleLine",
           xValue: 2.5,
         },
-      ],
     },
     insight: {
       variables: [
@@ -204,12 +197,12 @@ export const QuestionList: TQuestion[] = [
       condition: undefined,
       graph: {
         graphType: "Scatter",
-        xValues: "Blood sugar feature values",
-        yValues: "Blood sugar SHAP (Contribution) values",
-        annotation: [{
+        xValues: "Blood Sugar Feature Values",
+        yValues: "Blood Sugar SHAP (Contribution) Values",
+        annotation: {
           type: "highlightRange",
           xRange: [-0.05, 0.05]
-        }]
+        }
       },
     },
     testCondition: "ours",
@@ -233,12 +226,11 @@ export const QuestionList: TQuestion[] = [
       xValues: "none",
       yValues: "none",
       featuresToHighlight: ["blood pressure, age"],
-      annotation: [
+      annotation: 
         {
           type: "singleLine",
           xValue: 5,
         },
-      ],
     },
     insight: {
       variables: [
@@ -262,7 +254,7 @@ export const QuestionList: TQuestion[] = [
         yValues: "none",
         featuresToHighlight: ["blood pressure", "age"],
         featuresToShow: ["blood pressure", "age", "sex", "bmi"],
-        annotation: [{ type: "singleLine", xValue: 5 }],
+        annotation: { type: "singleLine", xValue: 5 },
       },
     },
     testCondition: "random vis",
@@ -275,8 +267,8 @@ export const QuestionList: TQuestion[] = [
       "BMI contributes positively to diabetes risk for more patients than sex does.",
     initVis: {
       graphType: "Scatter",
-      xValues: "BMI feature values",
-      yValues: "BMI SHAP (Contribution) values",
+      xValues: "BMI Feature Values",
+      yValues: "BMI SHAP (Contribution) Values",
     },
     secondVis: "bar", // randomly chosen
     newVis: {
@@ -284,12 +276,11 @@ export const QuestionList: TQuestion[] = [
       xValues: "None",
       yValues: "None",
       featuresToHighlight: ["bmi", "sex"],
-      annotation: [
+      annotation: 
         {
           type: "singleLine",
           xValue: 1,
         },
-      ],
     },
     insight: {
       variables: [
@@ -313,12 +304,11 @@ export const QuestionList: TQuestion[] = [
         yValues: "None",
         featuresToHighlight: ["bmi", "sex"],
         featuresToShow: ["blood pressure", "bmi", "sex", "blood sugar level"],
-        annotation: [
+        annotation: 
           {
             type: "singleLine",
             xValue: 0,
           },
-        ],
       },
     },
     testCondition: "random vis",
@@ -331,8 +321,8 @@ export const QuestionList: TQuestion[] = [
       "age contributes positively to more instances than Low-Density Lipoproteins.",
     initVis: {
       graphType: "Scatter",
-      xValues: "LDL feature values",
-      yValues: "LDL SHAP (Contribution) values",
+      xValues: "LDL Feature Values",
+      yValues: "LDL SHAP (Contribution) Values",
     },
     secondVis: "beeswarm",
     newVis: {
@@ -340,7 +330,7 @@ export const QuestionList: TQuestion[] = [
       xValues: "None",
       yValues: "None",
       //features: ["age", "low-density lipoproteins"],
-      annotation: [{ type: "singleLine", xValue: 0 }],
+      annotation: { type: "singleLine", xValue: 0 },
     },
     insight: {
       variables: [
@@ -377,8 +367,8 @@ export const QuestionList: TQuestion[] = [
       "Blood pressure has larger deviations in its contribution to diabetes risk compared to age",
     initVis: {
       graphType: "Scatter",
-      xValues: "Blood pressure feature values",
-      yValues: "Blood pressure SHAP (Contribution) values",
+      xValues: "Blood Pressure Feature Values",
+      yValues: "Blood Pressure SHAP (Contribution) Values",
     },
     secondVis: "bar", // randomly chosen
     newVis: {
@@ -387,12 +377,11 @@ export const QuestionList: TQuestion[] = [
       yValues: "None",
       featuresToHighlight: ["blood pressure", "age"],
       featuresToShow: ["blood pressure", "age", "blood sugar level", "bmi"],
-      annotation: [
+      annotation:
         {
           type: "singleLine",
           xValue: 8,
         },
-      ],
     },
     insight: {
       variables: [
@@ -416,12 +405,11 @@ export const QuestionList: TQuestion[] = [
         yValues: "BMI",
         featuresToHighlight: ["blood pressure", "age"],
         featuresToShow: ["blood pressure", "age", "blood sugar level", "low-density lipoproteins"],
-        annotation: [
+        annotation:
           {
             type: "singleLine",
             xValue: 8,
           },
-        ],
       },
     },
     testCondition: "random vis",
@@ -442,8 +430,8 @@ export const QuestionList: TQuestion[] = [
     secondVis: "scatter",
     newVis: {
       graphType: "Scatter",
-      xValues: "Blood pressure feature values",
-      yValues: "Blood pressure SHAP (Contribution) values",
+      xValues: "Blood Pressure Feature Values",
+      yValues: "Blood Pressure SHAP (Contribution) Values",
     },
     insight: {
       variables: [
@@ -463,8 +451,8 @@ export const QuestionList: TQuestion[] = [
       condition: undefined,
       graph: {
         graphType: "Scatter",
-        xValues: "BMI feature values",
-        yValues: "BMI SHAP (Contribution) values",
+        xValues: "BMI Feature Values",
+        yValues: "BMI SHAP (Contribution) Values",
       },
     },
     testCondition: "ours",
@@ -485,14 +473,13 @@ export const QuestionList: TQuestion[] = [
     secondVis: "scatter", // randomly chosen
     newVis: {
       graphType: "Scatter",
-      xValues: "Age feature values",
-      yValues: "Age SHAP (Contribution) values",
-      annotation: [
+      xValues: "Age Feature Values",
+      yValues: "Age SHAP (Contribution) Values",
+      annotation: 
         {
           type: "highlightRange",
           xRange: [-0.1, 0],
         },
-      ],
     },
     insight: {
       variables: [
@@ -512,10 +499,10 @@ export const QuestionList: TQuestion[] = [
       condition: { featureName: "age", range: [-0.1, 0] },
       // graph: {
       //   graphType: "two-scatter",
-      //   xValues: "Blood pressure feature values",
+      //   xValues: "Blood Pressure Feature Values",
       //   yValues: "Blood pressure SHAP values",
-      //   colorValues: "BMI feature values",
-      //   annotation: [
+      //   colorValues: "BMI Feature Values",
+      //   annotation:
       //     {
       //       type: "twoColorRange",
       //       range: [
@@ -523,18 +510,16 @@ export const QuestionList: TQuestion[] = [
       //         [0,0.1]
       //       ]
       //     },
-      //   ],
       // },
       graph: {
         graphType: "Scatter",
-        xValues: "Blood pressure feature values",
-        yValues: "Blood pressure SHAP (Contribution) values",
-        // annotation: [
+        xValues: "Blood Pressure Feature Values",
+        yValues: "Blood Pressure SHAP (Contribution) Values",
+        // annotation: 
         //   {
         //     type: "highlightRange",
         //     xRange: [-0.1, 0],
         //   },
-        // ],
       },
     },
     testCondition: "random vis",
@@ -555,14 +540,13 @@ export const QuestionList: TQuestion[] = [
     secondVis: "scatter",
     newVis: {
       graphType: "Scatter",
-      xValues: "BMI feature values",
-      yValues: "BMI SHAP (Contribution) values",
-      annotation: [
+      xValues: "BMI Feature Values",
+      yValues: "BMI SHAP (Contribution) Values",
+      annotation:
         {
           type: "highlightRange",
           xRange: [0.05, 0.1],
         },
-      ],
     },
     insight: {
       variables: [
@@ -582,14 +566,13 @@ export const QuestionList: TQuestion[] = [
       condition: { featureName: "bmi", range: [0.05, 0.1] },
       graph: {
         graphType: "Scatter",
-        xValues: "BMI feature values",
-        yValues: "BMI SHAP (Contribution) values",
-        annotation: [
+        xValues: "BMI Feature Values",
+        yValues: "BMI SHAP (Contribution) Values",
+        annotation:
           {
             type: "highlightRange",
             xRange: [0.05, 0.1],
           },
-        ],
       },
     },
     testCondition: "ours",
@@ -610,8 +593,8 @@ export const QuestionList: TQuestion[] = [
     secondVis: "scatter",
     newVis: {
       graphType: "Scatter",
-      xValues: "BMI feature values",
-      yValues: "BMI SHAP (Contribution) values",
+      xValues: "BMI Feature Values",
+      yValues: "BMI SHAP (Contribution) Values",
     },
     insight: {
       variables: [
@@ -637,10 +620,10 @@ export const QuestionList: TQuestion[] = [
       },
       graph: {
         graphType: "two-scatter",
-        xValues: "BMI feature values",
-        yValues: "BMI SHAP (Contribution) values",
-        colorValues: "Age feature values",
-        annotation: [
+        xValues: "BMI Feature Values",
+        yValues: "BMI SHAP (Contribution) Values",
+        colorValues: "Age Feature Values",
+        annotation: 
           {
             type: "twoColorRange",
             range: [
@@ -648,7 +631,6 @@ export const QuestionList: TQuestion[] = [
               [0, 0.02],
             ],
           },
-        ],
       },
     },
     testCondition: "ours",

@@ -1,7 +1,7 @@
 import { TQuestion } from "./types";
 import { QuestionList } from "./questionList";
 
-const seededShuffle = <T>(array: T[], seed: string): T[] => {
+export const seededShuffle = <T>(array: T[], seed: string): T[] => {
   const shuffled = array.slice();
   let currentIndex = shuffled.length;
   let randomIndex;

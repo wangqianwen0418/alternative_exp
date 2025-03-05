@@ -1,6 +1,9 @@
 import * as d3 from "d3";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { TAnnotation } from "../util/types";
+import { seededShuffle } from "../util/questionBalance";
+import { uuidAtom } from "../store";
+import { useAtom } from "jotai";
 
 interface BarProps {
   allShapValues: number[][];
@@ -15,7 +18,6 @@ interface BarProps {
 }
 
 export default function Bar(props: BarProps) {
-  // Reduced right margin significantly
   const margin = useMemo(
     () => [125, 10, 20, 40] as [number, number, number, number],
     []
@@ -35,6 +37,7 @@ export default function Bar(props: BarProps) {
 
   const [selectedBars, setSelectedBars] = useState<string[]>([]);
   const brushGroupRef = useRef<any>(null);
+  const [uuid] = useAtom(uuidAtom);
 
   const labelFontSize = 13;
   const maxLabelWidth = 100;
@@ -47,9 +50,9 @@ export default function Bar(props: BarProps) {
   }, []);
 
   const effectiveFeaturesToShow = useMemo(() => {
-    return (featuresToShow && featuresToShow.length > 0)
+    return featuresToShow && featuresToShow.length > 0
       ? featuresToShow
-      : ["serum triglycerides level", "bmi", "blood pressure", "age", "sex", "low-density lipoproteins"]; //default array
+      : ["serum triglycerides level", "bmi", "blood pressure", "age", "sex"]; //default array
   }, [featuresToShow]);
 
   const filteredIndices = useMemo(() => {
@@ -113,10 +116,12 @@ export default function Bar(props: BarProps) {
       avgShapeValues[featureName] =
         values.reduce((a, b) => a + b, 0) / values.length;
     }
-
-    return Object.entries(avgShapeValues)
-      .sort((a, b) => b[1] - a[1]); // Sorted descending by average value
-  }, [filteredFeatureNames, filteredShapValues]);
+    if (uuid) {
+      return seededShuffle(Object.entries(avgShapeValues), uuid);
+    } else {
+      return Object.entries(avgShapeValues).sort((a, b) => b[1] - a[1]);
+    }
+  }, [filteredFeatureNames, filteredShapValues, uuid]);
 
   const yScale = useMemo(
     () =>
@@ -162,7 +167,9 @@ export default function Bar(props: BarProps) {
 
   const maxXValue = useMemo(() => {
     const flatValues = filteredShapValues.flat();
-    return flatValues.length ? Math.max(...flatValues.map((d) => Math.abs(d))) : 0;
+    return flatValues.length
+      ? Math.max(...flatValues.map((d) => Math.abs(d)))
+      : 0;
   }, [filteredShapValues]);
 
   useEffect(() => {
@@ -235,13 +242,6 @@ export default function Bar(props: BarProps) {
           .style("stroke", "rgba(128, 128, 128, 0.2)");
       }
     }
-    // else if (annotation.type === "highlightBars") {
-    //   if (brushGroupRef.current) {
-    //     brushGroupRef.current.remove();
-    //     brushGroupRef.current = null;
-    //   }
-    //   setSelectedBars(annotation.labels);
-    // }
   }, [
     id,
     annotation,
@@ -256,7 +256,6 @@ export default function Bar(props: BarProps) {
   useEffect(() => {
     // If there are highlighted features, set them as selected bars
     if (featuresToHighlight && featuresToHighlight.length > 0) {
-      // console.log("FEATURES TO HIGHLIGHT: " + highlightedFeatures);
       setSelectedBars(featuresToHighlight);
       d3.selectAll(`g.bar#${id} .bars g.bar-group`).each(function () {
         const featureName = d3.select(this).attr("data-feature-name");
@@ -294,8 +293,6 @@ export default function Bar(props: BarProps) {
                 ? { fill: "black", fontWeight: "bold" }
                 : { fill: "gray", fontWeight: "normal" }
               : { fill: "black", fontWeight: "normal" };
-          // console.log(featureName);
-          // console.log(isSelected);
           return (
             <g
               key={featureName}
@@ -305,7 +302,7 @@ export default function Bar(props: BarProps) {
             >
               <text
                 x={margin[0] - 2}
-                y={(yScale(featureName) as number) + yScale.bandwidth() * 0.8}
+                y={(yScale(featureName) as number) + yScale.bandwidth() * 0.6}
                 textAnchor="end"
                 style={textStyle}
                 fontSize={labelFontSize}
@@ -354,8 +351,8 @@ export default function Bar(props: BarProps) {
           />
 
           <text
-            x={xScale(annotation.xValue ?? 0) + 5} // Position slightly to the right of the line
-            y={margin[1] + 200} // Position slightly below the top
+            x={xScale(annotation.xValue ?? 0) + 5}
+            y={margin[1] + 100}
             fill="black"
             fontSize="12px"
           >

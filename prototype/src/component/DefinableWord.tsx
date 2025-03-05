@@ -28,7 +28,7 @@ const DefinableWord: React.FC<DefinableWordProps> = ({ word, definition }) => {
           color: "#1976d2",
           cursor: "pointer",
           textDecoration: "underline",
-          position: "relative", // Add relative positioning to the word container
+          position: "relative",
           display: "inline-flex",
           alignItems: "center",
         }}
@@ -40,8 +40,8 @@ const DefinableWord: React.FC<DefinableWordProps> = ({ word, definition }) => {
             padding: "0",
             marginLeft: "-4px",
             position: "relative",
-            top: "-0.1em", // Adjusts the vertical position to make it look like a superscript
-            color: "#1976d2", // Same color as the word
+            top: "-0.1em",
+            color: "#1976d2",
             cursor: "pointer",
           }}
           onClick={handleClick}

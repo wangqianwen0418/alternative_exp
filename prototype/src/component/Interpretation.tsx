@@ -23,6 +23,7 @@ import {
   freeTextAtom,
   insightAtom,
   isSubmittedAtom,
+  isUserStudyAtom,
   pageNameAtom,
 } from "../store";
 
@@ -32,6 +33,7 @@ export default function Interpretation() {
   const [insight, setInsight] = useAtom(insightAtom);
   const [pageName] = useAtom(pageNameAtom);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [isUserStudy, setIsUserStudy] = useAtom(isUserStudyAtom);
 
   const [isLoading, setIsLoading] = useState(false); // Loading state
   const [apiKey, setApiKey] = useState<string>("");
@@ -61,8 +63,11 @@ export default function Interpretation() {
     setModalVisible(true);
   };
 
-  const isUserStudy = pageName?.includes("question");
-  // console.log("USER STUDY: " + isUserStudy);
+  useEffect(() => {
+    pageName?.includes("question")
+      ? setIsUserStudy(true)
+      : setIsUserStudy(false);
+  }, [pageName]);
 
   const handleSubmission = async () => {
     if (!freeText.trim()) return;

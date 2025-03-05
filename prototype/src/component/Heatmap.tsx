@@ -1,5 +1,8 @@
 import { useRef, useState, useMemo } from "react";
 import * as d3 from "d3";
+import { useAtom } from "jotai";
+import { uuidAtom } from "../store";
+import { seededShuffle } from "../util/questionBalance";
 
 interface HeatmapProps {
   shapValuesArray: number[][];
@@ -19,11 +22,12 @@ export default function Heatmap({
   height: totalHeight,
   title,
   featuresToHighlight: featuresToHighlight,
-  featuresToShow: featuresToShow
+  featuresToShow: featuresToShow,
 }: HeatmapProps) {
   const svgRef = useRef(null);
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
   const groupRef = useRef<SVGGElement>(null);
+  const [uuid] = useAtom(uuidAtom);
 
   const labelFontSizePx = 13;
   const maxLabelWidth = 100;
@@ -40,31 +44,29 @@ export default function Heatmap({
   );
 
   const effectiveFeaturesToShow = useMemo(() => {
-    return (featuresToShow && featuresToShow.length > 0)
+    return featuresToShow && featuresToShow.length > 0
       ? featuresToShow
-      : ["serum triglycerides level", "bmi", "blood pressure", "age", "sex", "low-density lipoproteins"]; //default array
+      : ["serum triglycerides level", "bmi", "blood pressure", "age", "sex"]; //default array
   }, [featuresToShow]);
 
-
   const datasets = useMemo(() => {
-
-    const indicesToKeep = d3.range(labels.length).filter(idx =>
-      effectiveFeaturesToShow.includes(labels[idx])
+    const indicesToKeep = d3
+      .range(labels.length)
+      .filter((idx) => effectiveFeaturesToShow.includes(labels[idx]));
+    const averageShapValues = indicesToKeep.map(
+      (idx) => d3.mean(shapValuesArray[idx].map(Math.abs)) ?? 0
     );
-    // Filter shapValuesArray and featureValuesArray to keep only the selected features
-    const averageShapValues = indicesToKeep.map(idx =>
-      d3.mean(shapValuesArray[idx].map(Math.abs)) ?? 0
-    );
-    
 
-    const combinedDatasets = indicesToKeep.map((idx, i) => ({
+    let combinedDatasets = indicesToKeep.map((idx, i) => ({
       shapValues: shapValuesArray[idx],
       featureValues: featureValuesArray[idx],
       label: labels[idx],
       averageShap: averageShapValues[i],
     }));
 
-    combinedDatasets.sort((a, b) => b.averageShap - a.averageShap);
+    combinedDatasets = uuid
+      ? seededShuffle(combinedDatasets, uuid)
+      : combinedDatasets.sort((a, b) => b.averageShap - a.averageShap);
 
     const sortedIndices = d3
       .range(combinedDatasets[0].shapValues.length)
@@ -81,7 +83,13 @@ export default function Heatmap({
     });
 
     return combinedDatasets;
-  }, [shapValuesArray, featureValuesArray, labels, effectiveFeaturesToShow]);
+  }, [
+    shapValuesArray,
+    featureValuesArray,
+    labels,
+    effectiveFeaturesToShow,
+    uuid,
+  ]);
 
   const [sortedShapValuesArray, , sortedLabels] = useMemo(
     () => [
@@ -192,7 +200,7 @@ export default function Heatmap({
 
   const legendHeight = totalBarAreaHeight;
   const legendBarWidth = 10;
-  const legendXOffset = textXOffset + 45;
+  const legendXOffset = textXOffset + 20;
   const legendYStart = centerY - legendHeight / 2;
 
   const legendTopLabelY = legendYStart - 5;
@@ -286,15 +294,6 @@ export default function Heatmap({
                   />
                 );
               })}
-              <text
-                x={textXOffset}
-                y={textY}
-                textAnchor="start"
-                fontSize={labelFontSizePx}
-                fill="black"
-              >
-                {averageShap.toFixed(2)}
-              </text>
             </g>
           );
         })}
@@ -339,24 +338,8 @@ export default function Heatmap({
         >
           SHAP (Contribution) Values
         </text>
-        <text
-          x={10 + textXOffset}
-          y={top + totalBarAreaHeight + 20}
-          textAnchor="middle"
-          fontSize={labelFontSizePx}
-        >
-          |Avg. SHAP|
-        </text>
 
         {truncatedLabels.map((label, idx) => {
-          // Check if this feature is among the selectedIndexes
-          const isSelected =
-            selectedIndexes.length > 0 && selectedIndexes.includes(idx);
-
-          // console.log(idx);
-          // console.log("Is selected: " + selectedIndexes.includes(idx));
-          // console.log(selectedIndexes);
-
           return (
             <text
               key={idx}
