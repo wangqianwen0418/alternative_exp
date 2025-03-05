@@ -69,7 +69,7 @@ export const QuestionList: TQuestion[] = [
       xValues: "None",
       yValues: "None",
       featuresToHighlight: ["serum triglycerides level"],
-      annotation: [
+      annotation: 
         {
           type: "singleLine",
           xValue: 5,
