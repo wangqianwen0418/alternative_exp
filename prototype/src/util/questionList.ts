@@ -4,7 +4,7 @@ export const QuestionList: TQuestion[] = [
   {
     index: 0,
     pageName: "question",
-    userText: "On average, the absolute contribution of BMI to diabetes risk is at least 25",
+    userText: "On average, the absolute contribution of BMI to diabetes risk is at least 20",
     initVis: {
       graphType: "Swarm",
       xValues: "None",
@@ -20,7 +20,7 @@ export const QuestionList: TQuestion[] = [
       annotation: [
         {
           type: "singleLine",
-          xValue: 25,
+          xValue: 20,
         },
       ],
     },
@@ -45,19 +45,19 @@ export const QuestionList: TQuestion[] = [
         annotation: [
           {
             type: "singleLine",
-            xValue: 25,
+            xValue: 20,
           },
         ],
       },
     },
     testCondition: "random vis",
-    groundTruth: false, //need to check
+    groundTruth: true, //verified
   },
   {
     index: 1,
     pageName: "question",
     userText:
-      "On average, serum triglycerides are more important than blood sugar for diabetes risk.",
+      "On average, the absolute contribution of serum triglycerides to diabetes risk is higher than it is for blood sugar.",
     initVis: {
       graphType: "Swarm",
       xValues: "None",
@@ -70,7 +70,7 @@ export const QuestionList: TQuestion[] = [
       graphType: "Bar",
       xValues: "None",
       yValues: "None",
-      featuresToHighlight: ["serum triglycer"],
+      featuresToHighlight: ["serum triglycerides level"],
       annotation: [
         {
           type: "singleLine",
@@ -213,7 +213,7 @@ export const QuestionList: TQuestion[] = [
       },
     },
     testCondition: "ours",
-    groundTruth: false, //needs to be checked 
+    groundTruth: false, //ASK NICK
   },
   {
     index: 4,
@@ -322,7 +322,7 @@ export const QuestionList: TQuestion[] = [
       },
     },
     testCondition: "random vis",
-    groundTruth: true,
+    groundTruth: false,
   },
   {
     index: 6,
@@ -368,7 +368,7 @@ export const QuestionList: TQuestion[] = [
       },
     },
     testCondition: "ours",
-    groundTruth: true,
+    groundTruth: false,
   },
   {
     index: 7,
@@ -538,7 +538,7 @@ export const QuestionList: TQuestion[] = [
       },
     },
     testCondition: "random vis",
-    groundTruth: true, //Need to check
+    groundTruth: false,
   },
   {
     index: 10,

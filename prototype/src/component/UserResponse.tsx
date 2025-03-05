@@ -30,7 +30,7 @@ import {
   questionOrderAtom,
   tutorialAtom,
 } from "../store";
-import { test_weburl } from "../util/appscript_url";
+import { pilot_weburl } from "../util/appscript_url";
 import Cookies from "js-cookie";
 import { TGraph } from "../util/types";
 
@@ -121,7 +121,7 @@ export default function UserResponse() {
 
     try {
       console.log("Submitting form:", JSON.stringify(data));
-      await fetch(test_weburl!, {
+      await fetch(pilot_weburl!, {
         method: "POST",
         mode: "no-cors",
         headers: {
@@ -153,13 +153,15 @@ export default function UserResponse() {
     const feedbackData = {
       uuid,
       timestamp: new Date().toLocaleString(),
-      firstVisFeedback,
-      secondVisFeedback,
+      firstVisFeedback: firstVisFeedback,
+      secondVisFeedback: secondVisFeedback,
+      difficultQuestions: difficultQuestions,
+      difficultGraphs: difficultGraphs
     };
 
     try {
       console.log("Submitting feedback:", JSON.stringify(feedbackData));
-      await fetch(test_weburl!, {
+      await fetch(pilot_weburl!, {
         method: "POST",
         mode: "no-cors",
         headers: {

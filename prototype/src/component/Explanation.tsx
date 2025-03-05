@@ -1,4 +1,4 @@
-import { Paper, Typography, IconButton, Popover } from "@mui/material";
+import { Paper, Typography, IconButton, Popover, Button, Box} from "@mui/material";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import shap_diabetes from "../assets/shap_diabetes.json";
 import {
@@ -22,10 +22,11 @@ import Swarm from "./Swarm";
 import Scatter from "./Scatter";
 import Bar from "./Bar";
 import { useAtom } from "jotai";
-import { initVisAtom, insightAtom, isSubmittedAtom } from "../store";
+import { initVisAtom, insightAtom, isSubmittedAtom, tutorialAtom } from "../store";
 import TwoColorScatter from "./TwoColorScatter";
 import { TGraph } from "../util/types";
 import { yellow } from "@mui/material/colors";
+import Tutorial from './Tutorial';
 
 
 
@@ -58,6 +59,9 @@ export default function Explanation() {
   const initialVisRef = useRef<SVGGElement>(null);
   const additionalVisRef = useRef<SVGGElement>(null);
   const [secondVisTranslateY, setSecondVisTranslateY] = useState(0);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
+  const [tutorialStep, setTutorialStep] = useState(0);
+  const [, setShowTutorial] = useAtom(tutorialAtom);
 
   useEffect(() => {
     if (initialVisRef.current) {
@@ -75,6 +79,14 @@ export default function Explanation() {
   const handlePopoverClose = () => {
     setAnchorEl(null);
   };
+
+  const openTutorialAtStep = (stepIndex: number) => {
+    setTutorialStep(stepIndex);
+    setTutorialOpen(true);
+    setShowTutorial(true);
+    console.log("tutorial showing now");
+  };
+
 
   const open = Boolean(anchorEl);
 
@@ -349,7 +361,6 @@ export default function Explanation() {
         }}
       >
         <Typography sx={{ p: 2 }}>
-          {/* This is the text you can customize */}
           In many machine learning models, features are adjusted so their
           average is 0, and the scale is based on standard deviations. <br />
           A positive value (e.g., BMI 0.1) is above average, and a negative
@@ -360,22 +371,69 @@ export default function Explanation() {
           blood pressure, even though they use different scales.
         </Typography>
       </Popover>
-      <svg className="swarm" width="100%" height="100vh">
-        {/* Initial Visualization */}
-        <g ref={initialVisRef} transform="translate(0, 0)">
-          {initialVisualization}
-        </g>
-
-        {/* Additional Visualization BELOW the initialVisualization */}
-        {isSubmitted && (
-          <g
-            ref={additionalVisRef}
-            transform={`translate(0, ${secondVisTranslateY})`}
-          >
-            {additionalVisualizations}
+      
+      <Box sx={{ position: 'relative', width: '100%' }}>
+        <svg className="swarm" width="85%" height="100vh">
+          {/* Initial Visualization */}
+          <g ref={initialVisRef} transform="translate(0, 0)">
+            {initialVisualization}
           </g>
+          
+          {/* Additional Visualization BELOW the initialVisualization */}
+          {isSubmitted && (
+            <g
+              ref={additionalVisRef}
+              transform={`translate(0, ${secondVisTranslateY})`}
+            >
+              {additionalVisualizations}
+            </g>
+          )}
+        </svg>
+        
+        {/* Button for first visualization */}
+        <Box 
+          sx={{ 
+            position: 'absolute', 
+            top: 150, // Adjust as needed to align with first visualization
+            right: '25%',
+            zIndex: 1
+          }}
+        >
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => openTutorialAtStep(3)}
+            sx={{ whiteSpace: 'nowrap' }}
+          >
+            CONFUSED ABOUT THIS
+            <br />
+            VISUALIZATION?
+          </Button>
+        </Box>
+        
+        {/* Button for second visualization */}
+        {isSubmitted && (
+          <Box 
+            sx={{ 
+              position: 'absolute', 
+              top: secondVisTranslateY + 150, // Position relative to second visualization
+              right: '25%',
+              zIndex: 1
+            }}
+          >
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() => openTutorialAtStep(4)}
+              sx={{ whiteSpace: 'nowrap' }}
+            >
+              CONFUSED ABOUT THIS
+              <br />
+              VISUALIZATION?
+            </Button>
+          </Box>
         )}
-      </svg>
+      </Box>
     </Paper>
   );
 }
