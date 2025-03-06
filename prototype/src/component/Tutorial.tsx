@@ -414,6 +414,7 @@ export default function Tutorial({ show, onClose, initialStep=0 }: TutorialProps
   const theme = useTheme();
   const [activeStep, setActiveStep] = React.useState(initialStep);
   const maxSteps = tutorialSteps.length;
+  console.log("ACTIVE STEP: " + initialStep);
 
   React.useEffect(() => {
     setActiveStep(initialStep);

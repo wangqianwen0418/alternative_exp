@@ -1,5 +1,5 @@
 import { Paper, Typography, IconButton, Popover, Button, Box} from "@mui/material";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import InfoIcon from "@mui/icons-material/Info";
 import shap_diabetes from "../assets/shap_diabetes.json";
 import {
   diabetesShapValues,
@@ -22,6 +22,7 @@ import {
   isSubmittedAtom, tutorialAtom,
   isUserStudyAtom,
   selectedIndicesAtom,
+  tutorialStep
 } from "../store";
 import TwoColorScatter from "./TwoColorScatter";
 import { TGraph } from "../util/types";
@@ -60,7 +61,7 @@ export default function Explanation() {
   const additionalVisRef = useRef<SVGGElement>(null);
   const [secondVisTranslateY, setSecondVisTranslateY] = useState(0);
   const [tutorialOpen, setTutorialOpen] = useState(false);
-  const [tutorialStep, setTutorialStep] = useState(0);
+  let [tutorialStepValue] = useAtom(tutorialStep);
   const [, setShowTutorial] = useAtom(tutorialAtom);
   const [isUserStudy] = useAtom(isUserStudyAtom);
 
@@ -82,10 +83,11 @@ export default function Explanation() {
   };
 
   const openTutorialAtStep = (stepIndex: number) => {
-    setTutorialStep(stepIndex);
+    tutorialStepValue = stepIndex;
     setTutorialOpen(true);
     setShowTutorial(true);
-    console.log("tutorial showing now");
+    console.log("tutorial showing now at step " + tutorialStepValue);
+
   };
 
 
@@ -352,7 +354,7 @@ export default function Explanation() {
       <Typography variant="h5" gutterBottom>
         Visual Explanation
         <IconButton onClick={handlePopoverOpen} aria-label="help">
-          <HelpOutlineIcon />
+          <InfoIcon />
         </IconButton>
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mt: 1, mb: 1 }}>

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Popover, Paper, IconButton } from "@mui/material";
-import QuestionMark from "@mui/icons-material/QuestionMark";
+import InfoIcon from "@mui/icons-material/Info";
 
 interface DefinableWordProps {
   word: string;
@@ -38,7 +38,7 @@ const DefinableWord: React.FC<DefinableWordProps> = ({ word, definition }) => {
           size="small"
           style={{
             padding: "0",
-            marginLeft: "-4px",
+            marginLeft: "2px",
             position: "relative",
             top: "-0.1em",
             color: "#1976d2",
@@ -46,7 +46,7 @@ const DefinableWord: React.FC<DefinableWordProps> = ({ word, definition }) => {
           }}
           onClick={handleClick}
         >
-          <QuestionMark fontSize="inherit" />
+          <InfoIcon fontSize="inherit" />
         </IconButton>
       </span>
       <Popover

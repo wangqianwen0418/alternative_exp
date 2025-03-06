@@ -31,7 +31,7 @@ import {
   tutorialAtom,
   selectedIndicesAtom,
 } from "../store";
-import { pilot_weburl } from "../util/appscript_url";
+import { test_weburl } from "../util/appscript_url";
 import Cookies from "js-cookie";
 import { TGraph } from "../util/types";
 
@@ -124,7 +124,7 @@ export default function UserResponse() {
 
     try {
       console.log("Submitting form:", JSON.stringify(data));
-      await fetch(pilot_weburl!, {
+      await fetch(test_weburl!, {
         method: "POST",
         mode: "no-cors",
         headers: {
@@ -165,7 +165,7 @@ export default function UserResponse() {
 
     try {
       console.log("Submitting feedback:", JSON.stringify(feedbackData));
-      await fetch(pilot_weburl!, {
+      await fetch(test_weburl!, {
         method: "POST",
         mode: "no-cors",
         headers: {
