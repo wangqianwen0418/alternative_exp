@@ -165,7 +165,7 @@ export default function UserResponse() {
 
     try {
       console.log("Submitting feedback:", JSON.stringify(feedbackData));
-      await fetch(test_weburl!, {
+      await fetch(pilot_weburl!, {
         method: "POST",
         mode: "no-cors",
         headers: {
