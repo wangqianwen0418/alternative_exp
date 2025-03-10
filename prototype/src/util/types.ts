@@ -16,6 +16,8 @@ export type TQuestion = TPageBase & {
   index: number;
   groundTruth: boolean;
   firstVis?: TGraph;
+  firstVisAnswer?: "true" | "false" | "irrelevant";
+  secondVisAnswer?: "true" | "false" | "irrelevant";
   newVis?: TGraph
 };
 
