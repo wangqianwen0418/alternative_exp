@@ -1,4 +1,11 @@
-import { Paper, Typography, IconButton, Popover, Button, Box} from "@mui/material";
+import {
+  Paper,
+  Typography,
+  IconButton,
+  Popover,
+  Button,
+  Box,
+} from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import shap_diabetes from "../assets/shap_diabetes.json";
 import {
@@ -19,38 +26,14 @@ import { useAtom } from "jotai";
 import {
   initVisAtom,
   insightAtom,
-  isSubmittedAtom, tutorialAtom,
+  isSubmittedAtom,
+  tutorialAtom,
   isUserStudyAtom,
   selectedIndicesAtom,
-  tutorialStep
+  tutorialStep,
 } from "../store";
 import TwoColorScatter from "./TwoColorScatter";
 import { TGraph } from "../util/types";
-import { yellow } from "@mui/material/colors";
-import Tutorial from './Tutorial';
-
-
-
-
-
-function getRandomPoints(arr: number[]) {
-  if (arr.length < 25) {
-    throw new Error("Array has fewer than 25 points.");
-  }
-
-  const randomPoints = [];
-  const randomIndices = new Set();
-
-  while (randomIndices.size < 25) {
-    const randomIndex = Math.floor(Math.random() * arr.length);
-    if (!randomIndices.has(randomIndex)) {
-      randomIndices.add(randomIndex);
-      randomPoints.push(arr[randomIndex]);
-    }
-  }
-
-  return randomPoints;
-}
 
 export default function Explanation() {
   const [isSubmitted] = useAtom(isSubmittedAtom);
@@ -60,10 +43,31 @@ export default function Explanation() {
   const initialVisRef = useRef<SVGGElement>(null);
   const additionalVisRef = useRef<SVGGElement>(null);
   const [secondVisTranslateY, setSecondVisTranslateY] = useState(0);
-  const [tutorialOpen, setTutorialOpen] = useState(false);
+  const [, setTutorialOpen] = useState(false);
   let [tutorialStepValue] = useAtom(tutorialStep);
   const [, setShowTutorial] = useAtom(tutorialAtom);
   const [isUserStudy] = useAtom(isUserStudyAtom);
+
+  const [rightPosition, setRightPosition] = useState("25%");
+
+  useEffect(() => {
+    const updatePosition = () => {
+      if (window.innerWidth < 1600) {
+        setRightPosition("0%");
+      } else if (window.innerWidth < 1800) {
+        setRightPosition("10%");
+      } else if (window.innerWidth < 1900) {
+        setRightPosition("20%");
+      } else {
+        setRightPosition("25%");
+      }
+    };
+
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+
+    return () => window.removeEventListener("resize", updatePosition);
+  }, []);
 
   useEffect(() => {
     if (initialVisRef.current) {
@@ -87,9 +91,7 @@ export default function Explanation() {
     setTutorialOpen(true);
     setShowTutorial(true);
     console.log("tutorial showing now at step " + tutorialStepValue);
-
   };
-
 
   const open = Boolean(anchorEl);
 
@@ -385,14 +387,14 @@ export default function Explanation() {
           blood pressure, even though they use different scales.
         </Typography>
       </Popover>
-      
-      <Box sx={{ position: 'relative', width: '100%' }}>
+
+      <Box sx={{ position: "relative", width: "100%" }}>
         <svg className="swarm" width="85%" height="100vh">
           {/* Initial Visualization */}
           <g ref={initialVisRef} transform="translate(0, 0)">
             {initialVisualization}
           </g>
-          
+
           {/* Additional Visualization BELOW the initialVisualization */}
           {isSubmitted && (
             <g
@@ -403,43 +405,43 @@ export default function Explanation() {
             </g>
           )}
         </svg>
-        
+
         {/* Button for first visualization */}
-        <Box 
-          sx={{ 
-            position: 'absolute', 
-            top: 150, // Adjust as needed to align with first visualization
-            right: '25%',
-            zIndex: 1
+        <Box
+          sx={{
+            position: "absolute",
+            top: 150,
+            right: rightPosition,
+            zIndex: 1,
           }}
         >
           <Button
             variant="outlined"
             color="primary"
             onClick={() => openTutorialAtStep(3)}
-            sx={{ whiteSpace: 'nowrap' }}
+            sx={{ whiteSpace: "nowrap" }}
           >
             CONFUSED ABOUT THIS
             <br />
             VISUALIZATION?
           </Button>
         </Box>
-        
+
         {/* Button for second visualization */}
         {isSubmitted && (
-          <Box 
-            sx={{ 
-              position: 'absolute', 
-              top: secondVisTranslateY + 150, // Position relative to second visualization
-              right: '25%',
-              zIndex: 1
+          <Box
+            sx={{
+              position: "absolute",
+              top: secondVisTranslateY + 150,
+              right: rightPosition,
+              zIndex: 1,
             }}
           >
             <Button
               variant="outlined"
               color="primary"
               onClick={() => openTutorialAtStep(4)}
-              sx={{ whiteSpace: 'nowrap' }}
+              sx={{ whiteSpace: "nowrap" }}
             >
               CONFUSED ABOUT THIS
               <br />
