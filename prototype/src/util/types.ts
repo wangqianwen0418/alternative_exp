@@ -16,6 +16,8 @@ export type TQuestion = TPageBase & {
   index: number;
   groundTruth: boolean;
   firstVis?: TGraph;
+  firstVisAnswer?: "true" | "false" | "irrelevant";
+  secondVisAnswer?: "true" | "false" | "irrelevant";
   newVis?: TGraph
 };
 
@@ -28,7 +30,7 @@ export type TAnnotation =
       label?: string, feature?: string;
     } // A range along X axis
   | { type: "singleLine"; xValue?: number; yValue?: number; label?: string } // A vertical line at a specific X/Y value
-  | { type: "twoColorRange"; range: Array<[number,number]>, label?: string };
+  | { type: "twoColorRange"; range: Array<[number,number]>; label?: string };
 
 export type TGraph = {
   graphType: "Swarm" | "Scatter" | "Bar" | "Heatmap" | "two-scatter";

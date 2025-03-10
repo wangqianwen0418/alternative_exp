@@ -1,5 +1,5 @@
-import { Paper, Typography, IconButton, Popover } from "@mui/material";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import { Paper, Typography, IconButton, Popover, Button, Box} from "@mui/material";
+import InfoIcon from "@mui/icons-material/Info";
 import shap_diabetes from "../assets/shap_diabetes.json";
 import {
   diabetesShapValues,
@@ -19,12 +19,38 @@ import { useAtom } from "jotai";
 import {
   initVisAtom,
   insightAtom,
-  isSubmittedAtom,
+  isSubmittedAtom, tutorialAtom,
   isUserStudyAtom,
   selectedIndicesAtom,
+  tutorialStep
 } from "../store";
 import TwoColorScatter from "./TwoColorScatter";
 import { TGraph } from "../util/types";
+import { yellow } from "@mui/material/colors";
+import Tutorial from './Tutorial';
+
+
+
+
+
+function getRandomPoints(arr: number[]) {
+  if (arr.length < 25) {
+    throw new Error("Array has fewer than 25 points.");
+  }
+
+  const randomPoints = [];
+  const randomIndices = new Set();
+
+  while (randomIndices.size < 25) {
+    const randomIndex = Math.floor(Math.random() * arr.length);
+    if (!randomIndices.has(randomIndex)) {
+      randomIndices.add(randomIndex);
+      randomPoints.push(arr[randomIndex]);
+    }
+  }
+
+  return randomPoints;
+}
 
 export default function Explanation() {
   const [isSubmitted] = useAtom(isSubmittedAtom);
@@ -34,6 +60,9 @@ export default function Explanation() {
   const initialVisRef = useRef<SVGGElement>(null);
   const additionalVisRef = useRef<SVGGElement>(null);
   const [secondVisTranslateY, setSecondVisTranslateY] = useState(0);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
+  let [tutorialStepValue] = useAtom(tutorialStep);
+  const [, setShowTutorial] = useAtom(tutorialAtom);
   const [isUserStudy] = useAtom(isUserStudyAtom);
 
   useEffect(() => {
@@ -52,6 +81,15 @@ export default function Explanation() {
   const handlePopoverClose = () => {
     setAnchorEl(null);
   };
+
+  const openTutorialAtStep = (stepIndex: number) => {
+    tutorialStepValue = stepIndex;
+    setTutorialOpen(true);
+    setShowTutorial(true);
+    console.log("tutorial showing now at step " + tutorialStepValue);
+
+  };
+
 
   const open = Boolean(anchorEl);
 
@@ -316,7 +354,7 @@ export default function Explanation() {
       <Typography variant="h5" gutterBottom>
         Visual Explanation
         <IconButton onClick={handlePopoverOpen} aria-label="help">
-          <HelpOutlineIcon />
+          <InfoIcon />
         </IconButton>
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mt: 1, mb: 1 }}>
@@ -337,7 +375,6 @@ export default function Explanation() {
         }}
       >
         <Typography sx={{ p: 2 }}>
-          {/* This is the text you can customize */}
           In many machine learning models, features are adjusted so their
           average is 0, and the scale is based on standard deviations. <br />
           A positive value (e.g., BMI 0.1) is above average, and a negative
@@ -348,22 +385,69 @@ export default function Explanation() {
           blood pressure, even though they use different scales.
         </Typography>
       </Popover>
-      <svg className="swarm" width="100%" height="100vh">
-        {/* Initial Visualization */}
-        <g ref={initialVisRef} transform="translate(0, 0)">
-          {initialVisualization}
-        </g>
-
-        {/* Additional Visualization BELOW the initialVisualization */}
-        {isSubmitted && (
-          <g
-            ref={additionalVisRef}
-            transform={`translate(0, ${secondVisTranslateY})`}
-          >
-            {additionalVisualizations}
+      
+      <Box sx={{ position: 'relative', width: '100%' }}>
+        <svg className="swarm" width="85%" height="100vh">
+          {/* Initial Visualization */}
+          <g ref={initialVisRef} transform="translate(0, 0)">
+            {initialVisualization}
           </g>
+          
+          {/* Additional Visualization BELOW the initialVisualization */}
+          {isSubmitted && (
+            <g
+              ref={additionalVisRef}
+              transform={`translate(0, ${secondVisTranslateY})`}
+            >
+              {additionalVisualizations}
+            </g>
+          )}
+        </svg>
+        
+        {/* Button for first visualization */}
+        <Box 
+          sx={{ 
+            position: 'absolute', 
+            top: 150, // Adjust as needed to align with first visualization
+            right: '25%',
+            zIndex: 1
+          }}
+        >
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => openTutorialAtStep(3)}
+            sx={{ whiteSpace: 'nowrap' }}
+          >
+            CONFUSED ABOUT THIS
+            <br />
+            VISUALIZATION?
+          </Button>
+        </Box>
+        
+        {/* Button for second visualization */}
+        {isSubmitted && (
+          <Box 
+            sx={{ 
+              position: 'absolute', 
+              top: secondVisTranslateY + 150, // Position relative to second visualization
+              right: '25%',
+              zIndex: 1
+            }}
+          >
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() => openTutorialAtStep(4)}
+              sx={{ whiteSpace: 'nowrap' }}
+            >
+              CONFUSED ABOUT THIS
+              <br />
+              VISUALIZATION?
+            </Button>
+          </Box>
         )}
-      </svg>
+      </Box>
     </Paper>
   );
 }

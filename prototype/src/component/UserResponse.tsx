@@ -159,8 +159,10 @@ export default function UserResponse() {
     const feedbackData = {
       uuid,
       timestamp: new Date().toLocaleString(),
-      firstVisFeedback,
-      secondVisFeedback,
+      firstVisFeedback: firstVisFeedback,
+      secondVisFeedback: secondVisFeedback,
+      difficultQuestions: difficultQuestions,
+      difficultGraphs: difficultGraphs
     };
 
     try {
