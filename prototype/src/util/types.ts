@@ -19,6 +19,8 @@ export type TQuestion = TPageBase & {
   firstVisAnswer?: "true" | "false" | "irrelevant";
   secondVisAnswer?: "true" | "false" | "irrelevant";
   newVis?: TGraph
+  condition?: "random" | "optimal",
+  secondTruth?: "true" | "false" | "irrelevant";
 };
 
 export type TAnnotation =
@@ -54,7 +56,8 @@ export type TInsight1 = {
   type: "read";
   relation: "greater than" | "less than" | "equal to";
   condition: { featureName: string; range: [number, number] } | undefined;
-  graph: TGraph;
+  optimalGraph: TGraph;
+  randomGraph?: TGraph;
 };
 
 export type TInsight2 = {
@@ -62,7 +65,8 @@ export type TInsight2 = {
   type: "comparison";
   relation: "greater than" | "less than" | "equal to";
   condition: { featureName: string; range: [number, number] } | undefined;
-  graph: TGraph;
+  optimalGraph: TGraph;
+  randomGraph?: TGraph;
 };
 
 export type TInsight3 = {
@@ -70,7 +74,8 @@ export type TInsight3 = {
   type: "correlation";
   relation: "positively correlated" | "negatively correlated" | "not correlated";
   condition: { featureName: string; range: [number, number] } | undefined;
-  graph: TGraph;
+  optimalGraph: TGraph;
+  randomGraph?: TGraph;
 };
 
 export type TInsight4 = {
@@ -78,7 +83,8 @@ export type TInsight4 = {
   type: "featureInteraction";
   relation: "same" | "different";
   condition: { featureName: string; range: [number, number][] } | undefined;
-  graph: TGraph;
+  optimalGraph: TGraph;
+  randomGraph?: TGraph;
 };
 
 export type TVariable = {

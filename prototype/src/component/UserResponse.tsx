@@ -30,6 +30,7 @@ import {
   questionOrderAtom,
   tutorialAtom,
   selectedIndicesAtom,
+  secondGraphTypeAtom,
 } from "../store";
 import { test_weburl } from "../util/appscript_url";
 import Cookies from "js-cookie";
@@ -61,6 +62,7 @@ export default function UserResponse() {
   const [difficultQuestions, setDifficultQuestions] = useState("");
   const [difficultGraphs, setDifficultGraphs] = useState("");
   const [, setSelectedIndices] = useAtom(selectedIndicesAtom);
+  const [secondGraphType, setSecondGraphType] = useAtom(secondGraphTypeAtom);
 
   const [modalVisible, setModalVisible] = React.useState(false);
   const [userAnswer, setUserAnswer] = React.useState<
@@ -116,10 +118,18 @@ export default function UserResponse() {
       currentIndex: currentQuestionIndex,
       questionOrder: questionIndexesArray.toString(),
       freeText,
-      currentVis: (initVis as TGraph).graphType,
+      firstVis: (initVis as TGraph).graphType,
+      firstVisAnswer: QuestionList[currentQuestionIndex].firstVisAnswer,
+      secondGraphType: secondGraphType,
+      secondAnswer:
+        secondGraphType === "optimal"
+          ? QuestionList[currentQuestionIndex].groundTruth
+          : QuestionList[currentQuestionIndex].secondTruth,
       isSecondPart: isSecondPart ? "Yes" : "No",
       userAnswer,
       confidence: confidence.value,
+      groundTruth: QuestionList[currentQuestionIndex].groundTruth,
+      
     };
 
     try {
@@ -160,7 +170,7 @@ export default function UserResponse() {
       firstVisFeedback: firstVisFeedback,
       secondVisFeedback: secondVisFeedback,
       difficultQuestions: difficultQuestions,
-      difficultGraphs: difficultGraphs
+      difficultGraphs: difficultGraphs,
     };
 
     try {
