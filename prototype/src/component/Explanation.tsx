@@ -35,8 +35,6 @@ import {
 } from "../store";
 import TwoColorScatter from "./TwoColorScatter";
 import { TGraph } from "../util/types";
-import { yellow } from "@mui/material/colors";
-import Tutorial from "./Tutorial";
 
 export default function Explanation() {
   const [isSubmitted] = useAtom(isSubmittedAtom);
@@ -60,7 +58,7 @@ export default function Explanation() {
         setRightPosition("0%");
       } else if (window.innerWidth < 1800) {
         setRightPosition("10%");
-      } else if (window.innerWidth < 1900) {
+      } else if (window.innerWidth < 2000) {
         setRightPosition("20%");
       } else {
         setRightPosition("25%");
@@ -422,7 +420,7 @@ export default function Explanation() {
           sx={{
             position: "absolute",
             top: 150, // Adjust as needed to align with first visualization
-            right: "25%",
+            right: rightPosition,
             zIndex: 1,
           }}
         >
