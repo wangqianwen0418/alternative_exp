@@ -17,5 +17,6 @@ export const questionIndexAtom = atom<number>(-1); // the index of the question 
 export const questionOrderAtom = atom<number[]>([]); // order of questions for user study
 export const uuidAtom = atom<string>(); // uuid of user
 export const initVisAtom = atom(); // the initial visualization type that users see
-export const secondVisAtom = atom(); //the second visualization that users see during a user story
+export const secondVisAtom = atom(); //the second visualization that users see during a user study
+export const secondGraphTypeAtom = atom<string>() //the second visualization that users see during a user study
 export const isSecondPartAtom = atom(false); // determine if question a or b should be shown

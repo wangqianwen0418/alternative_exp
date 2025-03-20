@@ -24,6 +24,9 @@ import {
   TwoColorTutorialGraph,
   AnnotationTutorialGraph,
 } from "../util/tutorialGraphs";
+import {
+  tutorialStep
+} from "../store"
 
 const definedWords = {
   XAI: "Explainable AI (XAI) is an approach to provide insight into the decision-making process of AI models, where explanations or rationales accompany recommendations made by AI.",

@@ -291,7 +291,7 @@ export const parseInput = async (
           type: jsonObject.Type,
           relation: jsonObject.Relationship,
           condition: jsonObject.Condition,
-          graph: {
+          optimalGraph: {
             graphType: jsonObject.GraphType,
             xValues: jsonObject.XValues,
             yValues: jsonObject.YValues,

@@ -29,7 +29,7 @@ export const CASES: TCase[] = [
       type: "comparison",
       relation: "greater than",
       condition: undefined,
-      graph: {
+      optimalGraph: {
         graphType: "Bar",
         xValues: "None",
         yValues: "None",
@@ -61,7 +61,7 @@ export const CASES: TCase[] = [
       type: "read",
       relation: "greater than",
       condition: undefined,
-      graph: {
+      optimalGraph: {
         graphType: "Swarm",
         xValues: "BMI",
         yValues: "BMI",
@@ -95,7 +95,7 @@ export const CASES: TCase[] = [
       type: "correlation",
       relation: "positively correlated",
       condition: undefined,
-      graph: {
+      optimalGraph: {
         graphType: "Scatter",
         xValues: "Age",
         yValues: "Age",
@@ -151,7 +151,7 @@ export const CASES: TCase[] = [
       type: "read",
       relation: "greater than",
       condition: undefined,
-      graph: {
+      optimalGraph: {
         graphType: "Scatter",
         xValues: "Blood Pressure Feature Values",
         yValues: "Blood pressure SHAP values",
