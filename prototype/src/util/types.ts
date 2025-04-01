@@ -15,9 +15,7 @@ export type TQuestion = TPageBase & {
   testCondition: "random vis" | "ours";
   index: number;
   groundTruth: boolean;
-  firstVis?: TGraph;
   firstVisAnswer?: "true" | "false" | "irrelevant";
-  secondVisAnswer?: "true" | "false" | "irrelevant";
   newVis?: TGraph
   condition?: "random" | "optimal",
   secondTruth?: "true" | "false" | "irrelevant";

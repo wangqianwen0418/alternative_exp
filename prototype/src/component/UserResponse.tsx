@@ -129,7 +129,6 @@ export default function UserResponse() {
       userAnswer,
       confidence: confidence.value,
       groundTruth: QuestionList[currentQuestionIndex].groundTruth,
-      
     };
 
     try {
@@ -222,6 +221,14 @@ export default function UserResponse() {
             ? "Given the new visualization, is the above interpretation accurate?"
             : "Is the above interpretation accurate?"}
         </span>
+        <Typography
+          variant="caption"
+          display="block"
+          style={{ marginTop: "8px", color: "red", fontSize: "14px" }}
+        >
+          Please answer the question based solely on the visualizations
+          provided, not your personal knowledge.
+        </Typography>
         <RadioGroup
           row
           aria-labelledby="demo-row-radio-buttons-group-label"

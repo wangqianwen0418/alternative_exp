@@ -1,9 +1,21 @@
 import { TQuestion } from "./types";
+const randList = [];
+for (let i=0; i < 12; i++){
+  randList.push(Math.random())
+}
+
+for (let i=0; i<5; i++){
+  console.log(i);
+  console.log(randList[0]);
+  
+}
+
+const newVals = randList;
 
 export const QuestionList: TQuestion[] = [
   {
     index: 0,
-    condition: Math.random() < 0.5 ? "optimal" : "random",
+    condition: newVals[0] < 0.5 ? "optimal" : "random",
     pageName: "question",
     userText: "On average, the absolute contribution of BMI to diabetes risk is at least 20",
     initVis: {
@@ -66,7 +78,7 @@ export const QuestionList: TQuestion[] = [
   },
   {
     index: 1,
-    condition: Math.random() < 0.5 ? "optimal" : "random",
+    condition: newVals[1] < 0.5 ? "optimal" : "random",
     pageName: "question",
     userText:
       "On average, the absolute contribution of serum triglycerides to diabetes risk is higher than it is for blood sugar.",
@@ -82,8 +94,8 @@ export const QuestionList: TQuestion[] = [
     newVis: {
       graphType: "Scatter",
       xValues: "Blood Sugar Feature Values",
-      yValues: "Blood sugar SHAP (Contribution) Values",
-      featuresToHighlight: ["serum triglycerides level"],
+      yValues: "Blood Sugar SHAP (Contribution) Values",
+      //featuresToHighlight: ["serum triglycerides level"],
       annotation: 
         {
           type: "singleLine",
@@ -117,8 +129,8 @@ export const QuestionList: TQuestion[] = [
       randomGraph: {
         graphType: "Scatter",
         xValues: "Blood Sugar Feature Values",
-        yValues: "Blood sugar SHAP (Contribution) Values",
-        featuresToHighlight: ["serum triglycerides level"],
+        yValues: "Blood Sugar SHAP (Contribution) Values",
+        //featuresToHighlight: ["serum triglycerides level"],
         annotation: 
           {
             type: "singleLine",
@@ -132,7 +144,7 @@ export const QuestionList: TQuestion[] = [
   },
   {
     index: 2,
-    condition: Math.random() < 0.5 ? "optimal" : "random",
+    condition: newVals[2] < 0.5 ? "optimal" : "random",
     pageName: "question",
     userText:
       "On average, the absolute contribution of serum triglycerides to diabetes risk is over 30",
@@ -201,7 +213,7 @@ export const QuestionList: TQuestion[] = [
   },
   {
     index: 3,
-    condition: Math.random() < 0.5 ? "optimal" : "random",
+    condition: newVals[3] < 0.5 ? "optimal" : "random",
     pageName: "question",
     userText:
       "There is a positive correlation between blood sugar values and the contribution of blood sugar to diabetes risk when the blood sugar value is between -0.05 and 0.05",
@@ -266,7 +278,7 @@ export const QuestionList: TQuestion[] = [
   },
   {
     index: 4,
-    condition: Math.random() < 0.5 ? "optimal" : "random",
+    condition: newVals[4] < 0.5 ? "optimal" : "random",
     pageName: "question",
     userText:
       "On average, the absolute contribution to diabetes progression of blood pressure is less than it is for age.",
@@ -283,7 +295,7 @@ export const QuestionList: TQuestion[] = [
       graphType: "Swarm",
       xValues: "none",
       yValues: "none",
-      featuresToHighlight: ["blood pressure, age"],
+      featuresToHighlight: ["blood pressure", "age"],
       featuresToShow: ["blood pressure", "age", "bmi", "blood sugar level"],
       annotation: 
         {
@@ -319,7 +331,7 @@ export const QuestionList: TQuestion[] = [
         graphType: "Swarm",
         xValues: "none",
         yValues: "none",
-        featuresToHighlight: ["blood pressure, age"],
+        featuresToHighlight: ["blood pressure", "age"],
         featuresToShow: ["blood pressure", "age", "bmi", "blood sugar level"],
         annotation: 
           {
@@ -334,7 +346,7 @@ export const QuestionList: TQuestion[] = [
   },
   {
     index: 5,
-    condition: Math.random() < 0.5 ? "optimal" : "random",
+    condition: newVals[5] < 0.5 ? "optimal" : "random",
     pageName: "question",
     userText:
       "BMI contributes positively to diabetes risk for more patients than sex does.",
@@ -404,7 +416,7 @@ export const QuestionList: TQuestion[] = [
   },
   {
     index: 6,
-    condition: Math.random() < 0.5 ? "optimal" : "random",
+    condition: newVals[6] < 0.5 ? "optimal" : "random",
     pageName: "question",
     userText:
       "age contributes positively to more instances than Low-Density Lipoproteins.",
@@ -464,7 +476,7 @@ export const QuestionList: TQuestion[] = [
   },
   {
     index: 7,
-    condition: Math.random() < 0.5 ? "optimal" : "random",
+    condition: newVals[7] < 0.5 ? "optimal" : "random",
     pageName: "question",
     userText:
       "Blood pressure has larger deviations in its contribution to diabetes risk compared to age",
@@ -534,7 +546,7 @@ export const QuestionList: TQuestion[] = [
   },
   {
     index: 8,
-    condition: Math.random() < 0.5 ? "optimal" : "random",
+    condition: newVals[8] < 0.5 ? "optimal" : "random",
     pageName: "question",
     userText:
       "There is a positive correlation between blood pressure and its contribution to diabetes risk",
@@ -576,8 +588,8 @@ export const QuestionList: TQuestion[] = [
       condition: undefined,
       optimalGraph: {
         graphType: "Scatter",
-        xValues: "BMI Feature Values",
-        yValues: "BMI SHAP (Contribution) Values",
+        xValues: "Blood Pressure Feature Values",
+        yValues: "Blood Pressure SHAP (Contribution) Values",
       },
       randomGraph: {
         graphType: "Swarm",
@@ -597,7 +609,7 @@ export const QuestionList: TQuestion[] = [
   },
   {
     index: 9,
-    condition: Math.random() < 0.5 ? "optimal" : "random",
+    condition: newVals[9] < 0.5 ? "optimal" : "random",
     pageName: "question",
     userText:
       "Blood pressure is correlated more strongly to diabetes risk when the BMI is between 0.1 and 0.2 versus -0.05 to 0.05",
@@ -617,7 +629,7 @@ export const QuestionList: TQuestion[] = [
       annotation: 
         {
           type: "highlightRange",
-          xRange: [0.1, 0.2],
+          xRange: [-0.05, 0.05],
         },
     },
     insight: {
@@ -639,23 +651,26 @@ export const QuestionList: TQuestion[] = [
       optimalGraph: {
         graphType: "two-scatter",
         xValues: "Blood Pressure Feature Values",
-        yValues: "Blood pressure SHAP values",
+        yValues: "Blood Pressure SHAP (Contribution) Values",
         colorValues: "BMI Feature Values",
         annotation:
           {
             type: "twoColorRange",
             range: [
-              [0.2,0.5],
-              [0,0.1]
+              [0.2, 0.5],
+              [0, 0.1]
             ]
           },
       },
       randomGraph: {
-        graphType: "Heatmap",
-        xValues: "None",
-        yValues: "None",
-        featuresToHighlight: ["blood pressure", "bmi"],
-        featuresToShow: ["blood pressure", "bmi", "high-density lipoproteins", "blood sugar level"],
+        graphType: "Scatter",
+        xValues: "Blood Pressure Feature Values",
+        yValues: "Blood Pressure SHAP (Contribution) Values",
+        annotation: 
+          {
+            type: "highlightRange",
+            xRange: [0.1, 0.2],
+          },
       },
     },
     testCondition: "random vis",
@@ -664,7 +679,7 @@ export const QuestionList: TQuestion[] = [
   },
   {
     index: 10,
-    condition: Math.random() < 0.5 ? "optimal" : "random",
+    condition: newVals[10] < 0.5 ? "optimal" : "random",
     pageName: "question",
     userText:
       "In the BMI range of 0.05 and 0.1, it is positively correlated with diabetes risk",
@@ -729,7 +744,7 @@ export const QuestionList: TQuestion[] = [
   },
   {
     index: 11,
-    condition: Math.random() < 0.5 ? "optimal" : "random",
+    condition: newVals[11] < 0.5 ? "optimal" : "random",
     pageName: "question",
     userText:
       "BMI is correlated more strongly to diabetes risk when the age is between 0.05 to 0.1 versus 0 to 0.02",
@@ -783,7 +798,7 @@ export const QuestionList: TQuestion[] = [
             type: "twoColorRange",
             range: [
               [0.05, 0.1],
-              [0, 0.02],
+              [0, 0.02]
             ],
           },
       },

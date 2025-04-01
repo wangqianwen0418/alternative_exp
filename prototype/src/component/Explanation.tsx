@@ -31,12 +31,15 @@ import {
   isUserStudyAtom,
   selectedIndicesAtom,
   tutorialStep,
-  secondGraphTypeAtom
+  secondGraphTypeAtom,
+  questionIndexAtom,
+  questionOrderAtom
 } from "../store";
 import TwoColorScatter from "./TwoColorScatter";
 import { TGraph } from "../util/types";
 import { yellow } from "@mui/material/colors";
 import Tutorial from "./Tutorial";
+import { QuestionList } from "../util/questionList"
 
 function getRandomPoints(arr: number[]) {
   if (arr.length < 25) {
@@ -72,6 +75,8 @@ export default function Explanation() {
   const [, setShowTutorial] = useAtom(tutorialAtom);
   const [isUserStudy] = useAtom(isUserStudyAtom);
   const [secondGraphType, setSecondGraphType] = useAtom(secondGraphTypeAtom);
+  const [questionIndexesArray] = useAtom(questionOrderAtom);
+  const [questionIndex, setQuestionIndex] = useAtom(questionIndexAtom);
 
   useEffect(() => {
     if (initialVisRef.current) {
@@ -251,7 +256,11 @@ export default function Explanation() {
   }
 
   let additionalVisualizations;
-  var graphCase = Math.random() < 0.5 ? "optimal" : "random";
+  const q = QuestionList[questionIndexesArray[questionIndex]];
+  var graphCase = "random";
+  if (q != null){
+    graphCase = q.condition? q.condition : "random";
+  }
   var graph =
     graphCase === "optimal" ? insight?.optimalGraph : insight?.randomGraph;
   setSecondGraphType(graphCase);
