@@ -1,5 +1,12 @@
-import { Paper, Typography, IconButton, Popover } from "@mui/material";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import {
+  Paper,
+  Typography,
+  IconButton,
+  Popover,
+  Button,
+  Box,
+} from "@mui/material";
+import InfoIcon from "@mui/icons-material/Info";
 import shap_diabetes from "../assets/shap_diabetes.json";
 import {
   diabetesShapValues,
@@ -20,11 +27,40 @@ import {
   initVisAtom,
   insightAtom,
   isSubmittedAtom,
+  tutorialAtom,
   isUserStudyAtom,
   selectedIndicesAtom,
+  tutorialStep,
+  secondGraphTypeAtom,
+  questionIndexAtom,
+  questionOrderAtom
 } from "../store";
 import TwoColorScatter from "./TwoColorScatter";
 import { TGraph } from "../util/types";
+import { yellow } from "@mui/material/colors";
+import Tutorial from "./Tutorial";
+import { QuestionList } from "../util/questionList"
+
+function getRandomPoints(arr: number[]) {
+  if (arr.length < 25) {
+    throw new Error("Array has fewer than 25 points.");
+  }
+
+  const randomPoints = [];
+  const randomIndices = new Set();
+
+  while (randomIndices.size < 25) {
+    const randomIndex = Math.floor(Math.random() * arr.length);
+    if (!randomIndices.has(randomIndex)) {
+      randomIndices.add(randomIndex);
+      randomPoints.push(arr[randomIndex]);
+    }
+  }
+
+  return randomPoints;
+}
+
+
 
 export default function Explanation() {
   const [isSubmitted] = useAtom(isSubmittedAtom);
@@ -34,7 +70,34 @@ export default function Explanation() {
   const initialVisRef = useRef<SVGGElement>(null);
   const additionalVisRef = useRef<SVGGElement>(null);
   const [secondVisTranslateY, setSecondVisTranslateY] = useState(0);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
+  const [tutorialStepValue, setTutorialStep] = useAtom(tutorialStep);
+  const [, setShowTutorial] = useAtom(tutorialAtom);
   const [isUserStudy] = useAtom(isUserStudyAtom);
+  const [secondGraphType, setSecondGraphType] = useAtom(secondGraphTypeAtom);
+  const [questionIndexesArray] = useAtom(questionOrderAtom);
+  const [questionIndex, setQuestionIndex] = useAtom(questionIndexAtom);
+
+  const [rightPosition, setRightPosition] = useState("25%");
+
+  useEffect(() => {
+    const updatePosition = () => {
+      if (window.innerWidth < 1600) {
+        setRightPosition("0%");
+      } else if (window.innerWidth < 1800) {
+        setRightPosition("10%");
+      } else if (window.innerWidth < 2000) {
+        setRightPosition("20%");
+      } else {
+        setRightPosition("25%");
+      }
+    };
+
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+
+    return () => window.removeEventListener("resize", updatePosition);
+  }, []);
 
   useEffect(() => {
     if (initialVisRef.current) {
@@ -51,6 +114,24 @@ export default function Explanation() {
 
   const handlePopoverClose = () => {
     setAnchorEl(null);
+  };
+
+  const openTutorialAtStep = (graphType: string) => {
+    const stepMapping: Record<string, number> = {
+      Bar: 3,
+      Swarm: 2,
+      Scatter: 4,
+      Heatmap: 5,
+    };
+
+    // Get the step based on the graphType, defaulting to 0 if not found
+    const stepIndex = stepMapping[graphType] ?? 0;
+
+    // Set the tutorial to open at the appropriate step
+    setTutorialStep(stepIndex);
+    setTutorialOpen(true);
+    setShowTutorial(true);
+    console.log("Tutorial showing now at step " + stepIndex);
   };
 
   const open = Boolean(anchorEl);
@@ -195,8 +276,16 @@ export default function Explanation() {
   }
 
   let additionalVisualizations;
-  if (insight?.graph.graphType && isUserStudy) {
-    switch (insight?.graph.graphType) {
+  const q = QuestionList[questionIndexesArray[questionIndex]];
+  var graphCase = "random";
+  if (q != null){
+    graphCase = q.condition? q.condition : "random";
+  }
+  var graph =
+    graphCase === "optimal" ? insight?.optimalGraph : insight?.randomGraph;
+  setSecondGraphType(graphCase);
+  if (graph?.graphType) {
+    switch (graph.graphType) {
       case "Bar":
         additionalVisualizations = isSubmitted && (
           <Bar
@@ -204,15 +293,13 @@ export default function Explanation() {
             featureNames={shap_diabetes["feature_names"].slice(0, 100)}
             width={600}
             height={
-              insight.graph.featuresToShow
-                ? 60 * insight.graph.featuresToShow.length
-                : 300
+              graph.featuresToShow ? 60 * graph.featuresToShow.length : 300
             }
             id="bar-secondVis"
             offsets={[0, 0]}
-            annotation={insight.graph.annotation}
-            featuresToHighlight={insight.graph.featuresToHighlight}
-            featuresToShow={insight.graph.featuresToShow}
+            annotation={graph.annotation}
+            featuresToHighlight={graph.featuresToHighlight}
+            featuresToShow={graph.featuresToShow}
           />
         );
         break;
@@ -221,12 +308,10 @@ export default function Explanation() {
           <>
             <Scatter
               xValues={
-                variableMapping[insight?.graph.xValues] ||
-                diabetes_bmi_featureValues
+                variableMapping[graph.xValues] || diabetes_bmi_featureValues
               }
               yValues={
-                variableMapping[insight?.graph.yValues] ||
-                diabetes_bmi_shapValues
+                variableMapping[graph.yValues] || diabetes_bmi_shapValues
               }
               width={600}
               height={400}
@@ -234,9 +319,9 @@ export default function Explanation() {
               offsets={[0, 0]}
               selectedIndices={selectedIndices}
               setSelectedIndices={setSelectedIndices}
-              xLabel={insight.graph.xValues}
-              yLabel={insight.graph.yValues}
-              annotation={insight.graph.annotation}
+              xLabel={graph.xValues}
+              yLabel={graph.yValues}
+              annotation={graph.annotation}
             />
           </>
         );
@@ -251,11 +336,11 @@ export default function Explanation() {
               height={400}
               id="swarm-secondVis"
               labels={diabetesLabels}
-              featuresToHighlight={insight.graph.featuresToHighlight}
-              featuresToShow={insight.graph.featuresToShow}
+              featuresToHighlight={graph.featuresToHighlight}
+              featuresToShow={graph.featuresToShow}
               selectedIndices={selectedIndices}
               setSelectedIndices={setSelectedIndices}
-              annotation={insight.graph.annotation}
+              annotation={graph.annotation}
             />
           </>
         );
@@ -269,13 +354,11 @@ export default function Explanation() {
             labels={diabetesLabels}
             width={600}
             height={
-              insight.graph.featuresToShow
-                ? 70 * insight.graph.featuresToShow!.length
-                : 350
+              graph.featuresToShow ? 70 * graph.featuresToShow!.length : 350
             }
             title="Diabetes Heatmap"
-            featuresToHighlight={insight.graph.featuresToHighlight}
-            featuresToShow={insight.graph.featuresToShow}
+            featuresToHighlight={graph.featuresToHighlight}
+            featuresToShow={graph.featuresToShow}
           />
         );
         break;
@@ -284,25 +367,23 @@ export default function Explanation() {
         additionalVisualizations = isSubmitted && (
           <TwoColorScatter
             xValues={
-              variableMapping[insight.graph.xValues] ||
-              diabetes_bmi_featureValues
+              variableMapping[graph.xValues] || diabetes_bmi_featureValues
             }
             yValues={
-              variableMapping[insight.graph.yValues] ||
-              diabetes_bmi_featureValues
+              variableMapping[graph.yValues] || diabetes_bmi_featureValues
             }
             colorValues={
               variableMapping[
-                insight?.graph.colorValues ?? "Age Feature Values"
+                insight?.optimalGraph.colorValues ?? "Age Feature Values"
               ]
             }
             width={600}
             height={400}
             id="two-color-additional"
-            xLabel={insight.graph.xValues}
-            yLabel={insight.graph.yValues}
-            colorLabel={insight?.graph?.colorValues ?? ""}
-            annotation={insight.graph.annotation}
+            xLabel={graph.xValues}
+            yLabel={graph.yValues}
+            colorLabel={graph.colorValues ?? ""}
+            annotation={graph.annotation}
           />
         );
         break;
@@ -316,7 +397,7 @@ export default function Explanation() {
       <Typography variant="h5" gutterBottom>
         Visual Explanation
         <IconButton onClick={handlePopoverOpen} aria-label="help">
-          <HelpOutlineIcon />
+          <InfoIcon />
         </IconButton>
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mt: 1, mb: 1 }}>
@@ -337,7 +418,6 @@ export default function Explanation() {
         }}
       >
         <Typography sx={{ p: 2 }}>
-          {/* This is the text you can customize */}
           In many machine learning models, features are adjusted so their
           average is 0, and the scale is based on standard deviations. <br />
           A positive value (e.g., BMI 0.1) is above average, and a negative
@@ -348,22 +428,71 @@ export default function Explanation() {
           blood pressure, even though they use different scales.
         </Typography>
       </Popover>
-      <svg className="swarm" width="100%" height="100vh">
-        {/* Initial Visualization */}
-        <g ref={initialVisRef} transform="translate(0, 0)">
-          {initialVisualization}
-        </g>
 
-        {/* Additional Visualization BELOW the initialVisualization */}
-        {isSubmitted && (
-          <g
-            ref={additionalVisRef}
-            transform={`translate(0, ${secondVisTranslateY})`}
-          >
-            {additionalVisualizations}
+      <Box sx={{ position: "relative", width: "100%" }}>
+        <svg className="swarm" width="85%" height="100vh">
+          {/* Initial Visualization */}
+          <g ref={initialVisRef} transform="translate(0, 0)">
+            {initialVisualization}
           </g>
+
+          {/* Additional Visualization BELOW the initialVisualization */}
+          {isSubmitted && (
+            <g
+              ref={additionalVisRef}
+              transform={`translate(0, ${secondVisTranslateY})`}
+            >
+              {additionalVisualizations}
+            </g>
+          )}
+        </svg>
+
+        {/* Button for first visualization */}
+        <Box
+          sx={{
+            position: "absolute",
+            top: 150, // Adjust as needed to align with first visualization
+            right: rightPosition,
+            zIndex: 1,
+          }}
+        >
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => openTutorialAtStep((initVis as TGraph).graphType)}
+            sx={{ whiteSpace: "nowrap" }}
+          >
+            CONFUSED ABOUT THIS
+            <br />
+            VISUALIZATION?
+          </Button>
+        </Box>
+
+        {/* Button for second visualization */}
+        {isSubmitted && (
+          <Box
+            sx={{
+              position: "absolute",
+              top: secondVisTranslateY + 150, // Position relative to second visualization
+              right: "25%",
+              zIndex: 1,
+            }}
+          >
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() =>
+                openTutorialAtStep(graph?.graphType ? graph?.graphType : "")
+              }
+              sx={{ whiteSpace: "nowrap" }}
+            >
+              CONFUSED ABOUT THIS
+              <br />
+              VISUALIZATION?
+            </Button>
+          </Box>
         )}
-      </svg>
+      </Box>
     </Paper>
   );
 }

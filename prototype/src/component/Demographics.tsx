@@ -9,6 +9,10 @@ import {
   Grid,
 } from "@mui/material";
 //import { useTheme } from "@mui/material/styles";
+import { useAtom } from "jotai";
+import { uuidAtom } from "../store";
+import { timeStamp } from "console";
+import { test_weburl } from "../util/appscript_url";
 
 export interface DemographicsData {
   age: number;
@@ -30,6 +34,7 @@ export default function Demographics({ show, onSubmit }: DemographicsProps) {
   const [educationLevel, setEducationLevel] = useState<string>("");
   const [occupation, setOccupation] = useState<string>("");
   const [mlExperience, setMlExperience] = useState<string>("");
+  const [uuid] = useAtom(uuidAtom);
 
   const isFormValid = () => {
     if (!age || !gender || !educationLevel || !occupation || !mlExperience)
@@ -38,7 +43,7 @@ export default function Demographics({ show, onSubmit }: DemographicsProps) {
     return true;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!isFormValid()) {
       return;
     }
@@ -49,6 +54,30 @@ export default function Demographics({ show, onSubmit }: DemographicsProps) {
       occupation,
       mlExperience: Number(mlExperience),
     };
+
+    const data = {
+      uuid,
+      timestamp: new Date().toLocaleString(),
+      age: Number(age),
+      gender: gender === "Other" ? otherGender : gender,
+      educationLevel: educationLevel,
+      occupation: occupation,
+      mlExperience: Number(mlExperience),
+    };
+
+    try {
+      console.log("Submitting form:", JSON.stringify(data));
+      await fetch(test_weburl!, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+    } catch (error) {
+      console.error("Error submitting demographics data: ", error);
+    }
     onSubmit(demographicsData);
   };
 

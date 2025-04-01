@@ -15,8 +15,10 @@ export type TQuestion = TPageBase & {
   testCondition: "random vis" | "ours";
   index: number;
   groundTruth: boolean;
-  firstVis?: TGraph;
+  firstVisAnswer?: "true" | "false" | "irrelevant";
   newVis?: TGraph
+  condition?: "random" | "optimal",
+  secondTruth?: "true" | "false" | "irrelevant";
 };
 
 export type TAnnotation =
@@ -28,7 +30,7 @@ export type TAnnotation =
       label?: string, feature?: string;
     } // A range along X axis
   | { type: "singleLine"; xValue?: number; yValue?: number; label?: string } // A vertical line at a specific X/Y value
-  | { type: "twoColorRange"; range: Array<[number,number]>, label?: string };
+  | { type: "twoColorRange"; range: Array<[number,number]>; label?: string };
 
 export type TGraph = {
   graphType: "Swarm" | "Scatter" | "Bar" | "Heatmap" | "two-scatter";
@@ -52,7 +54,8 @@ export type TInsight1 = {
   type: "read";
   relation: "greater than" | "less than" | "equal to";
   condition: { featureName: string; range: [number, number] } | undefined;
-  graph: TGraph;
+  optimalGraph: TGraph;
+  randomGraph?: TGraph;
 };
 
 export type TInsight2 = {
@@ -60,7 +63,8 @@ export type TInsight2 = {
   type: "comparison";
   relation: "greater than" | "less than" | "equal to";
   condition: { featureName: string; range: [number, number] } | undefined;
-  graph: TGraph;
+  optimalGraph: TGraph;
+  randomGraph?: TGraph;
 };
 
 export type TInsight3 = {
@@ -68,7 +72,8 @@ export type TInsight3 = {
   type: "correlation";
   relation: "positively correlated" | "negatively correlated" | "not correlated";
   condition: { featureName: string; range: [number, number] } | undefined;
-  graph: TGraph;
+  optimalGraph: TGraph;
+  randomGraph?: TGraph;
 };
 
 export type TInsight4 = {
@@ -76,7 +81,8 @@ export type TInsight4 = {
   type: "featureInteraction";
   relation: "same" | "different";
   condition: { featureName: string; range: [number, number][] } | undefined;
-  graph: TGraph;
+  optimalGraph: TGraph;
+  randomGraph?: TGraph;
 };
 
 export type TVariable = {

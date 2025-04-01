@@ -31,6 +31,7 @@ import {
   tutorialAtom,
   selectedIndicesAtom,
   isUserStudyAtom,
+  secondGraphTypeAtom,
 } from "../store";
 import { pilot_weburl, test_weburl } from "../util/appscript_url";
 import Cookies from "js-cookie";
@@ -63,6 +64,7 @@ export default function UserResponse() {
   const [difficultGraphs, setDifficultGraphs] = useState("");
   const [, setSelectedIndices] = useAtom(selectedIndicesAtom);
   const [isUserStudy] = useAtom(isUserStudyAtom);
+  const [secondGraphType, setSecondGraphType] = useAtom(secondGraphTypeAtom);
 
   const [modalVisible, setModalVisible] = React.useState(false);
   const [userAnswer, setUserAnswer] = React.useState<
@@ -118,10 +120,17 @@ export default function UserResponse() {
       currentIndex: currentQuestionIndex,
       questionOrder: questionIndexesArray.toString(),
       freeText,
-      currentVis: (initVis as TGraph).graphType,
+      firstVis: (initVis as TGraph).graphType,
+      firstVisAnswer: QuestionList[currentQuestionIndex].firstVisAnswer,
+      secondGraphType: secondGraphType,
+      secondAnswer:
+        secondGraphType === "optimal"
+          ? QuestionList[currentQuestionIndex].groundTruth
+          : QuestionList[currentQuestionIndex].secondTruth,
       isSecondPart: isSecondPart ? "Yes" : "No",
       userAnswer,
       confidence: confidence.value,
+      groundTruth: QuestionList[currentQuestionIndex].groundTruth,
     };
 
     try {
@@ -159,8 +168,10 @@ export default function UserResponse() {
     const feedbackData = {
       uuid,
       timestamp: new Date().toLocaleString(),
-      firstVisFeedback,
-      secondVisFeedback,
+      firstVisFeedback: firstVisFeedback,
+      secondVisFeedback: secondVisFeedback,
+      difficultQuestions: difficultQuestions,
+      difficultGraphs: difficultGraphs,
     };
 
     try {
@@ -212,6 +223,14 @@ export default function UserResponse() {
             ? "Given the new visualization, is the above interpretation accurate?"
             : "Is the above interpretation accurate?"}
         </span>
+        {/* <Typography
+          variant="caption"
+          display="block"
+          style={{ marginTop: "8px", color: "red", fontSize: "14px" }}
+        >
+          Please answer the question based solely on the visualizations
+          provided, not your personal knowledge.
+        </Typography> */}
         <RadioGroup
           row
           aria-labelledby="demo-row-radio-buttons-group-label"

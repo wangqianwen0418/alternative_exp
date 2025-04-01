@@ -24,6 +24,9 @@ import {
   TwoColorTutorialGraph,
   AnnotationTutorialGraph,
 } from "../util/tutorialGraphs";
+import {
+  tutorialStep
+} from "../store"
 
 const definedWords = {
   XAI: "Explainable AI (XAI) is an approach to provide insight into the decision-making process of AI models, where explanations or rationales accompany recommendations made by AI.",
@@ -96,8 +99,9 @@ const tutorialSteps = [
         <SwarmTutorialGraph />
         <Typography variant="body1">
           To interact with this visualization, you can click and drag a
-          selection box to highlight data points from a particular feature. This allows you to see additional info and the
-          same instances across features (Give it a try!). Additionally, visualizations without
+          selection box to highlight data points from a particular feature. This
+          allows you to see additional info and the same instances across
+          features (Give it a try!). Additionally, visualizations without
           annotations are interactive, while visualizations with annotations are
           not.
         </Typography>
@@ -156,7 +160,7 @@ const tutorialSteps = [
     ),
   },
   {
-    title: "Step 1e: Visualizations",
+    title: "Step 2e: Visualizations",
     content: (
       <>
         <Typography variant="body1" sx={{ mb: 2 }}>
@@ -166,7 +170,7 @@ const tutorialSteps = [
           in the (x, y) plane. However, points are colored based on another
           feature in the Two-Color Scatter. In this case, the additional feature
           is the SHAP values for age.
-        </Typography> 
+        </Typography>
         <TwoColorTutorialGraph />
         <Typography variant="body1" sx={{ mt: 2 }}>
           To interactive with this visualization, you can drag the two black
@@ -407,12 +411,22 @@ const tutorialSteps = [
 interface TutorialProps {
   show: boolean;
   onClose: () => void;
+  initialStep?: number;
 }
 
-export default function Tutorial({ show, onClose }: TutorialProps) {
+export default function Tutorial({
+  show,
+  onClose,
+  initialStep = 0,
+}: TutorialProps) {
   const theme = useTheme();
-  const [activeStep, setActiveStep] = React.useState(0);
+  const [activeStep, setActiveStep] = React.useState(initialStep);
   const maxSteps = tutorialSteps.length;
+  console.log("ACTIVE STEP: " + initialStep);
+
+  React.useEffect(() => {
+    setActiveStep(initialStep);
+  }, [initialStep]);
 
   const handleNext = () => {
     if (activeStep === maxSteps - 1) {

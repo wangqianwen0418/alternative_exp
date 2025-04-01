@@ -12,6 +12,7 @@ import {
   questionOrderAtom,
   tutorialAtom,
   isUserStudyAtom,
+  tutorialStep,
 } from "./store";
 
 import Explanation from "./component/Explanation";
@@ -57,6 +58,7 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
   const [, setQuestionOrder] = useAtom(questionOrderAtom);
   const [showTutorial, setShowTutorial] = useAtom(tutorialAtom);
   const [isUserStudy] = useAtom(isUserStudyAtom);
+  let [tutorialStepValue] = useAtom(tutorialStep)
 
   const [, setDemographics] = useState<any>(null);
   const [showDemographics, setShowDemographics] = useState(false);
@@ -247,6 +249,7 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
             setShowTutorial(false);
             Cookies.set("showTutorial", "false", { expires: 365 });
           }}
+          initialStep={tutorialStepValue}
         />
       )}
       <Grid item xs={7} className="App-body">

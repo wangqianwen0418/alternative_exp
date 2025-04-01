@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import { TInsight, TAnnotation} from "./types";
+import { TInsight, TAnnotation } from "./types";
 import { ResetTvOutlined } from "@mui/icons-material";
 
 export const generatePrompt = (
@@ -10,7 +10,7 @@ You are a bot that extracts structured content from User Interpretations (“ins
 
 First, ensure that all features mentioned in the insight are in this list: ${feature_names.join(
   ", "
-)}. If a feature is not in the list, set Variables to ["ERROR"]. Abbreviations (like "BMI" for "Body Mass Index") are fine.
+)}. If a feature is not in the list, set Variables to ["ERROR"]. Abbreviations (like "BMI" for "Body Mass Index") are fine, but any ouput you provide should match the names in the list exactly.
 
 Next, determine the Category of the insight based on these descriptions: 
 
@@ -27,7 +27,7 @@ Next, determine the Category of the insight based on these descriptions:
     Category 3:
     Attribution [DV1] by Feature Value [IV1] 
     Possible Examples:
-    There is a positive correlation between the contribution of Feature1 to predictions and the Feature1 values when values are above 15
+    There is a positive correlation between the contribution of Feature1 to predictions and the Feature1 values
 
 
     Category 4:
@@ -41,7 +41,7 @@ Once the category is determined, the JSON should contain:
 Variables: An array of variables with the format: 
 {
   featureName: string,
-  transform: "average" | "deviations of" | "" | undefined
+  transform: "average" | "deviation of" | "" | undefined
   type: "value of" | "contribution to the prediction of" | "number of instances <restriction> for" 
 }
 
@@ -59,7 +59,7 @@ Type - this will match the category. Options are “read”, “comparison”, �
 Relationship: Based on the category
 Category 1 (“read”): options are “greater than”, “less than”, “equal to”
 Category 2 (“comparison”): options are “greater than”, “less than”, “equal to”
-Category 3 (“correlation”): options are “positively correlated” or “negatively correlated”
+Category 3 (“correlation”): options are “positively correlated”, “negatively correlated”, or "not correlated"
 Category 4 (“featureInteraction”): options are “same” or “different”
 
 Condition: refers to restrictions on variable values. 
@@ -81,7 +81,7 @@ Condition: {
 
 GraphType: This will have four options: "Swarm", "Scatter", "Bar", "Heatmap". 
 Here are the situations in which each one is most optimal:
-Swarm: for comparisons of distributions, instances, or multiple features. Shows individual data points.
+Swarm: for comparisons of distributions, instances, or multiple features. Shows individual data points of multiple features, side-by-side. 
 Scatter: for correlations.
 Bar: For average values
 Heatmap (note: shows how each feature contributes to the output for individual samples):
@@ -90,7 +90,9 @@ When you want to see how different features impact the prediction for individual
 XValues and YValues: This depends on the GraphType
 Scatter: XValues and YValues both indicate what data to display on the graph for this insight. Use the following format: "<FeatureName> <Feature/SHAP (Contribution)> values". For example, your XValues can be "BMI Feature Values" and your YValues can be "BMI SHAP (Contribution) Values" 
 Swarm, Bar and Heatmap: Set both to "None".
-Features: A string array ["Feature 1", "Feature 2",...] of the names of the features to highlight in the graph. This should be be populated for Bar and Swarm Plots - otherwise, the value will be "None". Whenever you provide a feature name, make sure it is provided the same way it was in the feature list above.
+FeaturesToHighlight: A string array ["Feature 1", "Feature 2",...] of the names of the features to highlight/emphasize in the graph. This should be be populated for Bar, Swarm, and Heatmap Plots - otherwise, the value will be "None". Whenever you provide a feature name, make sure it is provided the same way it was in the feature list above.
+FeaturesToShow: A string array ["Feature 1", "Feature 2",...] of the names of all the features provided above, in addition to a few more of your choosing (aim for 3-5 features per graph). This should be populated for Bar, Swarm, and Heatmap plots. All the features in FeaturesToHighlight must also be provided here.
+
 
 Annotation is the next value in the JSON. Here are the options for Annotation:
 type TAnnotation =
@@ -112,13 +114,28 @@ For Barplots, the only annotations that are allowed are vertical lines (so make 
 For Swarms, there can be no range or line in the Y direction, only in the X direction.
 
 For example, suppose the user input statement was "The average contribution of the bmi to the prediction is larger than 20". Since we are looking at the average contribution of each feature, the GraphType value would be "Bar".
-Then, XValues and YValues would both be "None". Features would be ["BMI"]. Annotation would be "SingleLine" and AnnotationParams would be ["X", 20].
+Then, XValues and YValues would both be "None". FeaturesToHighlight would be ["bmi"], and FeaturesToShow could be ["bmi", "blood sugar level", "serum triglycerides level"]. Annotation would look like this:
+{
+	type: "singleLine",
+	xValue: 20
+}
 Here's another example: 
+
 Suppose the user input statement was "bmi has more instances above 5 than sex". Since we are looking at individual data points (and comparing features), the GraphType value would be "Swarm".
-In this case, the XValues field should be "BMI", and the YValues field would just be "BMI". Features would be ["BMI", "sex"].  Since we want to see the data points that satisfy this criteria, Annotation would be "HighlightRange" and AnnotationParams would be [[5, 100], []].
+In this case, the XValues field should be "BMI", and the YValues field would just be "BMI". FeaturesToHighlight would be ["bmi", "sex"] and FeaturesToShow could be ["bmi", "sex", "age", low-density lipoproteins"].  Since we want to see the data points that satisfy this criteria, Annotation would be 
+
+{
+	type: "highlightRange",
+	xRange: [5,100]
+}
 
 One last example: Suppose the user input statement was "There is a negative correlation between the contribution of age to predictions and the age values when the feature value is between -0.10 and 0.00". 
-In this case, since we are looking at correlation, GraphType would be "Scatter". Then the XValues field would be "Age" and the YValues field would be "Age".  Since it is a scatter plot, Features would be "None". The Annotation field would be "HighlightRange", and AnnotationParams would be [[-0.10, 0.00], []].
+In this case, since we are looking at correlation, GraphType would be "Scatter". Then the XValues field would be "Age Feature Values" and the YValues field would be "Age SHAP (Contribution) values".  Since it is a scatter plot, Features would be "None". Then annotation would be
+
+{
+	type: "highlightRange",
+	xRange: [-0.1, 0]
+}
 
 
 Here’s an example of the full JSON:
@@ -146,10 +163,9 @@ Condition: {}
 GraphType: "Bar" - since we are comparing the average values of two different features.
 XValues would be "None".
 YValues would be "None".
-Features would be ["BMI", "Age"]
-Annotation would be "None".
-AnnotationParams would be "None".
-
+FeaturesToHighlight would be ["bmi", "age"]
+FeaturesToShow would be ["bmi", "age", "sex", "blood sugar level"],
+Annotation would be empty: {}
 
 Here is another full example:
 Suppose the user input statement was "There is a positive correlation between the contribution of bmi to predictions and the bmi values when the feature value is between 0.05 and 0.10".
@@ -175,12 +191,13 @@ Condition: {
   range: [0.05, 0.10]
 }
 GraphType: "Scatter",
-XValues: "bmi",
-YValues: "bmi",
+XValues: "BMI Feature values",
+YValues: "BMI SHAP (Contribution) values",
 Features: "None",
-Annotation: "HighlightRange", 
-AnnotationParams: [[0.05, 0.10], []]
-
+Annotation: {
+	type: "highlightRange",
+	xRange: [0.01, 0.1]
+}
 
 One thing that is important to note: Sometimes, constants (numbers) are implicitly present in the statement even if they are not explicitly stated. For example, in the sentence "bmi always contributes positively for predicting diabetes progression", the implied number is 0, since the sentence can be rewritten as "the contribution of bmi is always greater than 0".
 In these cases, make sure you include the implied constant in the numbers array.
@@ -274,60 +291,20 @@ export const parseInput = async (
           type: jsonObject.Type,
           relation: jsonObject.Relationship,
           condition: jsonObject.Condition,
-          graph: {
+          optimalGraph: {
             graphType: jsonObject.GraphType,
             xValues: jsonObject.XValues,
             yValues: jsonObject.YValues,
-            ...(jsonObject.Features &&
-              jsonObject.Features !== "None" && {
-                featuresToHighlight: jsonObject.Features,
+            ...(jsonObject.FeaturesToHighlight &&
+              jsonObject.FeaturesToHighlight !== "None" && {
+                featuresToHighlight: jsonObject.FeaturesToHighlight,
+              }),
+            ...(jsonObject.FeaturesToShow &&
+              jsonObject.FeaturesToShow !== "None" && {
+                featuresToShow: jsonObject.FeaturesToShow,
               }),
             ...(jsonObject.Annotation !== "None" && {
-              annotation: (() => {
-                let annotations: TAnnotation[] = [];
-                switch (jsonObject.Annotation) {
-                  case "HighlightRange":
-                    const xRange = jsonObject.AnnotationParams[0];
-                    const yRange = jsonObject.AnnotationParams[1];
-
-                    const range: {
-                      type: string;
-                      xRange?: number[];
-                      yRange?: number[];
-                    } = {
-                      type: "HighlightRange",
-                    };
-                    if (xRange && xRange.length > 0) {
-                      range.xRange = xRange;
-                    }
-                    if (yRange && yRange.length > 0) {
-                      range.yRange = yRange;
-                    }
-                    return range;
-                  case "SingleLine":
-                    const [axis, value] = jsonObject.AnnotationParams;
-                    const line: {
-                      type: string;
-                      xValue?: number;
-                      yValue?: number;
-                    } = {
-                      type: "singleLine",
-                    };
-                    if (axis === "X" || jsonObject.GraphType == "Bar") {
-                      line.xValue = value;
-                    } else if (axis === "Y") {
-                      line.yValue = value;
-                    }
-                    return line;
-                  case "Highlight Specific Data Points":
-                    return {
-                      type: "highlightDataPoints",
-                      dataPoints: [0, 1, 2, 3, 4, 5, 6],
-                    };
-                  default:
-                    return null; // Return null if there's no valid annotation type
-                }
-              })(),
+              annotation: jsonObject.Annotation,
             }),
           },
         } as TInsight;
