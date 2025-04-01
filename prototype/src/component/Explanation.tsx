@@ -78,6 +78,27 @@ export default function Explanation() {
   const [questionIndexesArray] = useAtom(questionOrderAtom);
   const [questionIndex, setQuestionIndex] = useAtom(questionIndexAtom);
 
+  const [rightPosition, setRightPosition] = useState("25%");
+
+  useEffect(() => {
+    const updatePosition = () => {
+      if (window.innerWidth < 1600) {
+        setRightPosition("0%");
+      } else if (window.innerWidth < 1800) {
+        setRightPosition("10%");
+      } else if (window.innerWidth < 2000) {
+        setRightPosition("20%");
+      } else {
+        setRightPosition("25%");
+      }
+    };
+
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+
+    return () => window.removeEventListener("resize", updatePosition);
+  }, []);
+
   useEffect(() => {
     if (initialVisRef.current) {
       const bbox = initialVisRef.current.getBBox();
@@ -97,22 +118,21 @@ export default function Explanation() {
 
   const openTutorialAtStep = (graphType: string) => {
     const stepMapping: Record<string, number> = {
-      "Bar": 3,
-      "Swarm": 2,
-      "Scatter": 4,
-      "Heatmap": 5,
+      Bar: 3,
+      Swarm: 2,
+      Scatter: 4,
+      Heatmap: 5,
     };
-  
+
     // Get the step based on the graphType, defaulting to 0 if not found
     const stepIndex = stepMapping[graphType] ?? 0;
-  
+
     // Set the tutorial to open at the appropriate step
     setTutorialStep(stepIndex);
     setTutorialOpen(true);
     setShowTutorial(true);
     console.log("Tutorial showing now at step " + stepIndex);
   };
-
 
   const open = Boolean(anchorEl);
 
@@ -273,9 +293,7 @@ export default function Explanation() {
             featureNames={shap_diabetes["feature_names"].slice(0, 100)}
             width={600}
             height={
-              graph.featuresToShow
-                ? 60 * graph.featuresToShow.length
-                : 300
+              graph.featuresToShow ? 60 * graph.featuresToShow.length : 300
             }
             id="bar-secondVis"
             offsets={[0, 0]}
@@ -290,12 +308,10 @@ export default function Explanation() {
           <>
             <Scatter
               xValues={
-                variableMapping[graph.xValues] ||
-                diabetes_bmi_featureValues
+                variableMapping[graph.xValues] || diabetes_bmi_featureValues
               }
               yValues={
-                variableMapping[graph.yValues] ||
-                diabetes_bmi_shapValues
+                variableMapping[graph.yValues] || diabetes_bmi_shapValues
               }
               width={600}
               height={400}
@@ -338,9 +354,7 @@ export default function Explanation() {
             labels={diabetesLabels}
             width={600}
             height={
-              graph.featuresToShow
-                ? 70 * graph.featuresToShow!.length
-                : 350
+              graph.featuresToShow ? 70 * graph.featuresToShow!.length : 350
             }
             title="Diabetes Heatmap"
             featuresToHighlight={graph.featuresToHighlight}
@@ -353,12 +367,10 @@ export default function Explanation() {
         additionalVisualizations = isSubmitted && (
           <TwoColorScatter
             xValues={
-              variableMapping[graph.xValues] ||
-              diabetes_bmi_featureValues
+              variableMapping[graph.xValues] || diabetes_bmi_featureValues
             }
             yValues={
-              variableMapping[graph.yValues] ||
-              diabetes_bmi_featureValues
+              variableMapping[graph.yValues] || diabetes_bmi_featureValues
             }
             colorValues={
               variableMapping[
@@ -440,7 +452,7 @@ export default function Explanation() {
           sx={{
             position: "absolute",
             top: 150, // Adjust as needed to align with first visualization
-            right: "25%",
+            right: rightPosition,
             zIndex: 1,
           }}
         >
@@ -469,7 +481,9 @@ export default function Explanation() {
             <Button
               variant="outlined"
               color="primary"
-              onClick={() => openTutorialAtStep(graph?.graphType? graph?.graphType : "")}
+              onClick={() =>
+                openTutorialAtStep(graph?.graphType ? graph?.graphType : "")
+              }
               sx={{ whiteSpace: "nowrap" }}
             >
               CONFUSED ABOUT THIS
