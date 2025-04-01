@@ -281,7 +281,7 @@ export const QuestionList: TQuestion[] = [
     condition: newVals[4] < 0.5 ? "optimal" : "random",
     pageName: "question",
     userText:
-      "On average, the absolute contribution to diabetes progression of blood pressure is less than it is for age.",
+      "On average, the absolute contribution of blood pressure to diabetes progression is less than it is for age.",
     initVis: {
       graphType: "Heatmap",
       xValues: "none",
@@ -605,7 +605,7 @@ export const QuestionList: TQuestion[] = [
     },
     testCondition: "ours",
     groundTruth: true,
-    secondTruth: "irrelevant"
+    secondTruth: "true"
   },
   {
     index: 9,
