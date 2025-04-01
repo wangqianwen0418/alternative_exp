@@ -12,7 +12,7 @@ import {
 import { useAtom } from "jotai";
 import { uuidAtom } from "../store";
 import { timeStamp } from "console";
-import { test_weburl } from "../util/appscript_url";
+import { pilot_weburl } from "../util/appscript_url";
 
 export interface DemographicsData {
   age: number;
@@ -67,7 +67,7 @@ export default function Demographics({ show, onSubmit }: DemographicsProps) {
 
     try {
       console.log("Submitting form:", JSON.stringify(data));
-      await fetch(test_weburl!, {
+      await fetch(pilot_weburl!, {
         method: "POST",
         mode: "no-cors",
         headers: {
