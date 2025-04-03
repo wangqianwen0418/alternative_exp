@@ -421,7 +421,19 @@ export default function Explanation() {
               ref={additionalVisRef}
               transform={`translate(0, ${secondVisTranslateY})`}
             >
-              {additionalVisualizations}
+              {additionalVisualizations ? (
+                additionalVisualizations
+              ) : (
+                <Bar
+                  allShapValues={shap_diabetes["shap_values"].slice(0, 100)}
+                  featureNames={shap_diabetes["feature_names"].slice(0, 100)}
+                  width={600}
+                  height={300}
+                  id="bar-secondVis"
+                  offsets={[0, 0]}
+                />
+              )}
+              ;
             </g>
           )}
         </svg>
