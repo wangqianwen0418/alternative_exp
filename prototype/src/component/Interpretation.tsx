@@ -167,7 +167,7 @@ export default function Interpretation() {
         {isLoading ? (
           <CircularProgress />
         ) : (
-          (isSubmitted || insight) &&
+          isSubmitted &&
           !isUserStudy && (
             <Paper className="parse-input" elevation={0}>
               <b>Formatted: </b>
