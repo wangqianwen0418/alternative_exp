@@ -41,7 +41,7 @@ import { TGraph } from "../util/types";
 import { QuestionList } from "../util/questionList";
 
 export default function Explanation() {
-  const [isSubmitted] = useAtom(isSubmittedAtom);
+  const [isSubmitted, setIsSubmitted] = useAtom(isSubmittedAtom);
   const [insight] = useAtom(insightAtom);
   let [initVis] = useAtom(initVisAtom);
   const [selectedIndices, setSelectedIndices] = useAtom(selectedIndicesAtom);
@@ -74,6 +74,8 @@ export default function Explanation() {
 
     updatePosition();
     window.addEventListener("resize", updatePosition);
+
+    setIsSubmitted(false);
 
     return () => window.removeEventListener("resize", updatePosition);
   }, []);
