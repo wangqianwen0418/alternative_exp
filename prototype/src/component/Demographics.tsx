@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Modal,
   Box,
@@ -11,7 +11,6 @@ import {
 //import { useTheme } from "@mui/material/styles";
 import { useAtom } from "jotai";
 import { uuidAtom } from "../store";
-import { timeStamp } from "console";
 import { test_weburl } from "../util/appscript_url";
 
 export interface DemographicsData {
@@ -66,7 +65,6 @@ export default function Demographics({ show, onSubmit }: DemographicsProps) {
     };
 
     try {
-      console.log("Submitting form:", JSON.stringify(data));
       await fetch(test_weburl!, {
         method: "POST",
         mode: "no-cors",

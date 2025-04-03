@@ -134,7 +134,6 @@ export default function UserResponse() {
     };
 
     try {
-      console.log("Submitting form:", JSON.stringify(data));
       await fetch(test_weburl!, {
         method: "POST",
         mode: "no-cors",
@@ -175,7 +174,6 @@ export default function UserResponse() {
     };
 
     try {
-      console.log("Submitting feedback:", JSON.stringify(feedbackData));
       await fetch(test_weburl!, {
         method: "POST",
         mode: "no-cors",

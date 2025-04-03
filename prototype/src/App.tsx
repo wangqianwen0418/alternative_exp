@@ -58,7 +58,7 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
   const [, setQuestionOrder] = useAtom(questionOrderAtom);
   const [showTutorial, setShowTutorial] = useAtom(tutorialAtom);
   const [isUserStudy] = useAtom(isUserStudyAtom);
-  let [tutorialStepValue] = useAtom(tutorialStep)
+  let [tutorialStepValue] = useAtom(tutorialStep);
 
   const [, setDemographics] = useState<any>(null);
   const [showDemographics, setShowDemographics] = useState(false);
@@ -219,16 +219,12 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
             />
             .
             <br />
-            {/* {appProps.pageName:.includes("Free") && <SyncIcon />} */}
           </p>
         </Paper>
       </Grid>
       <Grid item xs={4} className="App-body">
         <Interpretation />
         {isUserStudy && <UserResponse />}
-        {/* <Paper style={{ padding: "15px", marginTop: "10px" }}>
-          <CounterbalanceButton />
-        </Paper> */}
       </Grid>
 
       {isUserStudy && showDemographics && (

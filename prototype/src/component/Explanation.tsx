@@ -33,34 +33,11 @@ import {
   tutorialStep,
   secondGraphTypeAtom,
   questionIndexAtom,
-  questionOrderAtom
+  questionOrderAtom,
 } from "../store";
 import TwoColorScatter from "./TwoColorScatter";
 import { TGraph } from "../util/types";
-import { yellow } from "@mui/material/colors";
-import Tutorial from "./Tutorial";
-import { QuestionList } from "../util/questionList"
-
-function getRandomPoints(arr: number[]) {
-  if (arr.length < 25) {
-    throw new Error("Array has fewer than 25 points.");
-  }
-
-  const randomPoints = [];
-  const randomIndices = new Set();
-
-  while (randomIndices.size < 25) {
-    const randomIndex = Math.floor(Math.random() * arr.length);
-    if (!randomIndices.has(randomIndex)) {
-      randomIndices.add(randomIndex);
-      randomPoints.push(arr[randomIndex]);
-    }
-  }
-
-  return randomPoints;
-}
-
-
+import { QuestionList } from "../util/questionList";
 
 export default function Explanation() {
   const [isSubmitted] = useAtom(isSubmittedAtom);
@@ -70,13 +47,13 @@ export default function Explanation() {
   const initialVisRef = useRef<SVGGElement>(null);
   const additionalVisRef = useRef<SVGGElement>(null);
   const [secondVisTranslateY, setSecondVisTranslateY] = useState(0);
-  const [tutorialOpen, setTutorialOpen] = useState(false);
-  const [tutorialStepValue, setTutorialStep] = useAtom(tutorialStep);
+  const [, setTutorialOpen] = useState(false);
+  const [, setTutorialStep] = useAtom(tutorialStep);
   const [, setShowTutorial] = useAtom(tutorialAtom);
   const [isUserStudy] = useAtom(isUserStudyAtom);
-  const [secondGraphType, setSecondGraphType] = useAtom(secondGraphTypeAtom);
+  const [, setSecondGraphType] = useAtom(secondGraphTypeAtom);
   const [questionIndexesArray] = useAtom(questionOrderAtom);
-  const [questionIndex, setQuestionIndex] = useAtom(questionIndexAtom);
+  const [questionIndex] = useAtom(questionIndexAtom);
 
   const [rightPosition, setRightPosition] = useState("25%");
 
@@ -131,7 +108,6 @@ export default function Explanation() {
     setTutorialStep(stepIndex);
     setTutorialOpen(true);
     setShowTutorial(true);
-    console.log("Tutorial showing now at step " + stepIndex);
   };
 
   const open = Boolean(anchorEl);
@@ -278,8 +254,8 @@ export default function Explanation() {
   let additionalVisualizations;
   const q = QuestionList[questionIndexesArray[questionIndex]];
   var graphCase = "random";
-  if (q != null){
-    graphCase = q.condition? q.condition : "random";
+  if (q != null) {
+    graphCase = q.condition ? q.condition : "random";
   }
   var graph =
     graphCase === "optimal" ? insight?.optimalGraph : insight?.randomGraph;

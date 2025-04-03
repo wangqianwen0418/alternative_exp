@@ -21,9 +21,7 @@ interface SwarmProps {
 
 export default function Swarm(props: SwarmProps) {
   const [uuid] = useAtom(uuidAtom);
-  const [localSelectedIndices, setLocalSelectedIndices] = useState<number[]>(
-    []
-  );
+  const [, setLocalSelectedIndices] = useState<number[]>([]);
   const {
     xValues,
     colorValues,

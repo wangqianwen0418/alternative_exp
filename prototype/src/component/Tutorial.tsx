@@ -24,9 +24,6 @@ import {
   TwoColorTutorialGraph,
   AnnotationTutorialGraph,
 } from "../util/tutorialGraphs";
-import {
-  tutorialStep
-} from "../store"
 
 const definedWords = {
   XAI: "Explainable AI (XAI) is an approach to provide insight into the decision-making process of AI models, where explanations or rationales accompany recommendations made by AI.",
@@ -422,7 +419,6 @@ export default function Tutorial({
   const theme = useTheme();
   const [activeStep, setActiveStep] = React.useState(initialStep);
   const maxSteps = tutorialSteps.length;
-  console.log("ACTIVE STEP: " + initialStep);
 
   React.useEffect(() => {
     setActiveStep(initialStep);

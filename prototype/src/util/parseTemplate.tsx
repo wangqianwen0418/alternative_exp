@@ -66,8 +66,6 @@ export const GenerateTextTemplates = (insight: TInsight) => {
     );
   } else if (insight?.type === "correlation") {
     const [var1, var2] = insight.variables;
-    // console.log("VAR 2: ");
-    // console.log(var2);
 
     return (
       <span className="formatted">
