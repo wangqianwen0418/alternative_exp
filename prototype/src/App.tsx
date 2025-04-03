@@ -13,6 +13,7 @@ import {
   tutorialAtom,
   isUserStudyAtom,
   tutorialStep,
+  tutorailOverrideAtom,
 } from "./store";
 
 import Explanation from "./component/Explanation";
@@ -59,6 +60,7 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
   const [showTutorial, setShowTutorial] = useAtom(tutorialAtom);
   const [isUserStudy] = useAtom(isUserStudyAtom);
   let [tutorialStepValue] = useAtom(tutorialStep);
+  const [tutorialOverride, setTutorialOverride] = useAtom(tutorailOverrideAtom);
 
   const [, setDemographics] = useState<any>(null);
   const [showDemographics, setShowDemographics] = useState(false);
@@ -238,11 +240,12 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
         />
       )}
 
-      {isUserStudy && !showDemographics && (
+      {((isUserStudy && !showDemographics) || tutorialOverride) && (
         <Tutorial
-          show={showTutorial}
+          show={showTutorial || tutorialOverride}
           onClose={() => {
             setShowTutorial(false);
+            setTutorialOverride(false);
             Cookies.set("showTutorial", "false", { expires: 365 });
           }}
           initialStep={tutorialStepValue}

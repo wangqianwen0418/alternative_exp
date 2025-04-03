@@ -34,6 +34,7 @@ import {
   secondGraphTypeAtom,
   questionIndexAtom,
   questionOrderAtom,
+  tutorailOverrideAtom,
 } from "../store";
 import TwoColorScatter from "./TwoColorScatter";
 import { TGraph } from "../util/types";
@@ -48,6 +49,7 @@ export default function Explanation() {
   const additionalVisRef = useRef<SVGGElement>(null);
   const [secondVisTranslateY, setSecondVisTranslateY] = useState(0);
   const [, setTutorialOpen] = useState(false);
+  const [, setTutorialOverride] = useAtom(tutorailOverrideAtom);
   const [, setTutorialStep] = useAtom(tutorialStep);
   const [, setShowTutorial] = useAtom(tutorialAtom);
   const [isUserStudy] = useAtom(isUserStudyAtom);
@@ -105,6 +107,7 @@ export default function Explanation() {
     const stepIndex = stepMapping[graphType] ?? 0;
 
     // Set the tutorial to open at the appropriate step
+    setTutorialOverride(true);
     setTutorialStep(stepIndex);
     setTutorialOpen(true);
     setShowTutorial(true);
@@ -450,7 +453,7 @@ export default function Explanation() {
             sx={{
               position: "absolute",
               top: secondVisTranslateY + 150, // Position relative to second visualization
-              right: "25%",
+              right: rightPosition,
               zIndex: 1,
             }}
           >
