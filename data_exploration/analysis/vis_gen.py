@@ -110,7 +110,7 @@ def generate_visualizations(user_stats_df, question_stats_df):
             std = row['STD'] if pd.notnull(row['STD']) else 0.0
             plt.errorbar(x_center, y_height, yerr=std, ecolor='black', capsize=4, fmt='none')
 
-        plt.legend(title="CONDITION", loc="upper right")
+        plt.legend(title="CONDITION", loc="center left", bbox_to_anchor=(1.02, 0.5), borderaxespad=0)
         plt.tight_layout()
         plt.savefig(filename)
         plt.close()
