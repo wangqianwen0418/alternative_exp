@@ -46,6 +46,7 @@ import Cookies from "js-cookie";
 import { generateQuestionOrder } from "./util/questionBalance";
 import Tutorial from "./component/Tutorial";
 import Demographics from "./component/Demographics";
+import { useLogging } from "./util/logging";
 
 function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
   const [open, setOpen] = useState(false);
@@ -66,6 +67,8 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
   const [showDemographics, setShowDemographics] = useState(false);
 
   let uuid = Cookies.get("uuid");
+
+  const log = useLogging();
 
   if (!uuid) {
     uuid = uuidv4();
@@ -235,7 +238,7 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
           onSubmit={(data) => {
             setDemographics(data);
             setShowDemographics(false);
-            Cookies.set("demographicsSubmitted", "true", { expires: 365 });
+            Cookies.set("demographicsSubmitted", "true");
           }}
         />
       )}
@@ -244,9 +247,10 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
         <Tutorial
           show={showTutorial || tutorialOverride}
           onClose={() => {
+            log("Tutorial", "User closed the tutorial.");
             setShowTutorial(false);
             setTutorialOverride(false);
-            Cookies.set("showTutorial", "false", { expires: 365 });
+            Cookies.set("showTutorial", "false");
           }}
           initialStep={tutorialStepValue}
         />

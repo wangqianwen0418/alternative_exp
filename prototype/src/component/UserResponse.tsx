@@ -36,6 +36,7 @@ import {
 import { test_weburl } from "../util/appscript_url";
 import Cookies from "js-cookie";
 import { TGraph } from "../util/types";
+import { useLogging } from "../util/logging";
 
 const confidenceOptions = [
   { value: "", label: "Please select" },
@@ -78,6 +79,8 @@ export default function UserResponse() {
     label: "Please select",
   });
   const [isSecondPart, setIsSecondPart] = React.useState(false);
+
+  const log = useLogging();
 
   useEffect(() => {
     const savedIsSecondPart = Cookies.get("isSecondPart");
@@ -367,7 +370,10 @@ export default function UserResponse() {
           <Button
             variant="outlined"
             sx={{ ml: 2 }}
-            onClick={() => setShowTutorial(true)}
+            onClick={() => {
+              setShowTutorial(true);
+              log("Tutorial", "User opened the tutorial.");
+            }}
           >
             Show Tutorial
           </Button>

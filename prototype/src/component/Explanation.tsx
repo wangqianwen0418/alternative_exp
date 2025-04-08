@@ -39,6 +39,7 @@ import {
 import TwoColorScatter from "./TwoColorScatter";
 import { TGraph } from "../util/types";
 import { QuestionList } from "../util/questionList";
+import { useLogging } from "../util/logging";
 
 export default function Explanation() {
   const [isSubmitted, setIsSubmitted] = useAtom(isSubmittedAtom);
@@ -58,6 +59,8 @@ export default function Explanation() {
   const [questionIndex] = useAtom(questionIndexAtom);
 
   const [rightPosition, setRightPosition] = useState("25%");
+
+  const log = useLogging();
 
   useEffect(() => {
     const updatePosition = () => {
@@ -452,7 +455,14 @@ export default function Explanation() {
           <Button
             variant="outlined"
             color="primary"
-            onClick={() => openTutorialAtStep((initVis as TGraph).graphType)}
+            onClick={() => {
+              openTutorialAtStep((initVis as TGraph).graphType);
+              log(
+                "Confusion Button",
+                "User clicked confusion button for " +
+                  (initVis as TGraph).graphType
+              );
+            }}
             sx={{ whiteSpace: "nowrap" }}
           >
             CONFUSED ABOUT THIS
@@ -474,9 +484,14 @@ export default function Explanation() {
             <Button
               variant="outlined"
               color="primary"
-              onClick={() =>
-                openTutorialAtStep(graph?.graphType ? graph?.graphType : "")
-              }
+              onClick={() => {
+                openTutorialAtStep(graph?.graphType ? graph?.graphType : "");
+                log(
+                  "Confusion Button",
+                  "User clicked confusion button for " +
+                    (graph?.graphType ?? "")
+                );
+              }}
               sx={{ whiteSpace: "nowrap" }}
             >
               CONFUSED ABOUT THIS

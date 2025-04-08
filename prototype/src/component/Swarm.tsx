@@ -4,6 +4,7 @@ import { TAnnotation } from "../util/types";
 import { useAtom } from "jotai";
 import { uuidAtom } from "../store";
 import { seededShuffle } from "../util/questionBalance";
+import { useLogging } from "../util/logging";
 
 interface SwarmProps {
   xValues: number[][];
@@ -116,6 +117,8 @@ export default function Swarm(props: SwarmProps) {
     () => [35, 80, 45, leftTitleMargin],
     [leftTitleMargin]
   );
+
+  const log = useLogging();
 
   const baseRadius = 3;
   const radius = useMemo(() => Math.max(1.5, baseRadius), [baseRadius]);
@@ -471,6 +474,7 @@ export default function Swarm(props: SwarmProps) {
               const max = d3.max(brushedValues) ?? 0;
               const avg = d3.mean(brushedValues) ?? 0;
               setDatasetStats({ min, max, avg });
+              log("Swarm Selection", "User used brush on Swarm chart.");
               sortedDatasetIndices.forEach((dataIdx, idx) => {
                 d3.selectAll(`g.swarm#${id} .points-${idx} circle`).attr(
                   "opacity",
