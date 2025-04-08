@@ -62,6 +62,8 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
   const [isUserStudy] = useAtom(isUserStudyAtom);
   let [tutorialStepValue] = useAtom(tutorialStep);
   const [tutorialOverride, setTutorialOverride] = useAtom(tutorailOverrideAtom);
+  const [questionIndex] = useAtom(questionIndexAtom);
+  const [questionIndexesArray] = useAtom(questionOrderAtom);
 
   const [, setDemographics] = useState<any>(null);
   const [showDemographics, setShowDemographics] = useState(false);
@@ -247,6 +249,12 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
         <Tutorial
           show={showTutorial || tutorialOverride}
           onClose={() => {
+            if (showTutorial) {
+              log(
+                "Question Started",
+                "Index: " + questionIndexesArray[questionIndex]
+              );
+            }
             log("Tutorial", "User closed the tutorial.");
             setShowTutorial(false);
             setTutorialOverride(false);

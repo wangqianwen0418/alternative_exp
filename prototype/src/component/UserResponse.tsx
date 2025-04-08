@@ -150,9 +150,16 @@ export default function UserResponse() {
     }
 
     if (isSecondPart && isUserStudy) {
+      log("Question Finished", "Index: " + currentQuestionIndex);
       if (isLastQuestion) {
         setModalVisible(true);
       } else {
+        setTimeout(() => {
+          log(
+            "Question Started",
+            "Index: " + questionIndexesArray[questionIndex + 1]
+          );
+        }, 500);
         moveToNextQuestion();
       }
     } else {
