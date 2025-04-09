@@ -33,52 +33,34 @@ import {
   tutorialStep,
   secondGraphTypeAtom,
   questionIndexAtom,
-  questionOrderAtom
+  questionOrderAtom,
+  tutorailOverrideAtom,
 } from "../store";
 import TwoColorScatter from "./TwoColorScatter";
 import { TGraph } from "../util/types";
-import { yellow } from "@mui/material/colors";
-import Tutorial from "./Tutorial";
-import { QuestionList } from "../util/questionList"
-
-function getRandomPoints(arr: number[]) {
-  if (arr.length < 25) {
-    throw new Error("Array has fewer than 25 points.");
-  }
-
-  const randomPoints = [];
-  const randomIndices = new Set();
-
-  while (randomIndices.size < 25) {
-    const randomIndex = Math.floor(Math.random() * arr.length);
-    if (!randomIndices.has(randomIndex)) {
-      randomIndices.add(randomIndex);
-      randomPoints.push(arr[randomIndex]);
-    }
-  }
-
-  return randomPoints;
-}
-
-
+import { QuestionList } from "../util/questionList";
+import { useLogging } from "../util/logging";
 
 export default function Explanation() {
-  const [isSubmitted] = useAtom(isSubmittedAtom);
+  const [isSubmitted, setIsSubmitted] = useAtom(isSubmittedAtom);
   const [insight] = useAtom(insightAtom);
   let [initVis] = useAtom(initVisAtom);
   const [selectedIndices, setSelectedIndices] = useAtom(selectedIndicesAtom);
   const initialVisRef = useRef<SVGGElement>(null);
   const additionalVisRef = useRef<SVGGElement>(null);
   const [secondVisTranslateY, setSecondVisTranslateY] = useState(0);
-  const [tutorialOpen, setTutorialOpen] = useState(false);
-  const [tutorialStepValue, setTutorialStep] = useAtom(tutorialStep);
+  const [, setTutorialOpen] = useState(false);
+  const [, setTutorialOverride] = useAtom(tutorailOverrideAtom);
+  const [, setTutorialStep] = useAtom(tutorialStep);
   const [, setShowTutorial] = useAtom(tutorialAtom);
   const [isUserStudy] = useAtom(isUserStudyAtom);
-  const [secondGraphType, setSecondGraphType] = useAtom(secondGraphTypeAtom);
+  const [, setSecondGraphType] = useAtom(secondGraphTypeAtom);
   const [questionIndexesArray] = useAtom(questionOrderAtom);
-  const [questionIndex, setQuestionIndex] = useAtom(questionIndexAtom);
+  const [questionIndex] = useAtom(questionIndexAtom);
 
   const [rightPosition, setRightPosition] = useState("25%");
+
+  const log = useLogging();
 
   useEffect(() => {
     const updatePosition = () => {
@@ -95,6 +77,8 @@ export default function Explanation() {
 
     updatePosition();
     window.addEventListener("resize", updatePosition);
+
+    setIsSubmitted(false);
 
     return () => window.removeEventListener("resize", updatePosition);
   }, []);
@@ -128,10 +112,10 @@ export default function Explanation() {
     const stepIndex = stepMapping[graphType] ?? 0;
 
     // Set the tutorial to open at the appropriate step
+    setTutorialOverride(true);
     setTutorialStep(stepIndex);
     setTutorialOpen(true);
     setShowTutorial(true);
-    console.log("Tutorial showing now at step " + stepIndex);
   };
 
   const open = Boolean(anchorEl);
@@ -278,8 +262,8 @@ export default function Explanation() {
   let additionalVisualizations;
   const q = QuestionList[questionIndexesArray[questionIndex]];
   var graphCase = "random";
-  if (q != null){
-    graphCase = q.condition? q.condition : "random";
+  if (q != null) {
+    graphCase = q.condition ? q.condition : "random";
   }
   var graph =
     graphCase === "optimal" ? insight?.optimalGraph : insight?.randomGraph;
@@ -442,7 +426,19 @@ export default function Explanation() {
               ref={additionalVisRef}
               transform={`translate(0, ${secondVisTranslateY})`}
             >
-              {additionalVisualizations}
+              {additionalVisualizations ? (
+                additionalVisualizations
+              ) : (
+                <Bar
+                  allShapValues={shap_diabetes["shap_values"].slice(0, 100)}
+                  featureNames={shap_diabetes["feature_names"].slice(0, 100)}
+                  width={600}
+                  height={300}
+                  id="bar-secondVis"
+                  offsets={[0, 0]}
+                />
+              )}
+              ;
             </g>
           )}
         </svg>
@@ -459,7 +455,14 @@ export default function Explanation() {
           <Button
             variant="outlined"
             color="primary"
-            onClick={() => openTutorialAtStep((initVis as TGraph).graphType)}
+            onClick={() => {
+              openTutorialAtStep((initVis as TGraph).graphType);
+              log(
+                "Confusion Button",
+                "User clicked confusion button for " +
+                  (initVis as TGraph).graphType
+              );
+            }}
             sx={{ whiteSpace: "nowrap" }}
           >
             CONFUSED ABOUT THIS
@@ -474,16 +477,21 @@ export default function Explanation() {
             sx={{
               position: "absolute",
               top: secondVisTranslateY + 150, // Position relative to second visualization
-              right: "25%",
+              right: rightPosition,
               zIndex: 1,
             }}
           >
             <Button
               variant="outlined"
               color="primary"
-              onClick={() =>
-                openTutorialAtStep(graph?.graphType ? graph?.graphType : "")
-              }
+              onClick={() => {
+                openTutorialAtStep(graph?.graphType ? graph?.graphType : "");
+                log(
+                  "Confusion Button",
+                  "User clicked confusion button for " +
+                    (graph?.graphType ?? "")
+                );
+              }}
               sx={{ whiteSpace: "nowrap" }}
             >
               CONFUSED ABOUT THIS

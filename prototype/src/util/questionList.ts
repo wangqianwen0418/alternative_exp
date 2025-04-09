@@ -1,13 +1,8 @@
 import { TQuestion } from "./types";
+
 const randList = [];
 for (let i=0; i < 12; i++){
   randList.push(Math.random())
-}
-
-for (let i=0; i<5; i++){
-  console.log(i);
-  console.log(randList[0]);
-  
 }
 
 const newVals = randList;

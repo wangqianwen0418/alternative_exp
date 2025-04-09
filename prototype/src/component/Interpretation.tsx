@@ -38,10 +38,8 @@ export default function Interpretation() {
   const [isLoading, setIsLoading] = useState(false); // Loading state
   const [apiKey, setApiKey] = useState<string>("");
 
-  // 1. Use useEffect to check if an API key is already stored in localStorage
   useEffect(() => {
     const storedApiKey = localStorage.getItem("apiKey");
-    // console.log("Stored API key: " + storedApiKey);
 
     if (pageName?.includes("Free") && !storedApiKey) {
       setModalVisible(true);
@@ -85,34 +83,12 @@ export default function Interpretation() {
           prompt
         );
         setInsight(parsedInput);
-        // console.log("PARSED INPUT: ");
-        // console.log(parsedInput);
       } catch (error) {
         console.error("Error parsing input: ", error);
       }
     }
     setIsLoading(false);
     setIsSubmitted(true);
-  };
-
-  // Handle the new "Parse" button click (parse only without submission state change)
-  const handleParseOnly = async () => {
-    if (!freeText.trim()) return;
-    setIsLoading(true);
-
-    const prompt = generatePrompt(
-      shapData.feature_names,
-      shapData.prediction_name
-    );
-    try {
-      const parsedInput: TInsight = await parseInput(freeText, apiKey, prompt);
-      setInsight(parsedInput); // Update insight to reflect the newly parsed input
-      // console.log("PARSED INPUT: ");
-      // console.log(parsedInput);
-    } catch (error) {
-      console.error("Error parsing input: ", error);
-    }
-    setIsLoading(false);
   };
 
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -187,23 +163,11 @@ export default function Interpretation() {
               Check with Additional Visualization
             </Button>
           )}
-
-          {/* New Parse Button
-          {!isUserStudy && (
-            <Button
-              variant="contained"
-              color="secondary"
-              style={{ margin: "10px 5px" }}
-              onClick={handleParseOnly}
-            >
-              Parse
-            </Button>
-          )} */}
         </div>
         {isLoading ? (
           <CircularProgress />
         ) : (
-          (isSubmitted || insight) &&
+          isSubmitted &&
           !isUserStudy && (
             <Paper className="parse-input" elevation={0}>
               <b>Formatted: </b>
@@ -248,4 +212,3 @@ export default function Interpretation() {
     </>
   );
 }
-//test check

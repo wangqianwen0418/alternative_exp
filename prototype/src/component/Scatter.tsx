@@ -1,6 +1,7 @@
 import * as d3 from "d3";
 import { useEffect, useState, useMemo } from "react";
 import { TAnnotation } from "../util/types";
+import { useLogging } from "../util/logging";
 
 interface ScatterProps {
   offsets: number[];
@@ -33,6 +34,8 @@ export default function Scatter(props: ScatterProps) {
 
   const margin = useMemo(() => [22.5, 10, 40, 52.5], []);
   const labelFontSize = 13;
+
+  const log = useLogging();
 
   const xScale = useMemo(() => {
     return d3
@@ -104,6 +107,7 @@ export default function Scatter(props: ScatterProps) {
           [width - margin[1], height - margin[2]],
         ])
         .on("start", () => {
+          log("Scatter Selection", "User used brush on Scatter chart.");
           brushGroup.call(brush.move, null);
         })
         .on("end", (event) => {

@@ -1,6 +1,7 @@
 import * as d3 from "d3";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { TAnnotation } from "../util/types";
+import { useLogging } from "../util/logging";
 
 interface TwoColorScatterProps {
   xValues: number[];
@@ -88,6 +89,8 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
   const handleMinRef = useRef<SVGRectElement>(null);
   const handleMaxRef = useRef<SVGRectElement>(null);
 
+  const log = useLogging();
+
   function createDragHandle(isMinHandle: boolean) {
     return d3
       .drag<SVGRectElement, unknown>()
@@ -103,7 +106,9 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
           return [low, high];
         });
       })
-      .on("end", () => {});
+      .on("end", () => {
+        log("Two Color Selection", "User adjusted range on Two Color chart.");
+      });
   }
 
   useEffect(() => {

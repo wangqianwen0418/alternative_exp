@@ -36,6 +36,7 @@ import {
 import { pilot_weburl, test_weburl } from "../util/appscript_url";
 import Cookies from "js-cookie";
 import { TGraph } from "../util/types";
+import { useLogging } from "../util/logging";
 
 const confidenceOptions = [
   { value: "", label: "Please select" },
@@ -78,6 +79,8 @@ export default function UserResponse() {
     label: "Please select",
   });
   const [isSecondPart, setIsSecondPart] = React.useState(false);
+
+  const log = useLogging();
 
   useEffect(() => {
     const savedIsSecondPart = Cookies.get("isSecondPart");
@@ -134,8 +137,7 @@ export default function UserResponse() {
     };
 
     try {
-      console.log("Submitting form:", JSON.stringify(data));
-      await fetch(pilot_weburl!, {
+      await fetch(test_weburl!, {
         method: "POST",
         mode: "no-cors",
         headers: {
@@ -148,9 +150,16 @@ export default function UserResponse() {
     }
 
     if (isSecondPart && isUserStudy) {
+      log("Question Finished", "Index: " + currentQuestionIndex);
       if (isLastQuestion) {
         setModalVisible(true);
       } else {
+        setTimeout(() => {
+          log(
+            "Question Started",
+            "Index: " + questionIndexesArray[questionIndex + 1]
+          );
+        }, 500);
         moveToNextQuestion();
       }
     } else {
@@ -175,8 +184,7 @@ export default function UserResponse() {
     };
 
     try {
-      console.log("Submitting feedback:", JSON.stringify(feedbackData));
-      await fetch(pilot_weburl!, {
+      await fetch(test_weburl!, {
         method: "POST",
         mode: "no-cors",
         headers: {
@@ -368,7 +376,10 @@ export default function UserResponse() {
           <Button
             variant="outlined"
             sx={{ ml: 2 }}
-            onClick={() => setShowTutorial(true)}
+            onClick={() => {
+              setShowTutorial(true);
+              log("Tutorial", "User opened the tutorial.");
+            }}
           >
             Show Tutorial
           </Button>

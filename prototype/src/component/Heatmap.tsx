@@ -25,7 +25,7 @@ export default function Heatmap({
   featuresToShow: featuresToShow,
 }: HeatmapProps) {
   const svgRef = useRef(null);
-  const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
+  const [selectedIndexes] = useState<number[]>([]);
   const groupRef = useRef<SVGGElement>(null);
   const [uuid] = useAtom(uuidAtom);
 

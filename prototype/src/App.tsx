@@ -13,6 +13,7 @@ import {
   tutorialAtom,
   isUserStudyAtom,
   tutorialStep,
+  tutorailOverrideAtom,
 } from "./store";
 
 import Explanation from "./component/Explanation";
@@ -45,6 +46,7 @@ import Cookies from "js-cookie";
 import { generateQuestionOrder } from "./util/questionBalance";
 import Tutorial from "./component/Tutorial";
 import Demographics from "./component/Demographics";
+import { useLogging } from "./util/logging";
 
 function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
   const [open, setOpen] = useState(false);
@@ -58,12 +60,17 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
   const [, setQuestionOrder] = useAtom(questionOrderAtom);
   const [showTutorial, setShowTutorial] = useAtom(tutorialAtom);
   const [isUserStudy] = useAtom(isUserStudyAtom);
-  let [tutorialStepValue] = useAtom(tutorialStep)
+  let [tutorialStepValue] = useAtom(tutorialStep);
+  const [tutorialOverride, setTutorialOverride] = useAtom(tutorailOverrideAtom);
+  const [questionIndex] = useAtom(questionIndexAtom);
+  const [questionIndexesArray] = useAtom(questionOrderAtom);
 
   const [, setDemographics] = useState<any>(null);
   const [showDemographics, setShowDemographics] = useState(false);
 
   let uuid = Cookies.get("uuid");
+
+  const log = useLogging();
 
   if (!uuid) {
     uuid = uuidv4();
@@ -219,16 +226,12 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
             />
             .
             <br />
-            {/* {appProps.pageName:.includes("Free") && <SyncIcon />} */}
           </p>
         </Paper>
       </Grid>
       <Grid item xs={4} className="App-body">
         <Interpretation />
         {isUserStudy && <UserResponse />}
-        {/* <Paper style={{ padding: "15px", marginTop: "10px" }}>
-          <CounterbalanceButton />
-        </Paper> */}
       </Grid>
 
       {isUserStudy && showDemographics && (
@@ -237,17 +240,25 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
           onSubmit={(data) => {
             setDemographics(data);
             setShowDemographics(false);
-            Cookies.set("demographicsSubmitted", "true", { expires: 365 });
+            Cookies.set("demographicsSubmitted", "true");
           }}
         />
       )}
 
-      {isUserStudy && !showDemographics && (
+      {((isUserStudy && !showDemographics) || tutorialOverride) && (
         <Tutorial
-          show={showTutorial}
+          show={showTutorial || tutorialOverride}
           onClose={() => {
+            if (showTutorial) {
+              log(
+                "Question Started",
+                "Index: " + questionIndexesArray[questionIndex]
+              );
+            }
+            log("Tutorial", "User closed the tutorial.");
             setShowTutorial(false);
-            Cookies.set("showTutorial", "false", { expires: 365 });
+            setTutorialOverride(false);
+            Cookies.set("showTutorial", "false");
           }}
           initialStep={tutorialStepValue}
         />

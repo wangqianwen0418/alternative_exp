@@ -4,6 +4,7 @@ import { TAnnotation } from "../util/types";
 import { seededShuffle } from "../util/questionBalance";
 import { uuidAtom } from "../store";
 import { useAtom } from "jotai";
+import { useLogging } from "../util/logging";
 
 interface BarProps {
   allShapValues: number[][];
@@ -38,6 +39,8 @@ export default function Bar(props: BarProps) {
   const [selectedBars, setSelectedBars] = useState<string[]>([]);
   const brushGroupRef = useRef<any>(null);
   const [uuid] = useAtom(uuidAtom);
+
+  const log = useLogging();
 
   const labelFontSize = 13;
   const maxLabelWidth = 100;
@@ -197,6 +200,8 @@ export default function Bar(props: BarProps) {
         brushGroupRef.current = brushGroup;
 
         const brushEnd = (event: any) => {
+          log("Bar Selection", "User used brush on Bar chart.");
+
           const selection = event.selection;
 
           if (!selection) {
