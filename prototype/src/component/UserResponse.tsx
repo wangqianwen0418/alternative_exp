@@ -33,7 +33,7 @@ import {
   isUserStudyAtom,
   secondGraphTypeAtom,
 } from "../store";
-import { pilot_weburl, test_weburl } from "../util/appscript_url";
+import { study_weburl } from "../util/appscript_url";
 import Cookies from "js-cookie";
 import { TGraph } from "../util/types";
 import { useLogging } from "../util/logging";
@@ -137,7 +137,7 @@ export default function UserResponse() {
     };
 
     try {
-      await fetch(test_weburl!, {
+      await fetch(study_weburl!, {
         method: "POST",
         mode: "no-cors",
         headers: {
@@ -184,7 +184,7 @@ export default function UserResponse() {
     };
 
     try {
-      await fetch(test_weburl!, {
+      await fetch(study_weburl!, {
         method: "POST",
         mode: "no-cors",
         headers: {
