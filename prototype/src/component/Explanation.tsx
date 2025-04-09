@@ -78,8 +78,6 @@ export default function Explanation() {
     updatePosition();
     window.addEventListener("resize", updatePosition);
 
-    setIsSubmitted(false);
-
     return () => window.removeEventListener("resize", updatePosition);
   }, []);
 
@@ -264,6 +262,8 @@ export default function Explanation() {
   var graphCase = "random";
   if (q != null) {
     graphCase = q.condition ? q.condition : "random";
+  } else {
+    graphCase = "optimal";
   }
   var graph =
     graphCase === "optimal" ? insight?.optimalGraph : insight?.randomGraph;
@@ -282,8 +282,10 @@ export default function Explanation() {
             id="bar-secondVis"
             offsets={[0, 0]}
             annotation={graph.annotation}
-            featuresToHighlight={graph.featuresToHighlight}
-            featuresToShow={graph.featuresToShow}
+            featuresToHighlight={
+              isUserStudy ? graph.featuresToHighlight : undefined
+            }
+            featuresToShow={isUserStudy ? graph.featuresToShow : undefined}
           />
         );
         break;

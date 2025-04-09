@@ -62,6 +62,7 @@ export default function Interpretation() {
   };
 
   useEffect(() => {
+    setIsSubmitted(false);
     pageName?.includes("question")
       ? setIsUserStudy(true)
       : setIsUserStudy(false);
