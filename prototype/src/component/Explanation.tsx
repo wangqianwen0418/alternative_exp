@@ -78,8 +78,6 @@ export default function Explanation() {
     updatePosition();
     window.addEventListener("resize", updatePosition);
 
-    setIsSubmitted(false);
-
     return () => window.removeEventListener("resize", updatePosition);
   }, []);
 
