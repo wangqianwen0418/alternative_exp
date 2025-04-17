@@ -39,13 +39,13 @@ def compute_user_stats(df):
     user_stats_list = []
 
     for user_id, user_df in user_groups:
-        baseline_df = user_df[user_df['SECOND_PART'] == 'NO']
-        optimal_df = user_df[(user_df['SECOND_PART'] == 'YES') & (user_df['TEST_CONDITION'] == 'OPTIMAL')]
-        random_df = user_df[(user_df['SECOND_PART'] == 'YES') & (user_df['TEST_CONDITION'] == 'RANDOM')]
+        baseline_df = user_df[user_df['SECOND_PART'] == 'FALSE']
+        optimal_df = user_df[(user_df['SECOND_PART'] == 'TRUE') & (user_df['TEST_CONDITION'] == 'OPTIMAL')]
+        random_df = user_df[(user_df['SECOND_PART'] == 'FALSE') & (user_df['TEST_CONDITION'] == 'RANDOM')]
 
-        baseline_stats = compute_stats(baseline_df, 'FIRST_TRUTH')
-        optimal_stats = compute_stats(optimal_df, 'SECOND_TRUTH')
-        random_stats = compute_stats(random_df, 'SECOND_TRUTH')
+        baseline_stats = compute_stats(baseline_df, 'GROUND_TRUTH')
+        optimal_stats = compute_stats(optimal_df, 'GROUND_TRUTH')
+        random_stats = compute_stats(random_df, 'GROUND_TRUTH')
 
         user_stats_list.append({
             'UUID': user_id,
@@ -92,7 +92,7 @@ def compute_user_stats(df):
 
 def compute_question_stats(df):
     baseline_df = df[df['SECOND_PART'] == 'NO'].copy()
-    baseline_df['CORRECT'] = (baseline_df['USER_ANSWER'] == baseline_df['FIRST_TRUTH'])
+    baseline_df['CORRECT'] = (baseline_df['USER_ANSWER'] == baseline_df['GROUND_TRUTH'])
     baseline_acc = baseline_df.groupby('Q_INDEX')['CORRECT'].mean().rename('BASELINE_ACCURACY')
     baseline_conf = baseline_df.groupby('Q_INDEX')['CONFIDENCE'].mean().rename('BASELINE_CONFIDENCE')
 
@@ -100,7 +100,7 @@ def compute_question_stats(df):
     baseline_conf_std = baseline_df.groupby('Q_INDEX')['CONFIDENCE'].std(ddof=1).rename('BASELINE_CONFIDENCE_STD')
 
     optimal_df = df[(df['SECOND_PART'] == 'YES') & (df['TEST_CONDITION'] == 'OPTIMAL')].copy()
-    optimal_df['CORRECT'] = (optimal_df['USER_ANSWER'] == optimal_df['SECOND_TRUTH'])
+    optimal_df['CORRECT'] = (optimal_df['USER_ANSWER'] == optimal_df['GROUND_TRUTH'])
     optimal_acc = optimal_df.groupby('Q_INDEX')['CORRECT'].mean().rename('OPTIMAL_ACCURACY')
     optimal_conf = optimal_df.groupby('Q_INDEX')['CONFIDENCE'].mean().rename('OPTIMAL_CONFIDENCE')
 
@@ -108,7 +108,7 @@ def compute_question_stats(df):
     optimal_conf_std = optimal_df.groupby('Q_INDEX')['CONFIDENCE'].std(ddof=1).rename('OPTIMAL_CONFIDENCE_STD')
 
     random_df = df[(df['SECOND_PART'] == 'YES') & (df['TEST_CONDITION'] == 'RANDOM')].copy()
-    random_df['CORRECT'] = (random_df['USER_ANSWER'] == random_df['SECOND_TRUTH'])
+    random_df['CORRECT'] = (random_df['USER_ANSWER'] == random_df['GROUND_TRUTH'])
     random_acc = random_df.groupby('Q_INDEX')['CORRECT'].mean().rename('RANDOM_ACCURACY')
     random_conf = random_df.groupby('Q_INDEX')['CONFIDENCE'].mean().rename('RANDOM_CONFIDENCE')
 
