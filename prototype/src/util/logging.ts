@@ -5,12 +5,13 @@ import { study_logging_weburl } from "../util/appscript_url";
 export function useLogging() {
   const [uuid] = useAtom(uuidAtom);
 
-  return async (logType: string, description: string) => {
+  return async (logType: string, description: string, second_graph_type?: string) => {
     const data = {
       uuid,
       timestamp: new Date().toLocaleString(),
-      logType: logType,
-      description: description
+      log_type: logType,
+      description: description,
+      second_graph_type: second_graph_type ? second_graph_type : "N/A"
     };
 
     try {

@@ -15,10 +15,8 @@ export type TQuestion = TPageBase & {
   testCondition: "random vis" | "ours";
   index: number;
   groundTruth: boolean;
-  firstVisAnswer?: "true" | "false" | "irrelevant";
   newVis?: TGraph
-  condition?: "random" | "optimal",
-  secondTruth?: "true" | "false" | "irrelevant";
+  condition?: "RANDOM" | "OPTIMAL",
 };
 
 export type TAnnotation =
@@ -33,7 +31,7 @@ export type TAnnotation =
   | { type: "twoColorRange"; range: Array<[number,number]>; label?: string };
 
 export type TGraph = {
-  graphType: "Swarm" | "Scatter" | "Bar" | "Heatmap" | "two-scatter";
+  graphType: "SWARM" | "SCATTER" | "BAR" | "HEATMAP" | "TWO-SCATTER";
   xValues: string;
   yValues: string;
   annotation?: TAnnotation;

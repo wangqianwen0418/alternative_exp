@@ -69,7 +69,7 @@ export default function UserResponse() {
 
   const [modalVisible, setModalVisible] = React.useState(false);
   const [userAnswer, setUserAnswer] = React.useState<
-    "yes" | "no" | "unsure" | undefined
+    "TRUE" | "FALSE" | undefined
   >();
   const [confidence, setConfidence] = React.useState<{
     value: string;
@@ -120,20 +120,15 @@ export default function UserResponse() {
     const data = {
       uuid,
       timestamp: new Date().toLocaleString(),
-      currentIndex: currentQuestionIndex,
-      questionOrder: questionIndexesArray.toString(),
-      freeText,
-      firstVis: (initVis as TGraph).graphType,
-      firstVisAnswer: QuestionList[currentQuestionIndex].firstVisAnswer,
-      secondGraphType: secondGraphType,
-      secondAnswer:
-        secondGraphType === "optimal"
-          ? QuestionList[currentQuestionIndex].groundTruth
-          : QuestionList[currentQuestionIndex].secondTruth,
-      isSecondPart: isSecondPart ? "Yes" : "No",
-      userAnswer,
+      q_index: currentQuestionIndex,
+      q_order: questionIndexesArray.toString(),
+      free_text: freeText,
+      first_vis: (initVis as TGraph).graphType,
+      second_graph_type: secondGraphType,
+      is_second_part: isSecondPart ? "TRUE" : "FALSE",
+      user_answer: userAnswer,
       confidence: confidence.value,
-      groundTruth: QuestionList[currentQuestionIndex].groundTruth,
+      ground_truth: QuestionList[currentQuestionIndex].groundTruth,
     };
 
     try {
@@ -150,7 +145,11 @@ export default function UserResponse() {
     }
 
     if (isSecondPart && isUserStudy) {
-      log("Question Finished", "Index: " + currentQuestionIndex);
+      log(
+        "Question Part B Finished",
+        "Index: " + currentQuestionIndex,
+        secondGraphType
+      );
       if (isLastQuestion) {
         setModalVisible(true);
       } else {
@@ -163,6 +162,7 @@ export default function UserResponse() {
         moveToNextQuestion();
       }
     } else {
+      log("Question Part A Finished", "Index: " + currentQuestionIndex);
       setSecondVis(QuestionList[currentQuestionIndex].secondVis);
       setUserAnswer(undefined);
       setConfidence(confidenceOptions[0]);
@@ -177,10 +177,10 @@ export default function UserResponse() {
     const feedbackData = {
       uuid,
       timestamp: new Date().toLocaleString(),
-      firstVisFeedback: firstVisFeedback,
-      secondVisFeedback: secondVisFeedback,
-      difficultQuestions: difficultQuestions,
-      difficultGraphs: difficultGraphs,
+      first_vis_feedback: firstVisFeedback,
+      second_vis_feedback: secondVisFeedback,
+      difficult_questions: difficultQuestions,
+      difficult_graphs: difficultGraphs,
     };
 
     try {
@@ -252,8 +252,8 @@ export default function UserResponse() {
             }}
           >
             <Radio
-              checked={userAnswer === "yes"}
-              onChange={() => setUserAnswer("yes")}
+              checked={userAnswer === "TRUE"}
+              onChange={() => setUserAnswer("TRUE")}
             />
             <span>
               <b>Correct</b>: the visualization clearly supports this statement.
@@ -268,28 +268,11 @@ export default function UserResponse() {
             }}
           >
             <Radio
-              checked={userAnswer === "no"}
-              onChange={() => setUserAnswer("no")}
+              checked={userAnswer === "FALSE"}
+              onChange={() => setUserAnswer("FALSE")}
             />
             <span>
               <b>Incorrect</b>: the visualization contradicts this statement.
-            </span>
-          </label>
-
-          <label
-            style={{
-              display: "flex",
-              alignItems: "center",
-              cursor: "pointer",
-            }}
-          >
-            <Radio
-              checked={userAnswer === "unsure"}
-              onChange={() => setUserAnswer("unsure")}
-            />
-            <span>
-              <b>Irrelevant</b>: the visualization does not provide enough
-              information to confirm or refute this statement.
             </span>
           </label>
         </RadioGroup>
