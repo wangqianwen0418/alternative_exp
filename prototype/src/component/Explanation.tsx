@@ -121,7 +121,7 @@ export default function Explanation() {
   let initialVisualization;
   if (initVis === undefined) {
     initVis = {
-      graphType: "Swarm",
+      graphType: "SWARM",
       xValues: "None",
       yValues: "None",
       features: ["bmi"],
@@ -129,7 +129,7 @@ export default function Explanation() {
   }
 
   switch ((initVis as TGraph).graphType) {
-    case "Swarm":
+    case "SWARM":
       initialVisualization = (
         <Swarm
           xValues={diabetesShapValues}
@@ -149,7 +149,7 @@ export default function Explanation() {
         />
       );
       break;
-    case "Scatter":
+    case "SCATTER":
       initialVisualization = (
         <Scatter
           xValues={
@@ -181,7 +181,7 @@ export default function Explanation() {
         />
       );
       break;
-    case "Bar":
+    case "BAR":
       initialVisualization = (
         <Bar
           allShapValues={shap_diabetes["shap_values"].slice(0, 100)}
@@ -204,7 +204,7 @@ export default function Explanation() {
         />
       );
       break;
-    case "Heatmap":
+    case "HEATMAP":
       initialVisualization = (
         <Heatmap
           shapValuesArray={diabetesShapValues}
@@ -226,7 +226,7 @@ export default function Explanation() {
         />
       );
       break;
-    case "two-scatter":
+    case "TWO-SCATTER":
       initialVisualization = (
         <TwoColorScatter
           yValues={diabetes_bmi_shapValues}
@@ -270,7 +270,7 @@ export default function Explanation() {
   setSecondGraphType(graphCase);
   if (graph?.graphType) {
     switch (graph.graphType) {
-      case "Bar":
+      case "BAR":
         additionalVisualizations = isSubmitted && (
           <Bar
             allShapValues={shap_diabetes["shap_values"].slice(0, 100)}
@@ -289,7 +289,7 @@ export default function Explanation() {
           />
         );
         break;
-      case "Scatter":
+      case "SCATTER":
         additionalVisualizations = isSubmitted && (
           <>
             <Scatter
@@ -312,7 +312,7 @@ export default function Explanation() {
           </>
         );
         break;
-      case "Swarm":
+      case "SWARM":
         additionalVisualizations = isSubmitted && (
           <>
             <Swarm
@@ -332,7 +332,7 @@ export default function Explanation() {
         );
         break;
 
-      case "Heatmap":
+      case "HEATMAP":
         additionalVisualizations = isSubmitted && (
           <Heatmap
             shapValuesArray={diabetesShapValues}
@@ -349,7 +349,7 @@ export default function Explanation() {
         );
         break;
 
-      case "two-scatter":
+      case "TWO-SCATTER":
         additionalVisualizations = isSubmitted && (
           <TwoColorScatter
             xValues={

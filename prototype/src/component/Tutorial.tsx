@@ -212,10 +212,6 @@ const tutorialSteps = [
           <li>
             <b>Incorrect</b> (the visualization contradicts the insight),
           </li>
-          <li>
-            <b>Irrelevant</b> (the visualization does not provide enough
-            information to determine).
-          </li>
         </ul>
         <Typography variant="body1" sx={{ mt: -1 }}>
           In this tutorial, we highlight one possible option. (In the real
@@ -258,13 +254,6 @@ const tutorialSteps = [
               <Radio checked={false} disabled />
               <span>
                 <b>Incorrect</b>
-              </span>
-            </div>
-
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <Radio checked={true} />
-              <span>
-                <b>Irrelevant</b>
               </span>
             </div>
           </RadioGroup>
@@ -321,10 +310,9 @@ const tutorialSteps = [
     content: (
       <>
         <Typography variant="body1">
-          Finally, you will once again decide if the provided insight is
-          correct, incorrect, or irrelevant and then rate your confidence in
-          your answer. In the case of the new visualization, an example response
-          may be:
+          Finally, you will once again decide if the provided insight is correct
+          or incorrect and then rate your confidence in your answer. In the case
+          of the new visualization, an example response may be:
         </Typography>
         <div
           style={{
@@ -363,20 +351,6 @@ const tutorialSteps = [
               <Radio checked={true} />
               <span>
                 <b>Incorrect</b>
-              </span>
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginRight: "16px",
-                opacity: 0.5,
-              }}
-            >
-              <Radio checked={false} disabled />
-              <span>
-                <b>Irrelevant</b>
               </span>
             </div>
           </RadioGroup>{" "}

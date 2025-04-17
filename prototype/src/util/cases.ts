@@ -7,7 +7,7 @@ export const CASES: TCase[] = [
     userText:
       "BMI is the more important than age for predicting diabetes progression.",
     initVis: {
-      graphType: "Swarm",
+      graphType: "SWARM",
       xValues: "None",
       yValues: "None",
       featuresToHighlight: ["age", "bmi"],
@@ -30,7 +30,7 @@ export const CASES: TCase[] = [
       relation: "greater than",
       condition: undefined,
       optimalGraph: {
-        graphType: "Bar",
+        graphType: "BAR",
         xValues: "None",
         yValues: "None",
         featuresToHighlight: ["age", "bmi"],
@@ -43,7 +43,7 @@ export const CASES: TCase[] = [
     userText:
       "bmi always contributes positively for predicting diabetes progression.",
     initVis: {
-      graphType: "Bar",
+      graphType: "BAR",
       xValues: "None",
       yValues: "None",
       featuresToHighlight: ["bmi"],
@@ -62,7 +62,7 @@ export const CASES: TCase[] = [
       relation: "greater than",
       condition: undefined,
       optimalGraph: {
-        graphType: "Swarm",
+        graphType: "SWARM",
         xValues: "BMI",
         yValues: "BMI",
         annotation: {
@@ -78,7 +78,7 @@ export const CASES: TCase[] = [
     userText:
       "the larger the age, the more likely to have greater diabetes progression.",
     initVis: {
-      graphType: "Scatter",
+      graphType: "SCATTER",
       xValues: "Age Feature Values",
       yValues: "Age SHAP values",
     },
@@ -96,7 +96,7 @@ export const CASES: TCase[] = [
       relation: "positively correlated",
       condition: undefined,
       optimalGraph: {
-        graphType: "Scatter",
+        graphType: "SCATTER",
         xValues: "Age",
         yValues: "Age",
       },
@@ -107,7 +107,7 @@ export const CASES: TCase[] = [
     href: "/case4",
     userText: "bp contributes more to the prediction than age.",
     initVis: {
-      graphType: "Heatmap",
+      graphType: "HEATMAP",
       xValues: "None",
       yValues: "None",
       featuresToHighlight: ["blood pressure, age"],
@@ -121,7 +121,7 @@ export const CASES: TCase[] = [
     userText:
       "The correlation between bmi and its feature values is stronger when the feature value for age is in the range |0.05 to 0.1| compared to |0 to 0.02|.",
     initVis: {
-      graphType: "two-scatter",
+      graphType: "TWO-SCATTER",
       xValues: "none",
       yValues: "none",
     },
@@ -133,7 +133,7 @@ export const CASES: TCase[] = [
     href: "/generator",
     userText: "BMI contributes positively to diabetes risk for more patients than sex does",
     initVis:{
-      graphType: "Bar",
+      graphType: "BAR",
       xValues: "none",
       yValues: "none",
       featuresToHighlight: ["serum triglycerides level", "blood sugar level"],
@@ -152,7 +152,7 @@ export const CASES: TCase[] = [
       relation: "greater than",
       condition: undefined,
       optimalGraph: {
-        graphType: "Scatter",
+        graphType: "SCATTER",
         xValues: "Blood Pressure Feature Values",
         yValues: "Blood pressure SHAP values",
       }
@@ -163,7 +163,7 @@ export const CASES: TCase[] = [
     href: "/free",
     userText: "",
     initVis: {
-      graphType: "Scatter",
+      graphType: "SCATTER",
       xValues: "None",
       yValues: "None",
     },

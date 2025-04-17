@@ -59,9 +59,9 @@ export default function Demographics({ show, onSubmit }: DemographicsProps) {
       timestamp: new Date().toLocaleString(),
       age: Number(age),
       gender: gender === "Other" ? otherGender : gender,
-      educationLevel: educationLevel,
+      education_level: educationLevel,
       occupation: occupation,
-      mlExperience: Number(mlExperience),
+      ml_experience: Number(mlExperience),
     };
 
     try {
