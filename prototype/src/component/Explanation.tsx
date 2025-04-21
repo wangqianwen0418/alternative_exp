@@ -259,14 +259,14 @@ export default function Explanation() {
 
   let additionalVisualizations;
   const q = QuestionList[questionIndexesArray[questionIndex]];
-  var graphCase = "random";
+  var graphCase = "RANDOM";
   if (q != null) {
-    graphCase = q.condition ? q.condition : "random";
+    graphCase = q.condition ? q.condition : "RANDOM";
   } else {
-    graphCase = "optimal";
+    graphCase = "OPTIMAL";
   }
   var graph =
-    graphCase === "optimal" ? insight?.optimalGraph : insight?.randomGraph;
+    graphCase === "OPTIMAL" ? insight?.optimalGraph : insight?.randomGraph;
   setSecondGraphType(graphCase);
   if (graph?.graphType) {
     switch (graph.graphType) {
