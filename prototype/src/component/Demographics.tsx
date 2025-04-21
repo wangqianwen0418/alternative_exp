@@ -8,10 +8,8 @@ import {
   MenuItem,
   Grid,
 } from "@mui/material";
-//import { useTheme } from "@mui/material/styles";
 import { useAtom } from "jotai";
 import { uuidAtom } from "../store";
-import { timeStamp } from "console";
 import { test_weburl } from "../util/appscript_url";
 
 export interface DemographicsData {
@@ -39,7 +37,14 @@ export default function Demographics({ show, onSubmit }: DemographicsProps) {
   const [uuid] = useAtom(uuidAtom);
 
   const isFormValid = () => {
-    if (!age || !gender || !educationLevel || !occupation || !mlExperience || !prolificID)
+    if (
+      !age ||
+      !gender ||
+      !educationLevel ||
+      !occupation ||
+      !mlExperience ||
+      !prolificID
+    )
       return false;
     if (gender === "Other" && !otherGender) return false;
     return true;
@@ -55,7 +60,7 @@ export default function Demographics({ show, onSubmit }: DemographicsProps) {
       educationLevel,
       occupation,
       mlExperience: Number(mlExperience),
-      prolificID: prolificID
+      prolificID: prolificID,
     };
 
     const data = {
@@ -63,15 +68,13 @@ export default function Demographics({ show, onSubmit }: DemographicsProps) {
       timestamp: new Date().toLocaleString(),
       age: Number(age),
       gender: gender === "Other" ? otherGender : gender,
-      educationLevel: educationLevel,
+      education_level: educationLevel,
       occupation: occupation,
-      mlExperience: Number(mlExperience),
-      prolificID:prolificID
+      ml_experience: Number(mlExperience),
+      prolific_id: prolificID,
     };
 
     try {
-      console.log("Submitting form:", JSON.stringify(data));
-      console.log("prolific ID: " + prolificID);
       await fetch(test_weburl!, {
         method: "POST",
         mode: "no-cors",
@@ -205,7 +208,7 @@ export default function Demographics({ show, onSubmit }: DemographicsProps) {
           </Grid>
           {/* Prolific ID */}
           <Grid item xs={12}>
-          <TextField
+            <TextField
               required
               fullWidth
               label="Prolific ID"
