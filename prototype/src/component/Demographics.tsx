@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Modal,
   Box,
@@ -8,7 +8,6 @@ import {
   MenuItem,
   Grid,
 } from "@mui/material";
-//import { useTheme } from "@mui/material/styles";
 import { useAtom } from "jotai";
 import { uuidAtom } from "../store";
 import { study_weburl } from "../util/appscript_url";
@@ -19,6 +18,7 @@ export interface DemographicsData {
   educationLevel: string;
   occupation: string;
   mlExperience: number;
+  prolificID: string;
 }
 
 interface DemographicsProps {
@@ -33,10 +33,18 @@ export default function Demographics({ show, onSubmit }: DemographicsProps) {
   const [educationLevel, setEducationLevel] = useState<string>("");
   const [occupation, setOccupation] = useState<string>("");
   const [mlExperience, setMlExperience] = useState<string>("");
+  const [prolificID, setProlificId] = useState<string>("");
   const [uuid] = useAtom(uuidAtom);
 
   const isFormValid = () => {
-    if (!age || !gender || !educationLevel || !occupation || !mlExperience)
+    if (
+      !age ||
+      !gender ||
+      !educationLevel ||
+      !occupation ||
+      !mlExperience ||
+      !prolificID
+    )
       return false;
     if (gender === "Other" && !otherGender) return false;
     return true;
@@ -52,6 +60,7 @@ export default function Demographics({ show, onSubmit }: DemographicsProps) {
       educationLevel,
       occupation,
       mlExperience: Number(mlExperience),
+      prolificID: prolificID,
     };
 
     const data = {
@@ -62,6 +71,7 @@ export default function Demographics({ show, onSubmit }: DemographicsProps) {
       education_level: educationLevel,
       occupation: occupation,
       ml_experience: Number(mlExperience),
+      prolific_id: prolificID,
     };
 
     try {
@@ -195,6 +205,16 @@ export default function Demographics({ show, onSubmit }: DemographicsProps) {
                 </MenuItem>
               ))}
             </TextField>
+          </Grid>
+          {/* Prolific ID */}
+          <Grid item xs={12}>
+            <TextField
+              required
+              fullWidth
+              label="Prolific ID"
+              value={prolificID}
+              onChange={(e) => setProlificId(e.target.value)}
+            />
           </Grid>
         </Grid>
 

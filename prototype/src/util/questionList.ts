@@ -12,7 +12,7 @@ export const QuestionList: TQuestion[] = [
     index: 0,
     condition: newVals[0] < 0.5 ? "OPTIMAL" : "RANDOM",
     pageName: "question",
-    userText: "On average, the absolute contribution of BMI to diabetes risk is at least 20",
+    userText: "On average, the absolute contribution of BMI to diabetes risk is at least 20.",
     initVis: {
       graphType: "SWARM",
       xValues: "None",
@@ -138,7 +138,7 @@ export const QuestionList: TQuestion[] = [
     condition: newVals[2] < 0.5 ? "OPTIMAL" : "RANDOM",
     pageName: "question",
     userText:
-      "On average, the absolute contribution of serum triglycerides to diabetes risk is over 30",
+      "On average, the absolute contribution of serum triglycerides to diabetes risk is over 30.",
     initVis: {
       graphType: "SWARM",
       xValues: "None",
@@ -205,7 +205,7 @@ export const QuestionList: TQuestion[] = [
     condition: newVals[3] < 0.5 ? "OPTIMAL" : "RANDOM",
     pageName: "question",
     userText:
-      "There is a positive correlation between blood sugar values and the contribution of blood sugar to diabetes risk when the blood sugar value is between -0.05 and 0.05",
+      "There is a positive correlation between blood sugar values and the contribution of blood sugar to diabetes risk when the blood sugar value is between -0.05 and 0.05.",
     initVis: {
       graphType: "SWARM",
       xValues: "None",
@@ -402,7 +402,7 @@ export const QuestionList: TQuestion[] = [
     condition: newVals[6] < 0.5 ? "OPTIMAL" : "RANDOM",
     pageName: "question",
     userText:
-      "age contributes positively to more instances than Low-Density Lipoproteins.",
+      "Age contributes positively to more instances than low-density lipoproteins.",
     initVis: {
       graphType: "SCATTER",
       xValues: "LDL Feature Values",
@@ -460,7 +460,7 @@ export const QuestionList: TQuestion[] = [
     condition: newVals[7] < 0.5 ? "OPTIMAL" : "RANDOM",
     pageName: "question",
     userText:
-      "Blood pressure has larger deviations in its contribution to diabetes risk compared to age",
+      "Blood pressure has larger deviations in its contribution to diabetes risk compared to age.",
     initVis: {
       graphType: "SCATTER",
       xValues: "Blood Pressure Feature Values",
@@ -528,7 +528,7 @@ export const QuestionList: TQuestion[] = [
     condition: newVals[8] < 0.5 ? "OPTIMAL" : "RANDOM",
     pageName: "question",
     userText:
-      "There is a positive correlation between blood pressure and its contribution to diabetes risk",
+      "There is a positive correlation between blood pressure and its contribution to diabetes risk.",
     initVis: {
       graphType: "HEATMAP",
       xValues: "None",
@@ -589,7 +589,7 @@ export const QuestionList: TQuestion[] = [
     condition: newVals[9] < 0.5 ? "OPTIMAL" : "RANDOM",
     pageName: "question",
     userText:
-      "Blood pressure is correlated more strongly to diabetes risk when the BMI is between 0.1 and 0.2 versus -0.05 to 0.05",
+      "Blood pressure is correlated more strongly to diabetes risk when the BMI is between 0.1 and 0.2 versus -0.05 to 0.05.",
     initVis: {
       graphType: "HEATMAP",
       xValues: "None",
@@ -657,7 +657,7 @@ export const QuestionList: TQuestion[] = [
     condition: newVals[10] < 0.5 ? "OPTIMAL" : "RANDOM",
     pageName: "question",
     userText:
-      "In the BMI range of 0.05 and 0.1, it is positively correlated with diabetes risk",
+      "In the BMI range of 0.05 and 0.1, it is positively correlated with diabetes risk.",
     initVis: {
       graphType: "HEATMAP",
       xValues: "None",
@@ -720,7 +720,7 @@ export const QuestionList: TQuestion[] = [
     condition: newVals[11] < 0.5 ? "OPTIMAL" : "RANDOM",
     pageName: "question",
     userText:
-      "BMI is correlated more strongly to diabetes risk when the age is between 0.05 to 0.1 versus 0 to 0.02",
+      "BMI is correlated more strongly to diabetes risk when the age is between 0.05 to 0.1 versus 0 to 0.02.",
     initVis: {
       graphType: "HEATMAP",
       xValues: "None",
@@ -786,5 +786,127 @@ export const QuestionList: TQuestion[] = [
     },
     testCondition: "ours",
     groundTruth: false,
+  },
+  {
+    index: 12,
+    condition: newVals[0] < 0.5 ? "OPTIMAL" : "RANDOM",
+    pageName: "question",
+    userText: "BMI is a feature that is used in this model to predict diabetes risk.",
+    initVis: {
+      graphType: "SWARM",
+      xValues: "None",
+      yValues: "None",
+      featuresToHighlight: ["bmi"],
+      featuresToShow: ["bmi", "serum triglycerides level", "blood pressure"],
+    },
+    secondVis: "SCATTER", // randomly chosen
+    newVis: {
+      graphType: "SCATTER",
+      xValues: "BMI Feature Values",
+      yValues: "BMI SHAP (Contribution) Values",
+      annotation: 
+        {
+          type: "singleLine",
+          xValue: 20,
+        },
+    },
+    insight: {
+      variables: [
+        {
+          featureName: "bmi",
+          transform: "average",
+          type: "contribution to the prediction of",
+        },
+        20,
+      ],
+      type: "read",
+      relation: "greater than",
+      condition: undefined,
+      optimalGraph: {
+        graphType: "BAR",
+        xValues: "None",
+        yValues: "None",
+        featuresToHighlight: ["bmi"],
+        featuresToShow: ["bmi", "serum triglycerides level", "blood pressure"],
+        annotation: 
+          {
+            type: "singleLine",
+            xValue: 20,
+          },
+      },
+      randomGraph: {
+        graphType: "SCATTER",
+        xValues: "BMI Feature Values",
+        yValues: "BMI SHAP (Contribution) Values",
+        annotation: 
+          {
+            type: "singleLine",
+            xValue: 20,
+          },
+      },
+    },
+    testCondition: "random vis",
+    groundTruth: true, //verified
+  },
+  {
+    index: 12,
+    condition: newVals[0] < 0.5 ? "OPTIMAL" : "RANDOM",
+    pageName: "question",
+    userText: "Diabetes is a chronic condition that affects many people.",
+    initVis: {
+      graphType: "SWARM",
+      xValues: "None",
+      yValues: "None",
+      featuresToHighlight: ["blood pressure"],
+      featuresToShow: ["bmi", "serum triglycerides level", "blood pressure"],
+    },
+    secondVis: "SCATTER", // randomly chosen
+    newVis: {
+      graphType: "SCATTER",
+      xValues: "Blood Pressure Feature Values",
+      yValues: "Blood Pressure SHAP (Contribution) Values",
+      annotation: 
+        {
+          type: "singleLine",
+          xValue: 20,
+        },
+    },
+    insight: {
+      variables: [
+        {
+          featureName: "bmi",
+          transform: "average",
+          type: "contribution to the prediction of",
+        },
+        20,
+      ],
+      type: "read",
+      relation: "greater than",
+      condition: undefined,
+      optimalGraph: {
+        graphType: "BAR",
+        xValues: "None",
+        yValues: "None",
+        featuresToHighlight: ["blood pressure"],
+        featuresToShow: ["bmi", "serum triglycerides level", "blood pressure"],
+        annotation: 
+          {
+            type: "singleLine",
+            xValue: 20,
+          },
+      },
+      randomGraph: {
+        graphType: "SCATTER",
+        xValues: "Blood Pressure Feature Values",
+        yValues: "Blood Pressure SHAP (Contribution) Values",
+        annotation: 
+          {
+            type: "singleLine",
+            xValue: 20,
+          },
+      },
+    },
+    testCondition: "random vis",
+    groundTruth: true, //verified
   },
 ];
