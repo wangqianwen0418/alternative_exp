@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Modal,
   Box,
@@ -11,6 +11,7 @@ import {
 //import { useTheme } from "@mui/material/styles";
 import { useAtom } from "jotai";
 import { uuidAtom } from "../store";
+import { timeStamp } from "console";
 import { test_weburl } from "../util/appscript_url";
 
 export interface DemographicsData {
@@ -19,6 +20,7 @@ export interface DemographicsData {
   educationLevel: string;
   occupation: string;
   mlExperience: number;
+  prolificID: string;
 }
 
 interface DemographicsProps {
@@ -33,10 +35,11 @@ export default function Demographics({ show, onSubmit }: DemographicsProps) {
   const [educationLevel, setEducationLevel] = useState<string>("");
   const [occupation, setOccupation] = useState<string>("");
   const [mlExperience, setMlExperience] = useState<string>("");
+  const [prolificID, setProlificId] = useState<string>("");
   const [uuid] = useAtom(uuidAtom);
 
   const isFormValid = () => {
-    if (!age || !gender || !educationLevel || !occupation || !mlExperience)
+    if (!age || !gender || !educationLevel || !occupation || !mlExperience || !prolificID)
       return false;
     if (gender === "Other" && !otherGender) return false;
     return true;
@@ -52,6 +55,7 @@ export default function Demographics({ show, onSubmit }: DemographicsProps) {
       educationLevel,
       occupation,
       mlExperience: Number(mlExperience),
+      prolificID: prolificID
     };
 
     const data = {
@@ -59,12 +63,15 @@ export default function Demographics({ show, onSubmit }: DemographicsProps) {
       timestamp: new Date().toLocaleString(),
       age: Number(age),
       gender: gender === "Other" ? otherGender : gender,
-      education_level: educationLevel,
+      educationLevel: educationLevel,
       occupation: occupation,
-      ml_experience: Number(mlExperience),
+      mlExperience: Number(mlExperience),
+      prolificID:prolificID
     };
 
     try {
+      console.log("Submitting form:", JSON.stringify(data));
+      console.log("prolific ID: " + prolificID);
       await fetch(test_weburl!, {
         method: "POST",
         mode: "no-cors",
@@ -195,6 +202,16 @@ export default function Demographics({ show, onSubmit }: DemographicsProps) {
                 </MenuItem>
               ))}
             </TextField>
+          </Grid>
+          {/* Prolific ID */}
+          <Grid item xs={12}>
+          <TextField
+              required
+              fullWidth
+              label="Prolific ID"
+              value={prolificID}
+              onChange={(e) => setProlificId(e.target.value)}
+            />
           </Grid>
         </Grid>
 
