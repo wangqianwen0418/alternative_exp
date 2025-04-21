@@ -787,4 +787,126 @@ export const QuestionList: TQuestion[] = [
     testCondition: "ours",
     groundTruth: false,
   },
+  {
+    index: 12,
+    condition: newVals[0] < 0.5 ? "OPTIMAL" : "RANDOM",
+    pageName: "question",
+    userText: "BMI is a feature that is used in this model to predict diabetes risk",
+    initVis: {
+      graphType: "SWARM",
+      xValues: "None",
+      yValues: "None",
+      featuresToHighlight: ["bmi"],
+      featuresToShow: ["bmi", "serum triglycerides level", "blood pressure"],
+    },
+    secondVis: "SCATTER", // randomly chosen
+    newVis: {
+      graphType: "SCATTER",
+      xValues: "BMI Feature Values",
+      yValues: "BMI SHAP (Contribution) Values",
+      annotation: 
+        {
+          type: "singleLine",
+          xValue: 20,
+        },
+    },
+    insight: {
+      variables: [
+        {
+          featureName: "bmi",
+          transform: "average",
+          type: "contribution to the prediction of",
+        },
+        20,
+      ],
+      type: "read",
+      relation: "greater than",
+      condition: undefined,
+      optimalGraph: {
+        graphType: "BAR",
+        xValues: "None",
+        yValues: "None",
+        featuresToHighlight: ["bmi"],
+        featuresToShow: ["bmi", "serum triglycerides level", "blood pressure"],
+        annotation: 
+          {
+            type: "singleLine",
+            xValue: 20,
+          },
+      },
+      randomGraph: {
+        graphType: "SCATTER",
+        xValues: "BMI Feature Values",
+        yValues: "BMI SHAP (Contribution) Values",
+        annotation: 
+          {
+            type: "singleLine",
+            xValue: 20,
+          },
+      },
+    },
+    testCondition: "random vis",
+    groundTruth: true, //verified
+  },
+  {
+    index: 12,
+    condition: newVals[0] < 0.5 ? "OPTIMAL" : "RANDOM",
+    pageName: "question",
+    userText: "Diabetes is a chronic condition that affects many people",
+    initVis: {
+      graphType: "SWARM",
+      xValues: "None",
+      yValues: "None",
+      featuresToHighlight: ["blood pressure"],
+      featuresToShow: ["bmi", "serum triglycerides level", "blood pressure"],
+    },
+    secondVis: "SCATTER", // randomly chosen
+    newVis: {
+      graphType: "SCATTER",
+      xValues: "Blood Pressure Feature Values",
+      yValues: "Blood Pressure SHAP (Contribution) Values",
+      annotation: 
+        {
+          type: "singleLine",
+          xValue: 20,
+        },
+    },
+    insight: {
+      variables: [
+        {
+          featureName: "bmi",
+          transform: "average",
+          type: "contribution to the prediction of",
+        },
+        20,
+      ],
+      type: "read",
+      relation: "greater than",
+      condition: undefined,
+      optimalGraph: {
+        graphType: "BAR",
+        xValues: "None",
+        yValues: "None",
+        featuresToHighlight: ["blood pressure"],
+        featuresToShow: ["bmi", "serum triglycerides level", "blood pressure"],
+        annotation: 
+          {
+            type: "singleLine",
+            xValue: 20,
+          },
+      },
+      randomGraph: {
+        graphType: "SCATTER",
+        xValues: "Blood Pressure Feature Values",
+        yValues: "Blood Pressure SHAP (Contribution) Values",
+        annotation: 
+          {
+            type: "singleLine",
+            xValue: 20,
+          },
+      },
+    },
+    testCondition: "random vis",
+    groundTruth: true, //verified
+  },
 ];
