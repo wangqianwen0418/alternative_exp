@@ -411,7 +411,7 @@ export default function UserResponse() {
           }}
         >
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 800 }}>
-            Thank you for your participation!
+            Thank you for your participation! Your prolific code is CLJIR87G.
           </Typography>
           <Typography variant="subtitle1" gutterBottom>
             We would appreciate your feedback:
