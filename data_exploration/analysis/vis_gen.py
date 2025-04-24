@@ -140,3 +140,26 @@ def generate_visualizations(user_stats_df, question_stats_df):
         palette='Set2',
         ylim=(0, 6.1)
     )
+
+    # 5. Average Duration per Question Part
+    durations_df = (
+        question_stats_df[['Q_INDEX', 'AVG_A_TIME', 'AVG_B_TIME']]
+        .melt(id_vars='Q_INDEX',
+              value_vars=['AVG_A_TIME','AVG_B_TIME'],
+              var_name='PART', value_name='TIME')
+    )
+    durations_df['PART'] = durations_df['PART'].map({
+        'AVG_A_TIME': 'Part A',
+        'AVG_B_TIME': 'Part B'
+    })
+
+    plt.figure(figsize=(10, 6))
+    ax = sns.barplot(data=durations_df, x='Q_INDEX', y='TIME', hue='PART', errorbar=None)
+    plt.title("AVERAGE DURATION PER QUESTION PART")
+    plt.ylabel("Time (seconds)")
+    plt.xlabel("Question Index")
+    plt.legend(title="Part", loc='center left', bbox_to_anchor=(1.02, 0.5), borderaxespad=0)
+    plt.tight_layout()
+    plt.subplots_adjust(right=0.85)
+    plt.savefig(script_dir / "bar_duration_per_question_part.png")
+    plt.close()
