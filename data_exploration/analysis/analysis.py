@@ -171,7 +171,12 @@ def main():
     user_path = script_dir / "user_stats.csv"
     question_path = script_dir / "question_stats.csv"
 
+    # -------------------------------------------------------------------------
+
     dropped_questions = []
+    render_error_bars = True
+    
+    # -------------------------------------------------------------------------
 
     df = pd.read_csv(data_path)
     log_df = pd.read_csv(
@@ -221,7 +226,7 @@ def main():
 
     user_stats_df.to_csv(user_path, index=False)
     question_stats_df.to_csv(question_path, index=False)
-    generate_visualizations(user_stats_df, question_stats_df)
+    generate_visualizations(user_stats_df, question_stats_df, render_error_bars)
 
 if __name__ == "__main__":
     main()

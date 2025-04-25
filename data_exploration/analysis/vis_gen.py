@@ -3,9 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 
-std_dev_bars = True
-
-def generate_visualizations(user_stats_df, question_stats_df):
+def generate_visualizations(user_stats_df, question_stats_df, render_error_bars):
     script_dir = Path(__file__).parent
 
     # 1. Bar Plot: Average Accuracy per Condition
@@ -32,7 +30,7 @@ def generate_visualizations(user_stats_df, question_stats_df):
     ]
     ax = plt.gca()
 
-    if std_dev_bars:
+    if render_error_bars:
         for i, bar in enumerate(ax.patches):
             x = bar.get_x() + bar.get_width() / 2
             y = bar.get_height()
@@ -77,7 +75,7 @@ def generate_visualizations(user_stats_df, question_stats_df):
         stds_conf.append(user_stats_df[f'{condition}_AVG_CONF_ALL_STD'].mean())
 
     ax = plt.gca()
-    if std_dev_bars:
+    if render_error_bars:
         for i, bar in enumerate(ax.patches):
             if i < len(stds_conf):
                 x = bar.get_x() + bar.get_width() / 2
@@ -109,7 +107,7 @@ def generate_visualizations(user_stats_df, question_stats_df):
         plt.ylabel(ylabel)
         plt.xlabel(x)
 
-        if std_dev_bars:
+        if render_error_bars:
             for bar, (_, row) in zip(ax.patches, df.iterrows()):
                 x_center = bar.get_x() + bar.get_width() / 2
                 y_height = bar.get_height()
