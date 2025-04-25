@@ -171,12 +171,16 @@ def main():
     user_path = script_dir / "user_stats.csv"
     question_path = script_dir / "question_stats.csv"
 
+    dropped_questions = []
+
     df = pd.read_csv(data_path)
     log_df = pd.read_csv(
         log_path,
         parse_dates=['TIMESTAMP'],
         date_format='%m/%d/%Y, %I:%M:%S %p'
     )
+    
+    df = df[~df['Q_INDEX'].isin(dropped_questions)].copy()
 
     duration_stats_df = compute_durations(log_df)
 

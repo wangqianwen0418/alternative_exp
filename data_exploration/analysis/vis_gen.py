@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 
-std_dev_bars = False
+std_dev_bars = True
 
 def generate_visualizations(user_stats_df, question_stats_df):
     script_dir = Path(__file__).parent

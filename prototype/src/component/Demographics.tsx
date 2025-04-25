@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { useAtom } from "jotai";
 import { uuidAtom } from "../store";
-import { study_weburl } from "../util/appscript_url";
+import { test_weburl } from "../util/appscript_url";
 
 export interface DemographicsData {
   age: number;
@@ -75,7 +75,7 @@ export default function Demographics({ show, onSubmit }: DemographicsProps) {
     };
 
     try {
-      await fetch(study_weburl!, {
+      await fetch(test_weburl!, {
         method: "POST",
         mode: "no-cors",
         headers: {
