@@ -71,6 +71,7 @@ export default function UserResponse() {
   const [userAnswer, setUserAnswer] = React.useState<
     "TRUE" | "FALSE" | undefined
   >();
+  const [userExplanation, setUserExplanation] = React.useState<string>("");
   const [confidence, setConfidence] = React.useState<{
     value: string;
     label: string;
@@ -105,6 +106,7 @@ export default function UserResponse() {
 
     setUserAnswer(undefined);
     setConfidence(confidenceOptions[0]);
+    setUserExplanation("");
     setIsSubmitted(false);
     setIsSecondPart(false);
 
@@ -128,6 +130,7 @@ export default function UserResponse() {
       is_second_part: isSecondPart ? "TRUE" : "FALSE",
       user_answer: userAnswer,
       confidence: confidence.value,
+      explanation: userExplanation,
       ground_truth: QuestionList[currentQuestionIndex].groundTruth,
     };
 
@@ -168,6 +171,7 @@ export default function UserResponse() {
       setConfidence(confidenceOptions[0]);
       setIsSecondPart(true);
       setIsSubmitted(true);
+      setUserExplanation("");
       setSelectedIndices([]);
       Cookies.set("isSecondPart", "true");
     }
@@ -231,14 +235,6 @@ export default function UserResponse() {
             ? "Given the new visualization, is the above interpretation accurate?"
             : "Is the above interpretation accurate?"}
         </span>
-        {/* <Typography
-          variant="caption"
-          display="block"
-          style={{ marginTop: "8px", color: "red", fontSize: "14px" }}
-        >
-          Please answer the question based solely on the visualizations
-          provided, not your personal knowledge.
-        </Typography> */}
         <RadioGroup
           row
           aria-labelledby="demo-row-radio-buttons-group-label"
@@ -311,11 +307,35 @@ export default function UserResponse() {
             </Select>
           </FormControl>
         </div>
+
+        <div
+          style={{ display: "flex", flexDirection: "column", marginTop: 10 }}
+        >
+          <span>
+            <b>Part 3:</b>{" "}
+            {isSecondPart
+              ? "Given the new visualization, please explain your answer."
+              : "Please explain your answer."}{" "}
+          </span>
+          <TextField
+            placeholder="Explain here"
+            multiline
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            value={userExplanation}
+            onChange={(e) => setUserExplanation(e.target.value)}
+          />
+        </div>
         <br />
         <div style={{ display: "flex", alignItems: "center" }}>
           <Button
             variant="contained"
-            disabled={userAnswer === undefined || confidence.value === ""}
+            disabled={
+              userAnswer === undefined ||
+              confidence.value === "" ||
+              userExplanation === ""
+            }
             onClick={onSubmit}
           >
             {isSecondPart ? (isLastQuestion ? "Submit" : "Next") : "Next"}

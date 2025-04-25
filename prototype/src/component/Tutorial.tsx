@@ -11,6 +11,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  TextField,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
@@ -284,6 +285,24 @@ const tutorialSteps = [
             </Select>
           </FormControl>
         </div>
+        <Typography variant="body1">
+          Finally, you'll provide a short explanation for your answer.
+        </Typography>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <TextField
+            placeholder="Explain here"
+            disabled
+            variant="outlined"
+            sx={{ width: 300 }}
+            margin="normal"
+          />
+        </div>
       </>
     ),
   },
@@ -369,6 +388,13 @@ const tutorialSteps = [
               <MenuItem value="5">5</MenuItem>
             </Select>
           </FormControl>
+          <TextField
+            disabled
+            variant="outlined"
+            value={"The bar for age does not extend past the value 5."}
+            margin="normal"
+            sx={{ width: 400, mt: -0.25 }}
+          />
         </div>
         <Typography variant="body1">
           That's it! Click "Finish" to begin the real user study now, or "Back"
