@@ -190,6 +190,16 @@ def main():
           .reset_index()
           .rename(columns={'A_TIME':'AVG_A_TIME','B_TIME':'AVG_B_TIME'})
     )
+
+    user_total = (
+        duration_stats_df
+        .groupby('UUID')[['A_TIME', 'B_TIME']]
+        .sum()
+        .sum(axis=1)
+        .to_frame('TOTAL_TIME')
+        .reset_index()
+    )
+
     q_avg = (
         duration_stats_df
           .groupby('Q_INDEX')[['A_TIME','B_TIME']]
@@ -198,7 +208,11 @@ def main():
           .rename(columns={'A_TIME':'AVG_A_TIME','B_TIME':'AVG_B_TIME'})
     )
 
-    user_stats_df = user_stats_df.merge(user_avg, on='UUID', how='left')
+    user_stats_df = (
+        user_stats_df
+        .merge(user_avg, on='UUID', how='left')
+        .merge(user_total, on='UUID', how='left')
+    )
     question_stats_df = question_stats_df.merge(q_avg, on='Q_INDEX', how='left')
 
     user_stats_df.to_csv(user_path, index=False)
