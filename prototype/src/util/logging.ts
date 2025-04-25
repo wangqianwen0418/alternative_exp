@@ -1,6 +1,6 @@
 import { useAtom } from "jotai";
 import { uuidAtom } from "../store";
-import { test_weburl } from "../util/appscript_url";
+import { study_weburl } from "../util/appscript_url";
 
 export function useLogging() {
   const [uuid] = useAtom(uuidAtom);
@@ -15,7 +15,7 @@ export function useLogging() {
     };
 
     try {
-      await fetch(test_weburl!, {
+      await fetch(study_weburl!, {
         method: "POST",
         mode: "no-cors",
         headers: {

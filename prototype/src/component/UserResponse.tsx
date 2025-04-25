@@ -33,7 +33,7 @@ import {
   isUserStudyAtom,
   secondGraphTypeAtom,
 } from "../store";
-import { test_weburl } from "../util/appscript_url";
+import { study_weburl } from "../util/appscript_url";
 import Cookies from "js-cookie";
 import { TGraph } from "../util/types";
 import { useLogging } from "../util/logging";
@@ -132,7 +132,7 @@ export default function UserResponse() {
     };
 
     try {
-      await fetch(test_weburl!, {
+      await fetch(study_weburl!, {
         method: "POST",
         mode: "no-cors",
         headers: {
@@ -184,7 +184,7 @@ export default function UserResponse() {
     };
 
     try {
-      await fetch(test_weburl!, {
+      await fetch(study_weburl!, {
         method: "POST",
         mode: "no-cors",
         headers: {
@@ -320,7 +320,7 @@ export default function UserResponse() {
           >
             {isSecondPart ? (isLastQuestion ? "Submit" : "Next") : "Next"}
           </Button>
-          <Button
+          {/* <Button
             variant="outlined"
             sx={{ ml: 2 }}
             onClick={onStepperNext}
@@ -354,7 +354,7 @@ export default function UserResponse() {
             }}
           >
             Reset UUID
-          </Button>
+          </Button> */}
 
           <Button
             variant="outlined"
