@@ -645,7 +645,7 @@ export const QuestionList: TQuestion[] = [
         annotation: 
           {
             type: "highlightRange",
-            xRange: [0.1, 0.2],
+            xRange: [-0.05, 0.05],
           },
       },
     },
@@ -849,7 +849,7 @@ export const QuestionList: TQuestion[] = [
     groundTruth: true, //verified
   },
   {
-    index: 12,
+    index: 13,
     condition: newVals[0] < 0.5 ? "OPTIMAL" : "RANDOM",
     pageName: "question",
     userText: "Diabetes is a chronic condition that affects many people.",
