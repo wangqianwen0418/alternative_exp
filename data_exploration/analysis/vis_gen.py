@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 
+std_dev_bars = False
+
 def generate_visualizations(user_stats_df, question_stats_df):
     script_dir = Path(__file__).parent
 
@@ -29,10 +31,12 @@ def generate_visualizations(user_stats_df, question_stats_df):
         user_stats_df['RANDOM_ACCURACY'].std(ddof=1)
     ]
     ax = plt.gca()
-    for i, bar in enumerate(ax.patches):
-        x = bar.get_x() + bar.get_width() / 2
-        y = bar.get_height()
-        plt.errorbar(x, y, yerr=accuracy_stds[i], ecolor='black', capsize=5, fmt='none')
+
+    if std_dev_bars:
+        for i, bar in enumerate(ax.patches):
+            x = bar.get_x() + bar.get_width() / 2
+            y = bar.get_height()
+            plt.errorbar(x, y, yerr=accuracy_stds[i], ecolor='black', capsize=5, fmt='none')
 
     plt.tight_layout()
     plt.savefig(script_dir / "bar_accuracy_per_condition.png")
@@ -73,11 +77,12 @@ def generate_visualizations(user_stats_df, question_stats_df):
         stds_conf.append(user_stats_df[f'{condition}_AVG_CONF_ALL_STD'].mean())
 
     ax = plt.gca()
-    for i, bar in enumerate(ax.patches):
-        if i < len(stds_conf):
-            x = bar.get_x() + bar.get_width() / 2
-            y = bar.get_height()
-            plt.errorbar(x, y, yerr=stds_conf[i], ecolor='black', capsize=5, fmt='none')
+    if std_dev_bars:
+        for i, bar in enumerate(ax.patches):
+            if i < len(stds_conf):
+                x = bar.get_x() + bar.get_width() / 2
+                y = bar.get_height()
+                plt.errorbar(x, y, yerr=stds_conf[i], ecolor='black', capsize=5, fmt='none')
 
     plt.tight_layout()
     plt.savefig(script_dir / "bar_confidence_per_condition.png")
@@ -104,11 +109,12 @@ def generate_visualizations(user_stats_df, question_stats_df):
         plt.ylabel(ylabel)
         plt.xlabel(x)
 
-        for bar, (_, row) in zip(ax.patches, df.iterrows()):
-            x_center = bar.get_x() + bar.get_width() / 2
-            y_height = bar.get_height()
-            std = row['STD'] if pd.notnull(row['STD']) else 0.0
-            plt.errorbar(x_center, y_height, yerr=std, ecolor='black', capsize=4, fmt='none')
+        if std_dev_bars:
+            for bar, (_, row) in zip(ax.patches, df.iterrows()):
+                x_center = bar.get_x() + bar.get_width() / 2
+                y_height = bar.get_height()
+                std = row['STD'] if pd.notnull(row['STD']) else 0.0
+                plt.errorbar(x_center, y_height, yerr=std, ecolor='black', capsize=4, fmt='none')
 
         plt.legend(title="CONDITION", loc="center left", bbox_to_anchor=(1.02, 0.5), borderaxespad=0)
         plt.tight_layout()
