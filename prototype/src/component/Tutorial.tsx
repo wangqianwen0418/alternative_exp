@@ -286,7 +286,8 @@ const tutorialSteps = [
           </FormControl>
         </div>
         <Typography variant="body1">
-          Finally, you'll provide a short explanation for your answer.
+          Finally, you'll provide a short explanation for your answer (less than
+          150 characters).
         </Typography>
         <div
           style={{

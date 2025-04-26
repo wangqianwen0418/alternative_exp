@@ -314,8 +314,8 @@ export default function UserResponse() {
           <span>
             <b>Part 3:</b>{" "}
             {isSecondPart
-              ? "Given the new visualization, please explain your answer."
-              : "Please explain your answer."}{" "}
+              ? "Given the new visualization, please briefly explain your answer (<150 characters)."
+              : "Please briefly explain your answer (<150 characters)."}{" "}
           </span>
           <TextField
             placeholder="Explain here"
