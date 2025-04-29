@@ -23,10 +23,11 @@ def generate_visualizations(user_stats_df, question_stats_df, render_error_bars)
     plt.ylabel("ACCURACY")
     plt.xlabel("CONDITION")
 
-    accuracy_stds = [
-        user_stats_df['BASELINE_ACCURACY'].std(ddof=1),
-        user_stats_df['OPTIMAL_ACCURACY'].std(ddof=1),
-        user_stats_df['RANDOM_ACCURACY'].std(ddof=1)
+    n = len(user_stats_df)
+    accuracy_cis = [
+        1.96 * user_stats_df['BASELINE_ACCURACY'].std(ddof=1) / (n ** 0.5),
+        1.96 * user_stats_df['OPTIMAL_ACCURACY'].std(ddof=1) / (n ** 0.5),
+        1.96 * user_stats_df['RANDOM_ACCURACY'].std(ddof=1) / (n ** 0.5)
     ]
     ax = plt.gca()
 
@@ -34,7 +35,7 @@ def generate_visualizations(user_stats_df, question_stats_df, render_error_bars)
         for i, bar in enumerate(ax.patches):
             x = bar.get_x() + bar.get_width() / 2
             y = bar.get_height()
-            plt.errorbar(x, y, yerr=accuracy_stds[i], ecolor='black', capsize=5, fmt='none')
+            plt.errorbar(x, y, yerr=accuracy_cis[i], ecolor='black', capsize=5, fmt='none')
 
     plt.tight_layout()
     plt.savefig(script_dir / "bar_accuracy_per_condition.png")
@@ -69,10 +70,11 @@ def generate_visualizations(user_stats_df, question_stats_df, render_error_bars)
     plt.legend(title="CONFIDENCE STAT", loc="center left", bbox_to_anchor=(1.02, 0.5), borderaxespad=0)
 
     stds_conf = []
+    n = len(user_stats_df)
     for condition in conditions:
-        stds_conf.append(user_stats_df[f'{condition}_AVG_CONF_CORRECT_STD'].mean())
-        stds_conf.append(user_stats_df[f'{condition}_AVG_CONF_INCORRECT_STD'].mean())
-        stds_conf.append(user_stats_df[f'{condition}_AVG_CONF_ALL_STD'].mean())
+        stds_conf.append(1.96 * user_stats_df[f'{condition}_AVG_CONF_CORRECT_STD'].mean() / (n ** 0.5))
+        stds_conf.append(1.96 * user_stats_df[f'{condition}_AVG_CONF_INCORRECT_STD'].mean() / (n ** 0.5))
+        stds_conf.append(1.96 * user_stats_df[f'{condition}_AVG_CONF_ALL_STD'].mean() / (n ** 0.5))
 
     ax = plt.gca()
     if render_error_bars:
@@ -95,7 +97,7 @@ def generate_visualizations(user_stats_df, question_stats_df, render_error_bars)
                     'Q_INDEX': int(q_index),
                     'CONDITION': condition,
                     'VALUE': row[f'{condition}_{value_col_suffix}'],
-                    'STD': row.get(f'{condition}_{std_col_suffix}', 0)
+                    'STD': 1.96 * row.get(f'{condition}_{std_col_suffix}', 0) / (row.get('N', 1) ** 0.5)
                 })
         return pd.DataFrame(melted_data).dropna(subset=['VALUE'])
 
