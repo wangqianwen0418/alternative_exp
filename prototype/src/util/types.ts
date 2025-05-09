@@ -40,18 +40,22 @@ export type TGraph = {
   colorValues?: string;
 };
 
+export type TCondition = {
+  featureName: string;
+  range: [number, number] | [undefined, number] | [number, undefined];
+}
+
 export type TInsight =
   | TInsight1
   | TInsight2
   | TInsight3
-  | TInsight4
   | undefined;
 
 export type TInsight1 = {
   variables: [TVariable, number];
   type: "read";
-  relation: "greater than" | "less than" | "equal to";
-  condition: { featureName: string; range: [number, number] } | undefined;
+  relation: "is";
+  condition?: TCondition;
   optimalGraph: TGraph;
   randomGraph?: TGraph;
 };
@@ -60,7 +64,7 @@ export type TInsight2 = {
   variables: [TVariable, TVariable];
   type: "comparison";
   relation: "greater than" | "less than" | "equal to";
-  condition: { featureName: string; range: [number, number] } | undefined;
+  condition?:TCondition;
   optimalGraph: TGraph;
   randomGraph?: TGraph;
 };
@@ -69,22 +73,15 @@ export type TInsight3 = {
   variables: [TVariable, TVariable];
   type: "correlation";
   relation: "positively correlated" | "negatively correlated" | "not correlated";
-  condition: { featureName: string; range: [number, number] } | undefined;
+  condition?: TCondition;
   optimalGraph: TGraph;
   randomGraph?: TGraph;
 };
 
-export type TInsight4 = {
-  variables: [TVariable, TVariable];
-  type: "featureInteraction";
-  relation: "same" | "different";
-  condition: { featureName: string; range: [number, number][] } | undefined;
-  optimalGraph: TGraph;
-  randomGraph?: TGraph;
-};
+
 
 export type TVariable = {
   featureName: string;
   transform: "average" | "deviation of" | "" | undefined; //relax
-  type: "value of" | "contribution to the prediction of" | `number of instances ${string} of` | "";
+  type: "value of" | "attribution" | `number of instances ${string} of` | "";
 };

@@ -15,69 +15,55 @@ First, ensure that all features mentioned in the insight are in this list: ${fea
 Next, determine the Category of the insight based on these descriptions: 
 
     Category 1:
-    Attribution (DV) by Feature (IV), univariate. 
-    Possible Examples: The <feature> values contribute at least <constant> to the <attribution>, The average contribution of F_i to the prediction is larger than <constant>
+    Read (univariate). Extract values related to the attribution of a feature to the prediction (e.g., average attribution, variations of attribution, number of data points with positive attribution).
+
+    Possible Examples: On average, BMI’s attribution to diabetes progression is 25
 
     Category 2:
-    Bivariate comparison (Feature1, Feature2):
+    Comparison (Feature1, Feature2):
     Possible Examples: 
     Feature1 contributes more to the prediction than Feature2
     Feature1 influences more instances positively than Feature2
 
     Category 3:
-    Attribution [DV1] by Feature Value [IV1] 
+    Correlation [DV1] by Feature Value [IV1] 
     Possible Examples:
     There is a positive correlation between the contribution of Feature1 to predictions and the Feature1 values
 
 
-    Category 4:
-    Multivariate Attribution by Feature Values
-    Possible Examples:
-    The correlation between the Feature1 Values and Feature1 is stronger/weaker when Feature2 is in range A compared to range B.
-
-The first value in the JSON file you provide will be the category that the given insight belongs to (1,2,3,4). This will determine how we parse the rest of the insight going forward. 
+The first value in the JSON file you provide will be the category that the given insight belongs to (1,2,3). This will determine how we parse the rest of the insight going forward. 
 
 Once the category is determined, the JSON should contain: 
 Variables: An array of variables with the format: 
 {
   featureName: string,
   transform: "average" | "deviation of" | "" | undefined
-  type: "value of" | "contribution to the prediction of" | "number of instances <restriction> for" 
+  type: "value of" | "attribution" | "number of instances <restriction> for" 
 }
 
 Note: For the "number of instances of <restriction> of", there would be a restriction that you should include in the value. for example, you might suggest "number of instances above 5 of" or "number of instances below 3 of". 
 For Category 2, you may have "number of instances <condition> for" -- for example, for the input prompt "age has more instances above 3 than s2", type would be "number of instances above 3 for".
 Note: if the type is "number of instances", there is no additional transformation (average, etc) that is provided.
 
-If "correlation" (category 3) involves both value and contribution of the same feature, include both in the array. 
+If "correlation" (category 3) involves both value and attribution of the same feature, include both in the array. 
 For example: "There is correlation between the contribution of bp to predictions and the bp values"
-In this case, there are two variables: contribution of BP and BP values. 
+In this case, there are two variables: attribution of BP and BP values. 
 
 Numbers: Any constants in the core part of the insight statement should be included in an array. If none, leave it empty.  It is important to note that this only applies to numbers that are part of the main insight statement - if there are numbers in a condition/restriction (described below), those should not go in this array. 
 
-Type - this will match the category. Options are “read”, “comparison”, “correlation”, or “featureInteraction”) for categories 1-4 respectively.
+Type - this will match the category. Options are “read”, “comparison”, or “correlation”) for categories 1-3 respectively.
 Relationship: Based on the category
-Category 1 (“read”): options are “greater than”, “less than”, “equal to”
+Category 1 (“read”): only one option - "is"
 Category 2 (“comparison”): options are “greater than”, “less than”, “equal to”
 Category 3 (“correlation”): options are “positively correlated”, “negatively correlated”, or "not correlated"
-Category 4 (“featureInteraction”): options are “same” or “different”
 
-Condition: refers to restrictions on variable values. 
+Condition: refers to restrictions on variable values. Will be represented as a range, with the ability to use infinity.
 Example: “BMI is the most important feature in predicting diabetes risk when the value is above 25”
 Condition: {
 	featureName: “BMI”,
 	range: [25, infinity]
 }
 If no condition, this will be an empty object.
-For Category 4, there will be TWO ranges in the condition. 
-Example: "The correlation between bmi and its feature values is stronger when the feature value for age is in the range 0.05 to 0.1 compared to -0.01 to 0"
-
-Then condition would look like this:
-Condition: {
-  featureName: "age",
-  range: [[0.05, 0.1], [-0.01, 0]]
-}
-
 
 GraphType: This will have four options: "Swarm", "Scatter", "Bar", "Heatmap". 
 Here are the situations in which each one is most optimal:
@@ -122,11 +108,11 @@ Then, XValues and YValues would both be "None". FeaturesToHighlight would be ["b
 Here's another example: 
 
 Suppose the user input statement was "bmi has more instances above 5 than sex". Since we are looking at individual data points (and comparing features), the GraphType value would be "Swarm".
-In this case, the XValues field should be "BMI", and the YValues field would just be "BMI". FeaturesToHighlight would be ["bmi", "sex"] and FeaturesToShow could be ["bmi", "sex", "age", low-density lipoproteins"].  Since we want to see the data points that satisfy this criteria, Annotation would be 
+In this case, the XValues and YValues field should both be "None". FeaturesToHighlight would be ["bmi", "sex"] and FeaturesToShow could be ["bmi", "sex", "age", low-density lipoproteins"].  Since we want to see the data points that satisfy this criteria, Annotation would be 
 
 {
 	type: "highlightRange",
-	xRange: [5,100]
+	xRange: [5,infinity]
 }
 
 One last example: Suppose the user input statement was "There is a negative correlation between the contribution of age to predictions and the age values when the feature value is between -0.10 and 0.00". 
@@ -142,18 +128,18 @@ Here’s an example of the full JSON:
 Suppose that the user input statement was “BMI is more important than age for predicting diabetes progression.” 
 In this case, since we are looking at a bivariate comparison between features, this would belong to Category 2.
 
-There are two variables: BMI and Age. Even though it is not specified, it is clear that this statement is referring to these on “average”. We want contributions rather than feature values, so variable type for both of these would be “contribution to the prediction of”.
+There are two variables: BMI and Age. Even though it is not specified, it is clear that this statement is referring to these on “average”. We want contributions rather than feature values, so variable type for both of these would be “attribution”.
  
 Variables: [
         {
           featureName: "bmi",
           transform: "average",
-          type: "contribution to the value of",
+          type: "attribution",
         },
         {
           featureName: "age",
           transform: "average",
-          type: "contribution to the value of",
+          type: "attribution",
         },
       ]
 Numbers: []
@@ -180,7 +166,7 @@ Variables: [
   {
     featureName: "bmi",
     transform: undefined,
-    type: "contribution to the value of",
+    type: "attribution",
   },
 ]
 Numbers: []
@@ -196,7 +182,7 @@ YValues: "BMI SHAP (Contribution) values",
 Features: "None",
 Annotation: {
 	type: "highlightRange",
-	xRange: [0.01, 0.1]
+	xRange: [0.05, 0.1]
 }
 
 One thing that is important to note: Sometimes, constants (numbers) are implicitly present in the statement even if they are not explicitly stated. For example, in the sentence "bmi always contributes positively for predicting diabetes progression", the implied number is 0, since the sentence can be rewritten as "the contribution of bmi is always greater than 0".

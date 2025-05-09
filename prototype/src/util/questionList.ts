@@ -36,13 +36,13 @@ export const QuestionList: TQuestion[] = [
         {
           featureName: "bmi",
           transform: "average",
-          type: "contribution to the prediction of",
+          type: "attribution",
         },
         20,
       ],
       type: "read",
-      relation: "greater than",
-      condition: undefined,
+      relation: "is",
+      
       optimalGraph: {
         graphType: "BAR",
         xValues: "None",
@@ -98,14 +98,14 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "blood pressure",
-          type: "contribution to the prediction of",
+          type: "attribution",
           transform: "average",
         },
         5,
       ],
       type: "read",
-      relation: "greater than",
-      condition: undefined,
+      relation: "is",
+      
       optimalGraph: {
         graphType: "BAR",
         xValues: "None",
@@ -166,14 +166,14 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "serum triglycerides level",
-          type: "contribution to the prediction of",
+          type: "attribution",
           transform: "average",
         },
         30,
       ],
       type: "read",
-      relation: "greater than",
-      condition: undefined,
+      relation: "is",
+      
       optimalGraph: {
         graphType: "BAR",
         xValues: "Serum Triglycerides Feature Values",
@@ -230,14 +230,14 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "serum cholesterol",
-          type: "contribution to the prediction of",
+          type: "attribution",
           transform: "average",
         },
         2.5,
       ],
       type: "read",
-      relation: "greater than",
-      condition: undefined,
+      relation: "is",
+      
       optimalGraph: {
         graphType: "SCATTER",
         xValues: "Blood Sugar Feature Values",
@@ -293,18 +293,18 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "blood pressure",
-          type: "contribution to the prediction of",
+          type: "attribution",
           transform: "average",
         },
         {
           featureName: "age",
-          type: "contribution to the prediction of",
+          type: "attribution",
           transform: "average",
         },
       ],
       type: "comparison",
       relation: "less than",
-      condition: undefined,
+      
       optimalGraph: {
         graphType: "BAR",
         xValues: "blood pressure",
@@ -368,7 +368,7 @@ export const QuestionList: TQuestion[] = [
       ],
       type: "comparison",
       relation: "greater than",
-      condition: undefined,
+      
       optimalGraph: {
         graphType: "SWARM",
         xValues: "None",
@@ -433,7 +433,7 @@ export const QuestionList: TQuestion[] = [
       ],
       type: "comparison",
       relation: "greater than",
-      condition: undefined,
+      
       optimalGraph: {
         graphType: "SWARM",
         xValues: "None",
@@ -494,7 +494,7 @@ export const QuestionList: TQuestion[] = [
       ],
       type: "comparison",
       relation: "greater than",
-      condition: undefined,
+      
       optimalGraph: {
         graphType: "BAR",
         xValues: "BMI",
@@ -552,7 +552,7 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "blood pressure",
-          type: "contribution to the prediction of",
+          type: "attribution",
           transform: "",
         },
         {
@@ -563,7 +563,7 @@ export const QuestionList: TQuestion[] = [
       ],
       type: "correlation",
       relation: "positively correlated",
-      condition: undefined,
+      
       optimalGraph: {
         graphType: "SCATTER",
         xValues: "Blood Pressure Feature Values",
@@ -612,7 +612,7 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "age",
-          type: "contribution to the prediction of",
+          type: "attribution",
           transform: "average",
         },
         {
@@ -687,7 +687,7 @@ export const QuestionList: TQuestion[] = [
         },
         {
           featureName: "bmi",
-          type: "contribution to the prediction of",
+          type: "attribution",
           transform: "",
         },
       ],
@@ -742,23 +742,20 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "bmi",
-          type: "contribution to the prediction of",
+          type: "attribution",
           transform: "average",
         },
         {
           featureName: "age",
-          type: "contribution to the prediction of",
+          type: "attribution",
           transform: "average",
         },
       ],
-      type: "featureInteraction",
-      relation: "different",
+      type: "correlation",
+      relation: "positively correlated",
       condition: {
         featureName: "age",
-        range: [
-          [0.05, 0.1],
-          [0, 0.02],
-        ],
+        range: [0.05, 0.1],
       },
       optimalGraph: {
         graphType: "TWO-SCATTER",
@@ -815,13 +812,13 @@ export const QuestionList: TQuestion[] = [
         {
           featureName: "bmi",
           transform: "average",
-          type: "contribution to the prediction of",
+          type: "attribution",
         },
         20,
       ],
       type: "read",
-      relation: "greater than",
-      condition: undefined,
+      relation: "is",
+      
       optimalGraph: {
         graphType: "BAR",
         xValues: "None",
@@ -876,13 +873,13 @@ export const QuestionList: TQuestion[] = [
         {
           featureName: "bmi",
           transform: "average",
-          type: "contribution to the prediction of",
+          type: "attribution",
         },
         20,
       ],
       type: "read",
-      relation: "greater than",
-      condition: undefined,
+      relation: "is",
+      
       optimalGraph: {
         graphType: "BAR",
         xValues: "None",
