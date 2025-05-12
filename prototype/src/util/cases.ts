@@ -41,7 +41,7 @@ export const CASES: TCase[] = [
     pageName: "Case 2",
     href: "/case2",
     userText:
-      "bmi always contributes positively for predicting diabetes progression.",
+      "bmi contributes positively for predicting diabetes progression.",
     initVis: {
       graphType: "BAR",
       xValues: "None",
@@ -54,12 +54,12 @@ export const CASES: TCase[] = [
         {
           featureName: "bmi",
           type: "attribution of",
-          transform: undefined,
+          transform: "",
         },
         0 as number,
       ],
-      type: "read",
-      relation: "is",
+      type: "comparison",
+      relation: "greater than",
       condition: undefined,
       optimalGraph: {
         graphType: "SWARM",
@@ -78,18 +78,20 @@ export const CASES: TCase[] = [
     userText:
       "the larger the age, the more likely to have greater diabetes progression.",
     initVis: {
-      graphType: "SCATTER",
+      graphType: "BAR",
       xValues: "Age Feature Values",
-      yValues: "Age SHAP values",
+      yValues: "Age SHAP (Contribution) Values",
+      
+
     },
     secondVis: undefined,
     insight: {
       variables: [
-        { featureName: "age", type: "value of", transform: undefined },
+        { featureName: "age", type: "value of", transform: "" },
         {
           featureName: "age",
           type: "attribution of",
-          transform: undefined,
+          transform: "",
         },
       ],
       type: "correlation",
@@ -97,8 +99,8 @@ export const CASES: TCase[] = [
       condition: undefined,
       optimalGraph: {
         graphType: "SCATTER",
-        xValues: "Age",
-        yValues: "Age",
+        xValues: "Age Feature Values",
+        yValues: "Age SHAP (Contribution) Values",
       },
     },
   },
@@ -116,17 +118,35 @@ export const CASES: TCase[] = [
     insight: undefined,
   },
   {
-    pageName: "Case 5",
+    pageName: "Case 5", //TODO: Still a two-color scatter setup
     href: "/case5",
     userText:
       "The correlation between bmi and its feature values is stronger when the feature value for age is in the range |0.05 to 0.1| compared to |0 to 0.02|.",
     initVis: {
-      graphType: "TWO-SCATTER",
+      graphType: "BAR",
       xValues: "none",
       yValues: "none",
     },
     secondVis: undefined,
-    insight: undefined,
+    insight: {
+      variables: [
+        { featureName: "age", type: "value of", transform: "" },
+        {
+          featureName: "age",
+          type: "attribution of",
+          transform: "",
+        },
+      ],
+      type: "correlation",
+      relation: "positively correlated",
+      condition: undefined,
+      optimalGraph: {
+        graphType: "TWO-SCATTER",
+        xValues: "BMI Feature Values",
+        yValues: "BMI SHAP (Contribution) Values",
+        colorValues: "Age Feature Values"
+      },
+    },
   },
   {
     pageName: "Visualization Generation",
