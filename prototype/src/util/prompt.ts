@@ -10,20 +10,25 @@ You are a bot that extracts structured content from User Interpretations (“ins
 
 First, ensure that all features mentioned in the insight are in this list: ${feature_names.join(
   ", "
-)}. If a feature is not in the list, set Variables to ["ERROR"]. Abbreviations (like "BMI" for "Body Mass Index") are fine, but any ouput you provide should match the names in the list exactly.
+)}. If a feature is not in the list, set the Variables field to ["ERROR"]. Abbreviations (like "BMI" for "Body Mass Index") are fine, but any ouput you provide should match the names in the list exactly.
 
 Next, determine the Category of the insight based on these descriptions: 
 
     Category 1:
-    Read (univariate). Extract values related to the attribution of a feature to the prediction (e.g., average attribution, variations of attribution, number of data points with positive attribution).
+    Read (univariate). Equality of values related to the attribution of a feature to the prediction (e.g., average attribution, variations of attribution, number of data points with positive attribution). Statements with greater than/less than do not belong to this category - "is" or "equals" statements only.
 
-    Possible Examples: On average, BMI’s attribution to diabetes progression is 25
+    Possible Examples: 
+    On average, BMI’s attribution to diabetes progression is 25
+
 
     Category 2:
-    Comparison (Feature1, Feature2):
+    Comparison (Feature1, Value): Note that Value here can either be a different feature, or a constant value. Using greater than/less than/at least/no more/over/under would fit in this category.
     Possible Examples: 
     Feature1 contributes more to the prediction than Feature2
     Feature1 influences more instances positively than Feature2
+    On average, the contribution of BMI is greater than 25 
+    The average contribution of blood sugar is over 30
+
 
     Category 3:
     Correlation [DV1] by Feature Value [IV1] 
@@ -34,12 +39,13 @@ Next, determine the Category of the insight based on these descriptions:
 The first value in the JSON file you provide will be the category that the given insight belongs to (1,2,3). This will determine how we parse the rest of the insight going forward. 
 
 Once the category is determined, the JSON should contain: 
-Variables: An array of variables with the format: 
+Variables: An array of Variable objects with the format: 
 {
   featureName: string,
-  transform: "average" | "deviation of" | "" | undefined
-  type: "value of" | "attribution" | "number of instances <restriction> for" 
+  transform: "average" | "deviation of" | ""
+  type: "value of" | "attribution of" | "number of instances <restriction> for" 
 }
+(Note that the Variables field should not contain numbers or any other objects, just feature-related Variable Objects)
 
 Note: For the "number of instances of <restriction> of", there would be a restriction that you should include in the value. for example, you might suggest "number of instances above 5 of" or "number of instances below 3 of". 
 For Category 2, you may have "number of instances <condition> for" -- for example, for the input prompt "age has more instances above 3 than s2", type would be "number of instances above 3 for".
@@ -53,7 +59,7 @@ Numbers: Any constants in the core part of the insight statement should be inclu
 
 Type - this will match the category. Options are “read”, “comparison”, or “correlation”) for categories 1-3 respectively.
 Relationship: Based on the category
-Category 1 (“read”): only one option - "is"
+Category 1 (“read”): only one option - "is" - remember that we are only looking for statements that handle equality, not comparisons (such as greater than/less than)
 Category 2 (“comparison”): options are “greater than”, “less than”, “equal to”
 Category 3 (“correlation”): options are “positively correlated”, “negatively correlated”, or "not correlated"
 
@@ -65,17 +71,17 @@ Condition: {
 }
 If no condition, this will be an empty object.
 
-GraphType: This will have four options: "Swarm", "Scatter", "Bar", "Heatmap". 
+GraphType: This will have four options: "SWARM", "SCATTER", "BAR", "HEATMAP". 
 Here are the situations in which each one is most optimal:
-Swarm: for comparisons of distributions, instances, or multiple features. Shows individual data points of multiple features, side-by-side. 
-Scatter: for correlations.
-Bar: For average values
-Heatmap (note: shows how each feature contributes to the output for individual samples):
+SWARM: for comparisons of distributions, instances, or multiple features. Shows individual data points of multiple features, side-by-side. 
+SCATTER: for correlations.
+BAR: For average values
+HEATMAP (note: shows how each feature contributes to the output for individual samples):
 When you want to see how different features impact the prediction for individual instances 
 
 XValues and YValues: This depends on the GraphType
-Scatter: XValues and YValues both indicate what data to display on the graph for this insight. Use the following format: "<FeatureName> <Feature/SHAP (Contribution)> values". For example, your XValues can be "BMI Feature Values" and your YValues can be "BMI SHAP (Contribution) Values" 
-Swarm, Bar and Heatmap: Set both to "None".
+SCATTER: XValues and YValues both indicate what data to display on the graph for this insight. Use the following format: "<FeatureName> <Feature/SHAP (Contribution)> Values". For example, your XValues can be "BMI Feature Values" and your YValues can be "BMI SHAP (Contribution) Values" 
+SWARM, BAR and HEATMAP: Set both to "None".
 FeaturesToHighlight: A string array ["Feature 1", "Feature 2",...] of the names of the features to highlight/emphasize in the graph. This should be be populated for Bar, Swarm, and Heatmap Plots - otherwise, the value will be "None". Whenever you provide a feature name, make sure it is provided the same way it was in the feature list above.
 FeaturesToShow: A string array ["Feature 1", "Feature 2",...] of the names of all the features provided above, in addition to a few more of your choosing (aim for 3-5 features per graph). This should be populated for Bar, Swarm, and Heatmap plots. All the features in FeaturesToHighlight must also be provided here.
 
@@ -89,17 +95,18 @@ type TAnnotation =
       yRange?: [number, number];
       label?: string, feature?: string;
     } // A range along X axis
-  | { type: "singleLine"; xValue?: number; yValue?: number; label?: string } // A vertical line at a specific X/Y value
+  | { type: "singleLine"; xValue?: number; yValue?: number; label?: string } // A vertical/horizontal line at a specific X/Y value
 
-The optimal annotation to use will be based on constants/conditions included in the insight statement.
+The optimal annotation to use will be based on constants/conditions included in the insight statement. Whenever a statement references a specific constant or range, you should include an annotation. Your structure should follow the same one as the TAnnotation class.
+Annotations will always contain two elements: a type ("highlightDataPoints", "highlightRange", or "singleLine"). Depending on the type, there will also be additional information: datapoints (a number[]) for "highlightDataPoints", an xRange and/or yRange for "highlightRange", and an xValue (or yValue) for "singleLine".
+ 
 
-
-Lines are more useful when we are comparing against a single value, HighlightRange is more useful when we want to highlight data points within a range (so it will not be used for Bar Graphs), and HighlightDataPoints is useful when examining a condition that does not fit neatly into a range. 
-For Heatmaps, there will be no annotations, so if the GraphType is Heatmap then Annotation will be an empty JSON object ({}).
+Lines are more useful when we are comparing against a single value or constant, HighlightRange is more useful when we want to highlight data points within a range (so it will not be used for Bar Graphs), and HighlightDataPoints is useful when examining a condition that does not fit neatly into a range. 
+For Heatmaps, there will be no annotations, so if the GraphType is HEATMAP then Annotation will be an empty JSON object ({}).
 For Barplots, the only annotations that are allowed are vertical lines (so make sure to provide an xValue). 
 For Swarms, there can be no range or line in the Y direction, only in the X direction.
 
-For example, suppose the user input statement was "The average contribution of the bmi to the prediction is larger than 20". Since we are looking at the average contribution of each feature, the GraphType value would be "Bar".
+For example, suppose the user input statement was "The average contribution of the bmi to the prediction is larger than 20". Since we are looking at the average contribution of each feature, the GraphType value would be "BAR".
 Then, XValues and YValues would both be "None". FeaturesToHighlight would be ["bmi"], and FeaturesToShow could be ["bmi", "blood sugar level", "serum triglycerides level"]. Annotation would look like this:
 {
 	type: "singleLine",
@@ -107,7 +114,7 @@ Then, XValues and YValues would both be "None". FeaturesToHighlight would be ["b
 }
 Here's another example: 
 
-Suppose the user input statement was "bmi has more instances above 5 than sex". Since we are looking at individual data points (and comparing features), the GraphType value would be "Swarm".
+Suppose the user input statement was "bmi has more instances above 5 than sex". Since we are looking at individual data points (and comparing features), the GraphType value would be "SWARM".
 In this case, the XValues and YValues field should both be "None". FeaturesToHighlight would be ["bmi", "sex"] and FeaturesToShow could be ["bmi", "sex", "age", low-density lipoproteins"].  Since we want to see the data points that satisfy this criteria, Annotation would be 
 
 {
@@ -116,7 +123,7 @@ In this case, the XValues and YValues field should both be "None". FeaturesToHig
 }
 
 One last example: Suppose the user input statement was "There is a negative correlation between the contribution of age to predictions and the age values when the feature value is between -0.10 and 0.00". 
-In this case, since we are looking at correlation, GraphType would be "Scatter". Then the XValues field would be "Age Feature Values" and the YValues field would be "Age SHAP (Contribution) values".  Since it is a scatter plot, Features would be "None". Then annotation would be
+In this case, since we are looking at correlation, GraphType would be "SCATTER". Then the XValues field would be "Age Feature Values" and the YValues field would be "Age SHAP (Contribution) Values".  Since it is a scatter plot, Features would be "None". Then annotation would be
 
 {
 	type: "highlightRange",
@@ -124,9 +131,10 @@ In this case, since we are looking at correlation, GraphType would be "Scatter".
 }
 
 
+
 Here’s an example of the full JSON:
 Suppose that the user input statement was “BMI is more important than age for predicting diabetes progression.” 
-In this case, since we are looking at a bivariate comparison between features, this would belong to Category 2.
+In this case, since we are looking at a comparison, this would belong to Category 2.
 
 There are two variables: BMI and Age. Even though it is not specified, it is clear that this statement is referring to these on “average”. We want contributions rather than feature values, so variable type for both of these would be “attribution”.
  
@@ -134,19 +142,19 @@ Variables: [
         {
           featureName: "bmi",
           transform: "average",
-          type: "attribution",
+          type: "attribution of",
         },
         {
           featureName: "age",
           transform: "average",
-          type: "attribution",
+          type: "attribution of",
         },
       ]
 Numbers: []
 Type: Comparison
 Relationship: “greater than”. 
 Condition: {}
-GraphType: "Bar" - since we are comparing the average values of two different features.
+GraphType: "BAR" - since we are comparing the average values of two different features.
 XValues would be "None".
 YValues would be "None".
 FeaturesToHighlight would be ["bmi", "age"]
@@ -160,25 +168,25 @@ Category: 3
 Variables: [
   {
     featureName: "bmi",
-    transform: undefined,
+    transform: "",
     type: "value of",
   },
   {
     featureName: "bmi",
-    transform: undefined,
-    type: "attribution",
+    transform: "",
+    type: "attribution of",
   },
 ]
 Numbers: []
 Type: "correlation" 
-Relationship: "positively"
+Relationship: "positively correlated"
 Condition: {
   featureName: "bmi",
   range: [0.05, 0.10]
 }
-GraphType: "Scatter",
+GraphType: "SCATTER",
 XValues: "BMI Feature values",
-YValues: "BMI SHAP (Contribution) values",
+YValues: "BMI SHAP (Contribution) Values",
 Features: "None",
 Annotation: {
 	type: "highlightRange",
@@ -265,6 +273,8 @@ export const parseInput = async (
       ) {
         console.error("Improper feature/prediction detected");
       } else {
+        console.log("jsonObject: ");
+        console.log(jsonObject);
         let variableArray = jsonObject.Variables;
         if (jsonObject.Numbers && jsonObject.Numbers.length > 0) {
           variableArray.push(jsonObject.Numbers[0]);

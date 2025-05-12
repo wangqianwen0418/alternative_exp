@@ -61,7 +61,7 @@ export type TInsight1 = {
 };
 
 export type TInsight2 = {
-  variables: [TVariable, TVariable];
+  variables: [TVariable, TVariable] | [TVariable, number];
   type: "comparison";
   relation: "greater than" | "less than" | "equal to";
   condition?:TCondition;
@@ -83,5 +83,5 @@ export type TInsight3 = {
 export type TVariable = {
   featureName: string;
   transform: "average" | "deviation of" | "" | undefined; //relax
-  type: "value of" | "attribution" | `number of instances ${string} of` | "";
+  type: "value of" | "attribution of" | `number of instances ${string} of` | "";
 };

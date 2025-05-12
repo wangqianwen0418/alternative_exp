@@ -35,6 +35,7 @@ import {
   questionIndexAtom,
   questionOrderAtom,
   tutorailOverrideAtom,
+  pageNameAtom,
 } from "../store";
 import TwoColorScatter from "./TwoColorScatter";
 import { TGraph } from "../util/types";
@@ -57,6 +58,7 @@ export default function Explanation() {
   const [, setSecondGraphType] = useAtom(secondGraphTypeAtom);
   const [questionIndexesArray] = useAtom(questionOrderAtom);
   const [questionIndex] = useAtom(questionIndexAtom);
+  const [pageName] = useAtom(pageNameAtom);
 
   const [rightPosition, setRightPosition] = useState("25%");
 
@@ -124,7 +126,8 @@ export default function Explanation() {
       graphType: "SWARM",
       xValues: "None",
       yValues: "None",
-      features: ["bmi"],
+      featuresToHighlight: ["bmi"],
+      featuresToShow: ["bmi", "age", "sex", "serum triglycerides level"]
     };
   }
 
@@ -141,10 +144,10 @@ export default function Explanation() {
           selectedIndices={selectedIndices}
           setSelectedIndices={setSelectedIndices}
           featuresToHighlight={
-            isUserStudy ? (initVis as TGraph).featuresToHighlight : undefined
+            (initVis as TGraph).featuresToHighlight
           }
           featuresToShow={
-            isUserStudy ? (initVis as TGraph).featuresToShow : undefined
+            (initVis as TGraph).featuresToShow
           }
         />
       );
@@ -259,16 +262,22 @@ export default function Explanation() {
 
   let additionalVisualizations;
   const q = QuestionList[questionIndexesArray[questionIndex]];
-  var graphCase = "RANDOM";
-  if (q != null) {
-    graphCase = q.condition ? q.condition : "RANDOM";
+  if (pageName?.includes("Free")) {
+    var graph = insight?.optimalGraph;
   } else {
-    graphCase = "OPTIMAL";
+    var graphCase = "RANDOM";
+    if (q != null) {
+      graphCase = q.condition ? q.condition : "RANDOM";
+    } else {
+      graphCase = "OPTIMAL";
+    }
+    var graph =
+      graphCase === "OPTIMAL" ? insight?.optimalGraph : insight?.randomGraph;
+    setSecondGraphType(graphCase);
   }
-  var graph =
-    graphCase === "OPTIMAL" ? insight?.optimalGraph : insight?.randomGraph;
-  setSecondGraphType(graphCase);
   if (graph?.graphType) {
+    console.log("Graph Type: ");
+    console.log(graph?.graphType);
     switch (graph.graphType) {
       case "BAR":
         additionalVisualizations = isSubmitted && (
@@ -283,9 +292,9 @@ export default function Explanation() {
             offsets={[0, 0]}
             annotation={graph.annotation}
             featuresToHighlight={
-              isUserStudy ? graph.featuresToHighlight : undefined
+              graph.featuresToHighlight
             }
-            featuresToShow={isUserStudy ? graph.featuresToShow : undefined}
+            featuresToShow={graph.featuresToShow}
           />
         );
         break;

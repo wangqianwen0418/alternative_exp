@@ -83,6 +83,8 @@ export default function Interpretation() {
           apiKey,
           prompt
         );
+        console.log("PARSED INPUT: ");
+        console.log(parsedInput);
         setInsight(parsedInput);
       } catch (error) {
         console.error("Error parsing input: ", error);

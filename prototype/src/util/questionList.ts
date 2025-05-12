@@ -36,7 +36,7 @@ export const QuestionList: TQuestion[] = [
         {
           featureName: "bmi",
           transform: "average",
-          type: "attribution",
+          type: "attribution of",
         },
         20,
       ],
@@ -98,7 +98,7 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "blood pressure",
-          type: "attribution",
+          type: "attribution of",
           transform: "average",
         },
         5,
@@ -166,7 +166,7 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "serum triglycerides level",
-          type: "attribution",
+          type: "attribution of",
           transform: "average",
         },
         30,
@@ -230,7 +230,7 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "serum cholesterol",
-          type: "attribution",
+          type: "attribution of",
           transform: "average",
         },
         2.5,
@@ -293,12 +293,12 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "blood pressure",
-          type: "attribution",
+          type: "attribution of",
           transform: "average",
         },
         {
           featureName: "age",
-          type: "attribution",
+          type: "attribution of",
           transform: "average",
         },
       ],
@@ -552,7 +552,7 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "blood pressure",
-          type: "attribution",
+          type: "attribution of",
           transform: "",
         },
         {
@@ -612,7 +612,7 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "age",
-          type: "attribution",
+          type: "attribution of",
           transform: "average",
         },
         {
@@ -687,7 +687,7 @@ export const QuestionList: TQuestion[] = [
         },
         {
           featureName: "bmi",
-          type: "attribution",
+          type: "attribution of",
           transform: "",
         },
       ],
@@ -742,12 +742,12 @@ export const QuestionList: TQuestion[] = [
       variables: [
         {
           featureName: "bmi",
-          type: "attribution",
+          type: "attribution of",
           transform: "average",
         },
         {
           featureName: "age",
-          type: "attribution",
+          type: "attribution of",
           transform: "average",
         },
       ],
@@ -812,7 +812,7 @@ export const QuestionList: TQuestion[] = [
         {
           featureName: "bmi",
           transform: "average",
-          type: "attribution",
+          type: "attribution of",
         },
         20,
       ],
@@ -873,7 +873,7 @@ export const QuestionList: TQuestion[] = [
         {
           featureName: "bmi",
           transform: "average",
-          type: "attribution",
+          type: "attribution of",
         },
         20,
       ],

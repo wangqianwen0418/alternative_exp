@@ -18,12 +18,12 @@ export const CASES: TCase[] = [
         {
           featureName: "bmi",
           transform: "average",
-          type: "contribution to the prediction of",
+          type: "attribution of",
         },
         {
           featureName: "age",
           transform: "average",
-          type: "contribution to the prediction of",
+          type: "attribution of",
         },
       ],
       type: "comparison",
@@ -53,13 +53,13 @@ export const CASES: TCase[] = [
       variables: [
         {
           featureName: "bmi",
-          type: "contribution to the prediction of",
+          type: "attribution of",
           transform: undefined,
         },
         0 as number,
       ],
       type: "read",
-      relation: "greater than",
+      relation: "is",
       condition: undefined,
       optimalGraph: {
         graphType: "SWARM",
@@ -88,7 +88,7 @@ export const CASES: TCase[] = [
         { featureName: "age", type: "value of", transform: undefined },
         {
           featureName: "age",
-          type: "contribution to the prediction of",
+          type: "attribution of",
           transform: undefined,
         },
       ],
@@ -144,12 +144,12 @@ export const CASES: TCase[] = [
         {
           featureName: "bmi",
           transform: "average",
-          type: "contribution to the prediction of",
+          type: "attribution of",
         },
         20,
       ],
       type: "read",
-      relation: "greater than",
+      relation: "is",
       condition: undefined,
       optimalGraph: {
         graphType: "SCATTER",
