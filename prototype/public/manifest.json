@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Interpreting XAI",
+  "name": "Enhancing XAI Interpretation through a Reverse Mapping from Insights to Visualizations",
   "icons": [
     {
       "src": "favicon.ico",

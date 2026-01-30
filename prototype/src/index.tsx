@@ -1,15 +1,16 @@
 import ReactDOM from "react-dom/client";
-import "./index.css";
-import App from "./App";
-import reportWebVitals from "./reportWebVitals";
-
-import { CASES } from "./util/cases";
-import Questions from "./Questions";
-
 import { createHashRouter, RouterProvider } from "react-router-dom";
 
+import "./app/styles/index.css";
+
+import App from "./app/App";
+import Questions from "./app/Questions";
+import reportWebVitals from "./reportWebVitals";
+
+import { CASES } from "./research/cases";
+
 const root = ReactDOM.createRoot(
-  document.getElementById("root") as HTMLElement
+  document.getElementById("root") as HTMLElement,
 );
 
 const cases = CASES.map((c) => ({

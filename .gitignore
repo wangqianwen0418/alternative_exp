@@ -11,7 +11,7 @@ node_modules/
 .pnp.js
 
 /prototype/key.env
-/prototype/src/util/appscript_url.ts
+/prototype/src/lib/appscript_url.ts
 
 # testing
 /coverage
