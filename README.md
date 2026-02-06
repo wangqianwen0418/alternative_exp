@@ -1,3 +1,12 @@
-# Interpreting XAI
+### when run first time, use
+ `npm install`
+ to install the dependencies
 
-See `README.md` in `prototype` directory for running the website.
+### dev mode
+`npm start` 
+
+Runs the app in the development mode.\
+Open [http://localhost:3000/alternative_exp](http://localhost:3000/alternative_exp) to view it in the browser.
+
+The page will reload if you make edits.\
+You will also see any lint errors in the console.
