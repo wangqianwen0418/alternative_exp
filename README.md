@@ -1,9 +1,12 @@
-TODO:
+### when run first time, use
+ `npm install`
+ to install the dependencies
 
-- [X] Parsing input explanation to extract feature, relation, prediction, condition
-- [X] Adding guardrails to ensure input matches user domain
-- [X] Add loading icon while waiting for GPT API response
-- [ ] Support for multiple features
-- [ ] VEGA-Lite based graph encoding/generation
-- [ ] Interactive plots
-- [X] Adding height to swarm plot (needs refinement)  
+### dev mode
+`npm start` 
+
+Runs the app in the development mode.\
+Open [http://localhost:3000/alternative_exp](http://localhost:3000/alternative_exp) to view it in the browser.
+
+The page will reload if you make edits.\
+You will also see any lint errors in the console.
