@@ -68,16 +68,21 @@ Runs Prettier to automatically format project files.
 ```
 src/
 │
-├── app/              # Application entry and high-level orchestration
-├── components/       # React components and visualization modules
-│   ├── charts/       # D3-based attribution visualizations
-│   ├── interpretation/
-│   └── ui/
+├── app/                   # Application entry and experiment orchestration
 │
-└── lib/              # Shared utilities and core logic
-    ├── utility/      # Cookies, logging, UUID, networking helpers
-    ├── llm/          # Structured insight generation and parsing
-    └── config.ts
+├── components/            # React UI and visualization components
+│   ├── charts/            # D3-based attribution visualizations and shared chart utilities
+│   ├── interpretation/    # Insight workflow and response collection components
+│   ├── tutorial/          # Guided onboarding and instructional components
+│   └── ui/                # Reusable interface components (forms, layouts, etc.)
+│
+├── data/                  # Static datasets used for experimentation and demos
+│
+└── lib/                   # Shared utilities and research infrastructure
+    ├── llm/               # LLM integration for structured insight extraction
+    ├── utility/           # Cookies, logging, UUID, storage, and networking helpers
+    └── research/          # Research-specific logic and experiment configuration
+        └── questions/     # Structured experiment questions and study definitions
 ```
 
 ## Contact
