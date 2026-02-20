@@ -1,11 +1,27 @@
 import * as d3 from 'd3';
 import { useAtom } from 'jotai';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 
 import { uuidAtom } from 'app/atoms';
 import { useLogging } from 'lib/utility/logging';
 import type { TAnnotation } from 'lib/types';
 import { seededShuffle } from 'research/questions/questionBalance';
+import {
+  getEffectiveFeaturesToShow,
+  getFilteredIndices,
+} from 'components/charts/featureUtils';
+
+/**
+ * src/components/charts/Bar
+ *
+ * Horizontal bar chart for SHAP-style feature importances.
+ *
+ * Notes:
+ * - Feature filtering uses `featureUtils` so defaults match other charts.
+ * - UUID-seeded shuffling is used in study mode to counterbalance ordering.
+ */
+
+const MARGIN: [number, number, number, number] = [125, 10, 20, 40];
 
 interface BarProps {
   allShapValues: number[][];
@@ -20,11 +36,6 @@ interface BarProps {
 }
 
 export default function Bar(props: BarProps) {
-  const margin = useMemo(
-    () => [125, 10, 20, 40] as [number, number, number, number],
-    [],
-  );
-
   const {
     allShapValues,
     featureNames,
@@ -53,20 +64,15 @@ export default function Bar(props: BarProps) {
     return null;
   }, []);
 
-  const effectiveFeaturesToShow = useMemo(() => {
-    return featuresToShow && featuresToShow.length > 0
-      ? featuresToShow
-      : ['serum triglycerides level', 'bmi', 'blood pressure', 'age', 'sex']; // default array
-  }, [featuresToShow]);
+  const effectiveFeaturesToShow = useMemo(
+    () => getEffectiveFeaturesToShow(featuresToShow),
+    [featuresToShow],
+  );
 
-  const filteredIndices = useMemo(() => {
-    return featureNames.reduce((acc: number[], name, idx) => {
-      if (effectiveFeaturesToShow.includes(name)) {
-        acc.push(idx);
-      }
-      return acc;
-    }, []);
-  }, [featureNames, effectiveFeaturesToShow]);
+  const filteredIndices = useMemo(
+    () => getFilteredIndices(featureNames, effectiveFeaturesToShow),
+    [featureNames, effectiveFeaturesToShow],
+  );
 
   const filteredFeatureNames = useMemo(() => {
     return filteredIndices.map((i) => featureNames[i]);
@@ -133,9 +139,9 @@ export default function Bar(props: BarProps) {
       d3
         .scaleBand()
         .domain(sortedAvgShapeValues.map((d) => d[0]))
-        .range([margin[1], height - margin[3]])
+        .range([MARGIN[1], height - MARGIN[3]])
         .padding(0.1),
-    [sortedAvgShapeValues, margin, height],
+    [sortedAvgShapeValues, height],
   );
 
   const xScale = useMemo(
@@ -149,8 +155,8 @@ export default function Bar(props: BarProps) {
             Math.max(...allShapValues.flat().map((d) => Math.abs(d))),
           ),
         ])
-        .range([margin[0], width - margin[2]]),
-    [allShapValues, margin, width],
+        .range([MARGIN[0], width - MARGIN[2]]),
+    [allShapValues, width],
   );
 
   const confidenceIntervals = useMemo(() => {
@@ -176,10 +182,10 @@ export default function Bar(props: BarProps) {
       .select(`g.bar#${id}`)
       .append('g')
       .attr('class', 'x-axis')
-      .attr('transform', `translate(0,${height - margin[3]})`);
+      .attr('transform', `translate(0,${height - MARGIN[3]})`);
 
     xAxisGroup.call(d3.axisBottom(xScale));
-  }, [xScale, id, height, margin]);
+  }, [xScale, id, height]);
 
   useEffect(() => {
     if (
@@ -230,8 +236,8 @@ export default function Bar(props: BarProps) {
         const brush = d3
           .brushY()
           .extent([
-            [margin[0], margin[1]],
-            [width - margin[2], height - margin[3]],
+            [MARGIN[0], MARGIN[1]],
+            [width - MARGIN[2], height - MARGIN[3]],
           ])
           .on('end', brushEnd);
 
@@ -248,7 +254,6 @@ export default function Bar(props: BarProps) {
     featuresToHighlight,
     sortedAvgShapeValues,
     yScale,
-    margin,
     width,
     height,
     setSelectedBars,
@@ -304,7 +309,7 @@ export default function Bar(props: BarProps) {
               opacity={isSelected ? 1 : 0.3}
             >
               <text
-                x={margin[0] - 2}
+                x={MARGIN[0] - 2}
                 y={(yScale(featureName) as number) + yScale.bandwidth() * 0.6}
                 textAnchor="end"
                 style={textStyle}
@@ -335,7 +340,7 @@ export default function Bar(props: BarProps) {
       </g>
 
       <text
-        x={(margin[0] + width - margin[2]) / 2}
+        x={(MARGIN[0] + width - MARGIN[2]) / 2}
         y={height - 7.5}
         textAnchor="middle"
         fontSize={labelFontSize}
@@ -347,16 +352,16 @@ export default function Bar(props: BarProps) {
         <>
           <line
             x1={xScale(annotation.xValue ?? 0)}
-            y1={margin[1]}
+            y1={MARGIN[1]}
             x2={xScale(annotation.xValue ?? 0)}
-            y2={height - margin[3]}
+            y2={height - MARGIN[3]}
             stroke="black"
             strokeDasharray="4,2"
           />
 
           <text
             x={xScale(annotation.xValue ?? 0) + 5}
-            y={margin[1] + 100}
+            y={MARGIN[1] + 100}
             fill="black"
             fontSize="12px"
           >

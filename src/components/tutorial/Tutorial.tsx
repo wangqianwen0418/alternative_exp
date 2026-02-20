@@ -28,6 +28,14 @@ import {
   TwoColorTutorialGraph,
 } from './TutorialGraphs';
 
+/**
+ * src/components/tutorial/Tutorial
+ *
+ * Multi-step onboarding/tutorial modal for the user study.
+ *
+ * The content is intentionally static and mirrors the study protocol.
+ */
+
 const definedWords = {
   XAI: 'Explainable AI (XAI) is an approach to provide insight into the decision-making process of AI models, where explanations or rationales accompany recommendations made by AI.',
 };

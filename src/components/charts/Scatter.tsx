@@ -1,7 +1,26 @@
 import * as d3 from 'd3';
 import { useLogging } from 'lib/utility/logging';
 import type { TAnnotation } from 'lib/types';
-import { useEffect, useMemo, useState } from 'react';
+import {
+  appendAxis,
+  appendAxisTitle,
+  clearGroups,
+  formatFixed2,
+} from './d3Utils';
+import { useEffect, useState, useMemo } from 'react';
+
+/**
+ * src/components/charts/Scatter
+ *
+ * Scatterplot used for comparing a feature (x) against SHAP/target values (y).
+ *
+ * Notes:
+ * - Uses shared D3 helpers in `d3Utils` to reduce boilerplate.
+ * - Selection indices are owned by the parent; this component only updates them.
+ */
+
+const MARGIN: [number, number, number, number] = [22.5, 10, 40, 52.5];
+const LABEL_FONT_SIZE = 13;
 
 interface ScatterProps {
   offsets: number[];
@@ -32,8 +51,8 @@ export default function Scatter(props: ScatterProps) {
     yLabel,
   } = props;
 
-  const margin = useMemo(() => [22.5, 10, 40, 52.5], []);
-  const labelFontSize = 13;
+  const margin = MARGIN;
+  const labelFontSize = LABEL_FONT_SIZE;
 
   const log = useLogging();
 
@@ -59,44 +78,33 @@ export default function Scatter(props: ScatterProps) {
   } | null>(null);
 
   useEffect(() => {
-    const container = d3.select(`g.scatter#${id}`);
-    container.selectAll('g.x-axis').remove();
-    container.selectAll('g.y-axis').remove();
-    container.selectAll('g.brush').remove();
+    const container = d3.select(`g.scatter#${id}`) as any;
+    clearGroups(container, ['g.x-axis', 'g.y-axis', 'g.brush']);
 
-    const xAxisGroup = container
-      .append('g')
-      .attr('class', 'x-axis')
-      .attr('transform', `translate(0, ${height - margin[2]})`);
+    const xAxisGroup = appendAxis(
+      container,
+      'x-axis',
+      `translate(0, ${height - margin[2]})`,
+      d3.axisBottom(xScale),
+    );
+    appendAxisTitle(xAxisGroup, xLabel, {
+      x: (margin[3] + (width - margin[1])) / 2,
+      y: 30,
+      'font-size': labelFontSize,
+    });
 
-    xAxisGroup.call(d3.axisBottom(xScale));
-
-    xAxisGroup
-      .append('text')
-      .attr('text-anchor', 'middle')
-      .attr('class', 'axis-title')
-      .attr('x', (margin[3] + (width - margin[1])) / 2)
-      .attr('y', 30)
-      .attr('fill', 'black')
-      .attr('font-size', labelFontSize)
-      .text(xLabel);
-
-    const yAxisGroup = container
-      .append('g')
-      .attr('class', 'y-axis')
-      .attr('transform', `translate(${margin[3]}, 0)`);
-    yAxisGroup.call(d3.axisLeft(yScale));
-
-    yAxisGroup
-      .append('text')
-      .attr('text-anchor', 'middle')
-      .attr('class', 'axis-title')
-      .attr('transform', 'rotate(-90)')
-      .attr('x', -((height - margin[2] + margin[0]) / 2))
-      .attr('y', -35)
-      .attr('fill', 'black')
-      .attr('font-size', labelFontSize)
-      .text(yLabel);
+    const yAxisGroup = appendAxis(
+      container,
+      'y-axis',
+      `translate(${margin[3]}, 0)`,
+      d3.axisLeft(yScale),
+    );
+    appendAxisTitle(yAxisGroup, yLabel, {
+      transform: 'rotate(-90)',
+      x: -((height - margin[2] + margin[0]) / 2),
+      y: -35,
+      'font-size': labelFontSize,
+    });
 
     const brushGroup = container.append('g').attr('class', 'brush');
     if (!annotation) {
@@ -152,6 +160,7 @@ export default function Scatter(props: ScatterProps) {
     xLabel,
     yLabel,
     log,
+    labelFontSize,
   ]);
 
   function isPointHighlighted(i: number): boolean {
@@ -179,12 +188,6 @@ export default function Scatter(props: ScatterProps) {
     return true;
   }
 
-  function formatValue(value: number | undefined): string {
-    if (value === undefined || isNaN(value)) return '';
-    if (Math.abs(value) < 0.005) value = 0;
-    return value.toFixed(2);
-  }
-
   function renderAnnotations() {
     const elements = [];
     let highlightedIndices: number[] = [];
@@ -206,11 +209,11 @@ export default function Scatter(props: ScatterProps) {
       const yMinVal = d3.min(yHighlightedValues);
       const yMaxVal = d3.max(yHighlightedValues);
       const yAvgVal = d3.mean(yHighlightedValues);
-      const statsText = `X - Avg: ${formatValue(xAvgVal)}, Min: ${formatValue(
+      const statsText = `X - Avg: ${formatFixed2(xAvgVal)}, Min: ${formatFixed2(
         xMinVal,
-      )}, Max: ${formatValue(xMaxVal)} | Y - Avg: ${formatValue(
+      )}, Max: ${formatFixed2(xMaxVal)} | Y - Avg: ${formatFixed2(
         yAvgVal,
-      )}, Min: ${formatValue(yMinVal)}, Max: ${formatValue(yMaxVal)}`;
+      )}, Min: ${formatFixed2(yMinVal)}, Max: ${formatFixed2(yMaxVal)}`;
 
       elements.push(
         <>
@@ -433,10 +436,10 @@ export default function Scatter(props: ScatterProps) {
             opacity={0.9}
           />
           <text x={5} y={-5} fontSize="10px" fill="black">
-            {`X: ${formatValue(tooltip.dataX)}`}
+            {`X: ${formatFixed2(tooltip.dataX)}`}
           </text>
           <text x={5} y={10} fontSize="10px" fill="black">
-            {`Y: ${formatValue(tooltip.dataY)}`}
+            {`Y: ${formatFixed2(tooltip.dataY)}`}
           </text>
         </g>
       )}

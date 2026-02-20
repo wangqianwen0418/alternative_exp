@@ -4,6 +4,15 @@ import type { TInsight } from 'lib/types';
 import { CASES } from 'research/cases';
 import { generateQuestionOrder } from 'research/questions/questionBalance';
 
+/**
+ * src/app/atoms
+ *
+ * Global application state powered by Jotai.
+ *
+ * Atoms are used to share state between the app shell, charts, tutorial, and
+ * response forms without prop-drilling.
+ */
+
 export const freeTextAtom = atom(''); // the free text that users input
 export const isSubmittedAtom = atom(false); // whether users have submitted the free text (or Question Part 1) for formatting
 export const tutorialAtom = atom(true); // whether the user should see the tutorial (only applicable to user study)

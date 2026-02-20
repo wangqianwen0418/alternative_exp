@@ -1,9 +1,20 @@
 import * as d3 from 'd3';
 import { useAtom } from 'jotai';
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef } from 'react';
 
 import { uuidAtom } from 'app/atoms';
 import { seededShuffle } from 'research/questions/questionBalance';
+import { truncateLabels } from './d3Utils';
+import { getEffectiveFeaturesToShow } from './featureUtils';
+
+/**
+ * src/components/charts/Heatmap
+ *
+ * Heatmap view over per-feature SHAP values and feature values.
+ *
+ * The rendering intentionally preserves the existing layout and ordering logic
+ * (including UUID-seeded shuffling in study mode).
+ */
 
 interface HeatmapProps {
   shapValuesArray: number[][];
@@ -27,12 +38,15 @@ export default function Heatmap({
   featuresToShow,
 }: HeatmapProps) {
   const svgRef = useRef(null);
-  const [selectedIndexes] = useState<number[]>([]);
   const groupRef = useRef<SVGGElement>(null);
   const [uuid] = useAtom(uuidAtom);
 
   const labelFontSizePx = 13;
   const maxLabelWidth = 100;
+
+  // Heatmap originally supported brushing over columns to dim non-selected samples.
+  // The brush is currently disabled, so we keep an empty selection for identical rendering.
+  const selectedIndexes: number[] = [];
 
   const [minShap, maxShap] = useMemo(() => [-50, 50], []);
   const colorScale = useMemo(
@@ -45,11 +59,11 @@ export default function Heatmap({
     [minShap, maxShap],
   );
 
-  const effectiveFeaturesToShow = useMemo(() => {
-    return featuresToShow && featuresToShow.length > 0
-      ? featuresToShow
-      : ['serum triglycerides level', 'bmi', 'blood pressure', 'age', 'sex']; // default array
-  }, [featuresToShow]);
+  // Mirror the default feature list used across other charts.
+  const effectiveFeaturesToShow = useMemo(
+    () => getEffectiveFeaturesToShow(featuresToShow),
+    [featuresToShow],
+  );
 
   const datasets = useMemo(() => {
     const indicesToKeep = d3
@@ -128,73 +142,15 @@ export default function Heatmap({
     numRows > 0 ? (plotHeight - (numRows - 1) * rowSpace) / numRows : 0;
   const rectWidth = numFeatures > 0 ? plotWidth / numFeatures : 0;
 
-  const truncatedLabels = useMemo(() => {
-    if (typeof document === 'undefined') {
-      return sortedLabels;
-    }
-
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return sortedLabels;
-
-    ctx.font = `${labelFontSizePx}px sans-serif`;
-    return sortedLabels.map((label) => {
-      let truncated = label;
-      while (
-        ctx.measureText(truncated).width > maxLabelWidth &&
-        truncated.length > 1
-      ) {
-        truncated = truncated.slice(0, -1);
-      }
-
-      if (truncated !== label) {
-        while (
-          ctx.measureText(truncated + '...').width > maxLabelWidth &&
-          truncated.length > 1
-        ) {
-          truncated = truncated.slice(0, -1);
-        }
-        truncated += '...';
-      }
-      return truncated;
-    });
-  }, [sortedLabels]);
+  const truncatedLabels = useMemo(
+    () => truncateLabels(sortedLabels, maxLabelWidth, labelFontSizePx),
+    [sortedLabels, maxLabelWidth, labelFontSizePx],
+  );
 
   const truncatedSelectedLabels = useMemo(() => {
-    if (typeof document === 'undefined') {
-      return featuresToHighlight;
-    }
-
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return sortedLabels;
-
-    ctx.font = `${labelFontSizePx}px sans-serif`;
-    if (!featuresToHighlight || featuresToHighlight.length === 0) {
-      return [];
-    }
-
-    return featuresToHighlight.map((label) => {
-      let truncated = label;
-      while (
-        ctx.measureText(truncated).width > maxLabelWidth &&
-        truncated.length > 1
-      ) {
-        truncated = truncated.slice(0, -1);
-      }
-
-      if (truncated !== label) {
-        while (
-          ctx.measureText(truncated + '...').width > maxLabelWidth &&
-          truncated.length > 1
-        ) {
-          truncated = truncated.slice(0, -1);
-        }
-        truncated += '...';
-      }
-      return truncated;
-    });
-  }, [featuresToHighlight]);
+    if (!featuresToHighlight || featuresToHighlight.length === 0) return [];
+    return truncateLabels(featuresToHighlight, maxLabelWidth, labelFontSizePx);
+  }, [featuresToHighlight, maxLabelWidth, labelFontSizePx]);
 
   const totalBarAreaHeight = numRows * rectHeight + (numRows - 1) * rowSpace;
   const textXOffset = left + plotWidth + 10;

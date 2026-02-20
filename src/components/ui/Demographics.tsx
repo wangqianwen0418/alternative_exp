@@ -11,7 +11,17 @@ import {
 import { useAtom } from 'jotai';
 
 import { uuidAtom } from 'app/atoms';
-import { WEBURL_ENDPOINT } from 'lib/config';
+import { postJson } from 'lib/utility/postJson';
+
+/**
+ * src/components/ui/Demographics
+ *
+ * Modal form that collects demographic information for the user study.
+ *
+ * Data is:
+ * - POSTed to the configured endpoint via `postJson`
+ * - returned to the parent via `onSubmit` for local UI flow control
+ */
 
 export interface DemographicsData {
   age: number;
@@ -88,18 +98,8 @@ export default function Demographics({ show, onSubmit }: DemographicsProps) {
       prolific_id: prolificID,
     };
 
-    try {
-      if (!WEBURL_ENDPOINT) return;
-
-      await fetch(WEBURL_ENDPOINT, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-    } catch (error) {
-      console.error('Error submitting demographics data: ', error);
-    }
+    // Persist demographics to the configured endpoint (no-op if endpoint is unset).
+    await postJson(payload, { silent: true });
 
     onSubmit(demographicsData);
   };

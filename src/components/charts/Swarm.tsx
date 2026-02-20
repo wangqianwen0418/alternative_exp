@@ -6,6 +6,20 @@ import { uuidAtom } from 'app/atoms';
 import { useLogging } from 'lib/utility/logging';
 import type { TAnnotation } from 'lib/types';
 import { seededShuffle } from 'research/questions/questionBalance';
+import {
+  getEffectiveFeaturesToShow,
+  getFilteredIndices,
+} from 'components/charts/featureUtils';
+
+/**
+ * src/components/charts/Swarm
+ *
+ * Swarm/strip plot for per-instance SHAP values.
+ *
+ * Notes:
+ * - Feature filtering uses `featureUtils` for consistent defaults.
+ * - Brush interactions update `selectedIndices` to coordinate with other views.
+ */
 
 interface SwarmProps {
   xValues: number[][];
@@ -23,7 +37,6 @@ interface SwarmProps {
 
 export default function Swarm(props: SwarmProps) {
   const [uuid] = useAtom(uuidAtom);
-  const [, setLocalSelectedIndices] = useState<number[]>([]);
   const {
     xValues,
     colorValues,
@@ -48,20 +61,15 @@ export default function Swarm(props: SwarmProps) {
     return null;
   }, []);
 
-  const effectiveFeaturesToShow = useMemo(() => {
-    return featuresToShow && featuresToShow.length > 0
-      ? featuresToShow
-      : ['serum triglycerides level', 'bmi', 'blood pressure', 'age', 'sex'];
-  }, [featuresToShow]);
+  const effectiveFeaturesToShow = useMemo(
+    () => getEffectiveFeaturesToShow(featuresToShow),
+    [featuresToShow],
+  );
 
-  const filteredIndices = useMemo(() => {
-    return labels.reduce((acc: number[], name, idx) => {
-      if (effectiveFeaturesToShow.includes(name)) {
-        acc.push(idx);
-      }
-      return acc;
-    }, []);
-  }, [labels, effectiveFeaturesToShow]);
+  const filteredIndices = useMemo(
+    () => getFilteredIndices(labels, effectiveFeaturesToShow),
+    [labels, effectiveFeaturesToShow],
+  );
 
   const truncatedLabels = useMemo(() => {
     if (!canvasContext) {
@@ -105,13 +113,7 @@ export default function Swarm(props: SwarmProps) {
       }
       return truncatedLabel;
     });
-  }, [
-    labels,
-    canvasContext,
-    labelFontSize,
-    maxLabelWidth,
-    featuresToHighlight,
-  ]);
+  }, [canvasContext, labelFontSize, maxLabelWidth, featuresToHighlight]);
 
   const leftTitleMargin = maxLabelWidth + 10;
   const margin = useMemo(
@@ -120,9 +122,7 @@ export default function Swarm(props: SwarmProps) {
   );
 
   const log = useLogging();
-
-  const baseRadius = 3;
-  const radius = useMemo(() => Math.max(1.5, baseRadius), [baseRadius]);
+  const radius = 3;
 
   const [tooltip, setTooltip] = useState<{
     x: number;
@@ -454,7 +454,6 @@ export default function Swarm(props: SwarmProps) {
               const selection = event.selection;
               if (!selection) {
                 setSelectedIndices([]);
-                setLocalSelectedIndices([]);
                 d3.selectAll(`g.swarm#${id} .points circle`).attr('opacity', 1);
                 setDatasetStats(null);
                 return;
@@ -470,7 +469,6 @@ export default function Swarm(props: SwarmProps) {
                 }
               });
               setSelectedIndices(brushedIndices);
-              setLocalSelectedIndices(brushedIndices);
               const min = d3.min(brushedValues) ?? 0;
               const max = d3.max(brushedValues) ?? 0;
               const avg = d3.mean(brushedValues) ?? 0;
@@ -517,6 +515,8 @@ export default function Swarm(props: SwarmProps) {
     totalPlotHeight,
     numDatasets,
     annotation,
+    id,
+    log,
   ]);
 
   // Update point opacity based solely on selectedIndices.

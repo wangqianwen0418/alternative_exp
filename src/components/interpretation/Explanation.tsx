@@ -43,6 +43,16 @@ import { QuestionList } from 'research/questions/questionList';
 
 import shap_diabetes from 'data//shap_diabetes.json';
 
+/**
+ * src/components/interpretation/Explanation
+ *
+ * Main visualization panel.
+ *
+ * Renders the primary chart (and, when applicable, the second chart) for the
+ * current case/question. Handles shared selection state and logs key
+ * interactions for the user study.
+ */
+
 export default function Explanation() {
   const [isSubmitted] = useAtom(isSubmittedAtom);
   const [insight] = useAtom(insightAtom);

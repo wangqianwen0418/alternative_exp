@@ -8,6 +8,15 @@ import { useUUID } from 'lib/utility/useUUID';
 import App from './App';
 import { questionIndexAtom, questionOrderAtom } from './atoms';
 
+/**
+ * src/app/Questions
+ *
+ * Gatekeeper component that:
+ * - Ensures the UUID is initialized (via `useUUID()`).
+ * - Restores the saved question index from cookies.
+ * - Renders the current question by passing the correct props into `App`.
+ */
+
 export default function Questions() {
   // Ensure UUID exists before we derive question ordering.
   const uuid = useUUID();

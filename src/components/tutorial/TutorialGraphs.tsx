@@ -17,6 +17,16 @@ import {
   diabetes_bmi_shapValues,
 } from 'lib/diabetesData';
 
+/**
+ * src/components/tutorial/TutorialGraphs
+ *
+ * Small wrapper components that render each chart with fixed, tutorial-friendly
+ * parameters.
+ *
+ * Keeping these separate prevents the main chart components from accumulating
+ * tutorial-specific conditionals.
+ */
+
 export function SwarmTutorialGraph() {
   const [selectedIndices, setSelectedIndices] = React.useState<number[]>([]);
 

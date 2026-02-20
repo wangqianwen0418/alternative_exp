@@ -2,6 +2,15 @@ import React, { useState } from 'react';
 import { Popover, Paper, IconButton } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 
+/**
+ * src/components/ui/DefinableWord
+ *
+ * Inline term with a hover/click popover definition.
+ *
+ * Used throughout tutorial text to introduce study terminology without
+ * cluttering the main narrative.
+ */
+
 interface DefinableWordProps {
   word: string;
   definition: string;

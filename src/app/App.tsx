@@ -47,6 +47,17 @@ import {
 
 import './styles/App.css';
 
+/**
+ * src/app/App
+ *
+ * Top-level application shell.
+ *
+ * Responsibilities:
+ * - Initializes per-session UUID and user-study state.
+ * - Renders the primary layout (tutorial + interpretation + charts + response UI).
+ * - Emits high-level analytics/logging events for study instrumentation.
+ */
+
 function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
   const [open, setOpen] = useState(false);
 
@@ -63,8 +74,6 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
 
   const [questionIndex] = useAtom(questionIndexAtom);
   const [questionIndexesArray] = useAtom(questionOrderAtom);
-
-  const [, setDemographics] = useState<any>(null);
   const [showDemographics, setShowDemographics] = useState(false);
 
   const log = useLogging();
@@ -226,7 +235,6 @@ function App(appProps: (TCase | TQuestion) & { questionIndex: number }) {
         <Demographics
           show={showDemographics}
           onSubmit={(data) => {
-            setDemographics(data);
             setShowDemographics(false);
             setCookieBoolean('demographicsSubmitted', true);
           }}

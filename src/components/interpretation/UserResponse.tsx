@@ -16,7 +16,6 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import Cookies from 'js-cookie';
 import { useAtom } from 'jotai';
 
 import {
@@ -34,10 +33,31 @@ import {
   tutorialAtom,
   uuidAtom,
 } from 'app/atoms';
-import { WEBURL_ENDPOINT } from 'lib/config';
+import {
+  getCookieBoolean,
+  removeCookie,
+  setCookieBoolean,
+  setCookieNumber,
+} from 'lib/utility/cookies';
 import { useLogging } from 'lib/utility/logging';
+import { postJson } from 'lib/utility/postJson';
 import type { TGraph } from 'lib/types';
 import { QuestionList } from 'research/questions/questionList';
+
+/**
+ * src/components/interpretation/UserResponse
+ *
+ * Study response form.
+ *
+ * Collects:
+ * - binary correctness judgment (TRUE/FALSE)
+ * - confidence
+ * - free-text explanation
+ * - end-of-study feedback
+ *
+ * Responses are persisted via `postJson` and key steps are logged via
+ * `useLogging()`.
+ */
 
 const confidenceOptions = [
   { value: '', label: 'Please select' },
@@ -86,11 +106,10 @@ export default function UserResponse() {
   const log = useLogging();
 
   useEffect(() => {
-    const savedIsSecondPart = Cookies.get('isSecondPart');
+    const savedIsSecondPart = getCookieBoolean('isSecondPart');
     if (savedIsSecondPart !== undefined) {
-      const second = savedIsSecondPart === 'true';
-      setIsSecondPart(second);
-      setIsSubmitted(second);
+      setIsSecondPart(savedIsSecondPart);
+      setIsSubmitted(savedIsSecondPart);
     }
   }, [setIsSubmitted]);
 
@@ -115,8 +134,8 @@ export default function UserResponse() {
 
     setQuestionIndex((prevIndex) => {
       const newIndex = prevIndex + 1;
-      Cookies.set('questionIndex', String(newIndex));
-      Cookies.set('isSecondPart', 'false');
+      setCookieNumber('questionIndex', newIndex);
+      setCookieBoolean('isSecondPart', false);
       return newIndex;
     });
   };
@@ -137,20 +156,8 @@ export default function UserResponse() {
       ground_truth: QuestionList[currentQuestionIndex].groundTruth,
     };
 
-    try {
-      if (!WEBURL_ENDPOINT) return;
-
-      await fetch(WEBURL_ENDPOINT, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-    } catch (error) {
-      console.error('Error submitting form:', error);
-    }
+    // Persist the response to the configured endpoint (no-op if endpoint is unset).
+    await postJson(data, { silent: true });
 
     if (isSecondPart && isUserStudy) {
       log(
@@ -181,7 +188,7 @@ export default function UserResponse() {
       setIsSubmitted(true);
       setUserExplanation('');
       setSelectedIndices([]);
-      Cookies.set('isSecondPart', 'true');
+      setCookieBoolean('isSecondPart', true);
     }
   };
 
@@ -195,20 +202,8 @@ export default function UserResponse() {
       difficult_graphs: difficultGraphs,
     };
 
-    try {
-      if (!WEBURL_ENDPOINT) return;
-
-      await fetch(WEBURL_ENDPOINT, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(feedbackData),
-      });
-    } catch (error) {
-      console.error('Error submitting feedback:', error);
-    }
+    // Persist the feedback to the configured endpoint (no-op if endpoint is unset).
+    await postJson(feedbackData, { silent: true });
 
     // Optionally, you can reset the feedback fields or close the modal
     setModalVisible(false);
@@ -228,7 +223,7 @@ export default function UserResponse() {
       setIsSecondPart(true);
       setIsSubmitted(true);
       setSelectedIndices([]);
-      Cookies.set('isSecondPart', 'true');
+      setCookieBoolean('isSecondPart', true);
     }
   };
 
@@ -362,8 +357,8 @@ export default function UserResponse() {
             variant="outlined"
             sx={{ ml: 2 }}
             onClick={() => {
-              Cookies.remove('questionIndex');
-              Cookies.remove('isSecondPart');
+              removeCookie('questionIndex');
+              removeCookie('isSecondPart');
               setQuestionIndex(0); // Reset to first question
               setIsSecondPart(false); // Reset to Part A
               setIsSubmitted(false);
@@ -376,9 +371,9 @@ export default function UserResponse() {
             variant="outlined"
             sx={{ ml: 2 }}
             onClick={() => {
-              Cookies.remove('questionIndex');
-              Cookies.remove('isSecondPart');
-              Cookies.remove('uuid');
+              removeCookie('questionIndex');
+              removeCookie('isSecondPart');
+              removeCookie('uuid');
               setQuestionIndex(0); // Reset to first question
               setIsSecondPart(false); // Reset to Part A
               setIsSubmitted(false);

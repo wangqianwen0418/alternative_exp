@@ -1,8 +1,24 @@
 import * as d3 from 'd3';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  appendAxis,
+  appendAxisTitle,
+  clearGroups,
+} from 'components/charts/d3Utils';
+import { useEffect, useRef, useState, useMemo } from 'react';
 
 import { useLogging } from 'lib/utility/logging';
 import type { TAnnotation } from 'lib/types';
+
+/**
+ * src/components/charts/TwoColorScatter
+ *
+ * Two-group scatterplot used to compare distributions across a binary group.
+ *
+ * Helper utilities in `d3Utils` are used to keep axis setup consistent and
+ * reduce repeated D3 boilerplate.
+ */
+
+const MARGIN = [22.5, 10, 40, 52.5] as const;
 
 interface TwoColorScatterProps {
   xValues: number[];
@@ -31,14 +47,16 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
     annotation,
   } = props;
 
+  const margin = MARGIN;
+
   const annotationArray: Array<[number, number]> | undefined =
     annotation?.type === 'twoColorRange' ? annotation.range : undefined;
-
-  const margin = useMemo(() => [22.5, 10, 40, 52.5] as const, []);
   const labelFontSize = 13;
 
   const chartLeft = margin[3];
   const chartRight = width - margin[1] - 90;
+  const chartTop = margin[0];
+  const chartBottom = height - margin[2];
 
   const xScale = useMemo(() => {
     return d3
@@ -128,40 +146,33 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
   }, [annotationArray, legendHeight, legendScale, log]);
 
   useEffect(() => {
-    const container = d3.select(`g.twoColorScatter#${id}`);
-    container.selectAll('g.x-axis').remove();
-    container.selectAll('g.y-axis').remove();
+    const container = d3.select(`g.twoColorScatter#${id}`) as any;
+    clearGroups(container, ['g.x-axis', 'g.y-axis']);
 
-    const xAxisGroup = container
-      .append('g')
-      .attr('class', 'x-axis')
-      .attr('transform', `translate(-10,${height - margin[2]})`);
-    xAxisGroup.call(d3.axisBottom(xScale));
-    xAxisGroup
-      .append('text')
-      .attr('text-anchor', 'middle')
-      .attr('class', 'axis-title')
-      .attr('x', (chartLeft + chartRight) / 2)
-      .attr('y', 30)
-      .attr('fill', 'black')
-      .attr('font-size', labelFontSize)
-      .text(xLabel);
+    const xAxisGroup = appendAxis(
+      container,
+      'x-axis',
+      `translate(-10, ${height - margin[2]})`,
+      d3.axisBottom(xScale),
+    );
+    appendAxisTitle(xAxisGroup, xLabel, {
+      x: (chartLeft + chartRight) / 2,
+      y: 30,
+      'font-size': labelFontSize,
+    });
 
-    const yAxisGroup = container
-      .append('g')
-      .attr('class', 'y-axis')
-      .attr('transform', `translate(${margin[3] - 10},0)`);
-    yAxisGroup.call(d3.axisLeft(yScale));
-    yAxisGroup
-      .append('text')
-      .attr('text-anchor', 'middle')
-      .attr('class', 'axis-title')
-      .attr('transform', 'rotate(-90)')
-      .attr('x', -((height - margin[2] + margin[0]) / 2))
-      .attr('y', -27.5)
-      .attr('fill', 'black')
-      .attr('font-size', labelFontSize)
-      .text(yLabel);
+    const yAxisGroup = appendAxis(
+      container,
+      'y-axis',
+      `translate(${chartLeft}, 0)`,
+      d3.axisLeft(yScale),
+    );
+    appendAxisTitle(yAxisGroup, yLabel, {
+      transform: 'rotate(-90)',
+      x: -((chartTop + chartBottom) / 2),
+      y: -40,
+      'font-size': labelFontSize,
+    });
   }, [
     xScale,
     yScale,
@@ -171,6 +182,8 @@ export default function TwoColorScatter(props: TwoColorScatterProps) {
     margin,
     chartLeft,
     chartRight,
+    chartTop,
+    chartBottom,
     labelFontSize,
     id,
   ]);

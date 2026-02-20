@@ -33,6 +33,16 @@ import { GenerateTextTemplates } from 'lib/utility/parseTemplate';
 
 import 'app/styles/Interpretation.css';
 
+/**
+ * src/components/interpretation/Interpretation
+ *
+ * Text interpretation editor/renderer.
+ *
+ * In free exploration mode, users can request an interpretation from the LLM.
+ * In study mode, the interpretation is pre-seeded from the question list.
+ * The final text is rendered using `GenerateTextTemplates`.
+ */
+
 export default function Interpretation() {
   const [isSubmitted, setIsSubmitted] = useAtom(isSubmittedAtom);
   const [freeText, setFreeText] = useAtom(freeTextAtom);
