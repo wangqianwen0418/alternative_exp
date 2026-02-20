@@ -76,11 +76,10 @@ src/
 
 For research inquiries or collaboration:
 
-| Name           | Affiliation                         | Email                  |
-| -------------- | ----------------------------------- | ---------------------- |
-| Nicholas Hinds | University of Minnesota             | hinds084@umn.edu       |
-| Zhanna Kaufman | University of Massachusetts Amherst | zhannakaufma@umass.edu |
-| Qianwen Wang   | University of Minnesota             | qianwen@umn.edu        |
+| Name           | Affiliation             | Email            |
+| -------------- | ----------------------- | ---------------- |
+| Nicholas Hinds | University of Minnesota | hinds084@umn.edu |
+| Qianwen Wang   | University of Minnesota | qianwen@umn.edu  |
 
 ## How to Cite
 
