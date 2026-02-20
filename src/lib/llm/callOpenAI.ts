@@ -4,12 +4,11 @@ import { OPENAI_MODEL } from 'lib/config';
 /**
  * lib/llm/callOpenAI
  *
- * Calls the OpenAI Chat Completions endpoint and requests a JSON-only response.
+ * Calls the OpenAI Responses API and requests a JSON-only response.
  *
- * Returns the raw JSON string content and the finish reason so callers can
+ * Returns the raw JSON string content and a status indicator so callers can
  * decide whether to parse/retry.
  */
-
 export async function callOpenAIJson({
   apiKey,
   systemPrompt,
@@ -25,18 +24,37 @@ export async function callOpenAIJson({
     apiKey,
     dangerouslyAllowBrowser: true,
   });
-  const chatCompletion = await openai.chat.completions.create({
+
+  const jsonGuard =
+    'This is a reminder to return only valid JSON (a single JSON object). Do not include markdown, code fences, extra text, etc.';
+
+  const inputText = userText.toLowerCase().includes('json')
+    ? userText
+    : `${userText}\n\n(${jsonGuard})`;
+
+  const response = await openai.responses.create({
     model: OPENAI_MODEL,
-    response_format: { type: 'json_object' },
-    max_tokens: maxTokens,
-    messages: [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userText },
+    instructions: systemPrompt,
+    input: [
+      {
+        role: 'user',
+        content: [{ type: 'input_text', text: inputText }],
+      },
     ],
+    text: {
+      format: { type: 'json_object' },
+    },
+    max_output_tokens: maxTokens,
   });
 
-  return {
-    content: chatCompletion.choices[0].message.content ?? '',
-    finishReason: chatCompletion.choices[0].finish_reason ?? null,
-  };
+  const content = (response.output_text ?? '').trim();
+
+  const finishReason =
+    response.status === 'completed'
+      ? 'stop'
+      : response.status === 'incomplete'
+        ? 'length'
+        : null;
+
+  return { content, finishReason };
 }

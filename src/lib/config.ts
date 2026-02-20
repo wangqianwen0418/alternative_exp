@@ -22,4 +22,4 @@ export const WEBURL_ENDPOINT = isProd
 
 // OpenAI config
 export const OPENAI_API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
-export const OPENAI_MODEL = process.env.REACT_APP_OPENAI_MODEL ?? 'gpt-4o-mini';
+export const OPENAI_MODEL = process.env.REACT_APP_OPENAI_MODEL;

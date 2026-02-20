@@ -24,240 +24,313 @@ import { parseInsightFromLLMJson } from './parseInsight';
  * - and a suggested visualization configuration.
  */
 export const generatePrompt = (feature_names: string[]) => `
-You are a bot that extracts structured content from User Interpretations (“insight”) of graphs related to how a machine learning system treats certain features. You will output a JSON object with specific information. 
+You are an information extraction assistant for an Explainable AI (XAI) visualization tool.
 
-First, ensure that all features mentioned in the insight are in this list: ${feature_names.join(
-  ', ',
-)}. If a feature is not in the list, set Variables to ["ERROR"]. Abbreviations (like "BMI" for "Body Mass Index") are fine, but any ouput you provide should match the names in the list exactly.
+The user will type a free-form interpretation ("insight") about how a model treats features.
+Your job: convert that text into a SINGLE JSON object that matches the schema below.
 
-Next, determine the Category of the insight based on these descriptions: 
+CRITICAL OUTPUT RULES
+- Output ONLY valid JSON (one JSON object). No markdown, no code fences, no extra text.
+- Think step-by-step privately to reach the answer, but DO NOT output your reasoning.
+- If you cannot confidently fit the input into the allowed insight types, output Type="ERROR".
 
-    Category 1:
-    Attribution (DV) by Feature (IV), univariate. 
-    Possible Examples: The <feature> values contribute at least <constant> to the <attribution>, The average contribution of F_i to the prediction is larger than <constant>
+FEATURE LIST (ONLY THESE ARE ALLOWED)
+- Any featureName you output MUST match EXACTLY one of these strings:
+${feature_names.join(', ')}
 
-    Category 2:
-    Bivariate comparison (Feature1, Feature2):
-    Possible Examples: 
-    Feature1 contributes more to the prediction than Feature2
-    Feature1 influences more instances positively than Feature2
+- You may understand common abbreviations (e.g., "BMI"), but the JSON must use the exact feature string from the list.
+- If the user mentions a feature that is NOT in the list (and you cannot map it confidently to a listed feature),
+  then return the ERROR object described in the "Error Handling" section.
 
-    Category 3:
-    Attribution [DV1] by Feature Value [IV1] 
-    Possible Examples:
-    There is a positive correlation between the contribution of Feature1 to predictions and the Feature1 values
+============================================================
+1) REQUIRED JSON SCHEMA (keys and enums must match exactly)
+============================================================
 
+Top-level keys you MUST output:
 
-    Category 4:
-    Multivariate Attribution by Feature Values
-    Possible Examples:
-    The correlation between the Feature1 Values and Feature1 is stronger/weaker when Feature2 is in range A compared to range B.
-
-The first value in the JSON file you provide will be the category that the given insight belongs to (1,2,3,4). This will determine how we parse the rest of the insight going forward. 
-
-Once the category is determined, the JSON should contain: 
-Variables: An array of variables with the format: 
 {
-  featureName: string,
-  transform: "average" | "deviation of" | "" | undefined
-  type: "value of" | "contribution to the prediction of" | "number of instances <restriction> for" 
-}
+  "Category": 1 | 2 | 3 | 4,               // kept for backward compatibility
+  "Type": "read" | "comparison" | "correlation" | "featureInteraction" | "ERROR",
 
-Note: For the "number of instances of <restriction> of", there would be a restriction that you should include in the value. for example, you might suggest "number of instances above 5 of" or "number of instances below 3 of". 
-For Category 2, you may have "number of instances <condition> for" -- for example, for the input prompt "age has more instances above 3 than s2", type would be "number of instances above 3 for".
-Note: if the type is "number of instances", there is no additional transformation (average, etc) that is provided.
+  "Variables": [ TVariable, ... ],         // see TVariable below
+  "Numbers": number[],                     // constants from the CORE claim only (not from Condition ranges)
 
-If "correlation" (category 3) involves both value and contribution of the same feature, include both in the array. 
-For example: "There is correlation between the contribution of bp to predictions and the bp values"
-In this case, there are two variables: contribution of BP and BP values. 
-
-Numbers: Any constants in the core part of the insight statement should be included in an array. If none, leave it empty.  It is important to note that this only applies to numbers that are part of the main insight statement - if there are numbers in a condition/restriction (described below), those should not go in this array. 
-
-Type - this will match the category. Options are “read”, “comparison”, “correlation”, or “featureInteraction”) for categories 1-4 respectively.
-Relationship: Based on the category
-Category 1 (“read”): options are “greater than”, “less than”, “equal to”
-Category 2 (“comparison”): options are “greater than”, “less than”, “equal to”
-Category 3 (“correlation”): options are “positively correlated”, “negatively correlated”, or "not correlated"
-Category 4 (“featureInteraction”): options are “same” or “different”
-
-Condition: refers to restrictions on variable values. 
-Example: “BMI is the most important feature in predicting diabetes risk when the value is above 25”
-Condition: {
-	featureName: “BMI”,
-	range: [25, infinity]
-}
-If no condition, this will be an empty object.
-For Category 4, there will be TWO ranges in the condition. 
-Example: "The correlation between bmi and its feature values is stronger when the feature value for age is in the range 0.05 to 0.1 compared to -0.01 to 0"
-
-Then condition would look like this:
-Condition: {
-  featureName: "age",
-  range: [[0.05, 0.1], [-0.01, 0]]
-}
-
-
-GraphType: This will have four options: "Swarm", "Scatter", "Bar", "Heatmap". 
-Here are the situations in which each one is most optimal:
-Swarm: for comparisons of distributions, instances, or multiple features. Shows individual data points of multiple features, side-by-side. 
-Scatter: for correlations.
-Bar: For average values
-Heatmap (note: shows how each feature contributes to the output for individual samples):
-When you want to see how different features impact the prediction for individual instances 
-
-XValues and YValues: This depends on the GraphType
-Scatter: XValues and YValues both indicate what data to display on the graph for this insight. Use the following format: "<FeatureName> <Feature/SHAP (Contribution)> values". For example, your XValues can be "BMI Feature Values" and your YValues can be "BMI SHAP (Contribution) Values" 
-Swarm, Bar and Heatmap: Set both to "None".
-FeaturesToHighlight: A string array ["Feature 1", "Feature 2",...] of the names of the features to highlight/emphasize in the graph. This should be be populated for Bar, Swarm, and Heatmap Plots - otherwise, the value will be "None". Whenever you provide a feature name, make sure it is provided the same way it was in the feature list above.
-FeaturesToShow: A string array ["Feature 1", "Feature 2",...] of the names of all the features provided above, in addition to a few more of your choosing (aim for 3-5 features per graph). This should be populated for Bar, Swarm, and Heatmap plots. All the features in FeaturesToHighlight must also be provided here.
-
-
-Annotation is the next value in the JSON. Here are the options for Annotation:
-type TAnnotation =
-  | { type: "highlightDataPoints"; dataPoints: number[]; label?: string } // An array of data points to highlight
-  | {
-      type: "highlightRange";
-      xRange?: [number, number];
-      yRange?: [number, number];
-      label?: string, feature?: string;
-    } // A range along X axis
-  | { type: "singleLine"; xValue?: number; yValue?: number; label?: string } // A vertical line at a specific X/Y value
-
-The optimal annotation to use will be based on constants/conditions included in the insight statement.
-
-
-Lines are more useful when we are comparing against a single value, HighlightRange is more useful when we want to highlight data points within a range (so it will not be used for Bar Graphs), and HighlightDataPoints is useful when examining a condition that does not fit neatly into a range. 
-For Heatmaps, there will be no annotations, so if the GraphType is Heatmap then Annotation will be an empty JSON object ({}).
-For Barplots, the only annotations that are allowed are vertical lines (so make sure to provide an xValue). 
-For Swarms, there can be no range or line in the Y direction, only in the X direction.
-
-For example, suppose the user input statement was "The average contribution of the bmi to the prediction is larger than 20". Since we are looking at the average contribution of each feature, the GraphType value would be "Bar".
-Then, XValues and YValues would both be "None". FeaturesToHighlight would be ["bmi"], and FeaturesToShow could be ["bmi", "blood sugar level", "serum triglycerides level"]. Annotation would look like this:
-{
-	type: "singleLine",
-	xValue: 20
-}
-Here's another example: 
-
-Suppose the user input statement was "bmi has more instances above 5 than sex". Since we are looking at individual data points (and comparing features), the GraphType value would be "Swarm".
-In this case, the XValues field should be "BMI", and the YValues field would just be "BMI". FeaturesToHighlight would be ["bmi", "sex"] and FeaturesToShow could be ["bmi", "sex", "age", low-density lipoproteins"].  Since we want to see the data points that satisfy this criteria, Annotation would be 
-{
-	type: "highlightRange",
-	xRange: [5,100]
-}
-
-One last example: Suppose the user input statement was "There is a negative correlation between the contribution of age to predictions and the age values when the feature value is between -0.10 and 0.00". 
-In this case, since we are looking at correlation, GraphType would be "Scatter". Then the XValues field would be "Age Feature Values" and the YValues field would be "Age SHAP (Contribution) values".  Since it is a scatter plot, Features would be "None". Then annotation would be
-{
-	type: "highlightRange",
-	xRange: [-0.1, 0]
-}
-
-
-Here's an example of the full JSON:
-Suppose that the user input statement was “BMI is more important than age for predicting diabetes progression.” 
-In this case, since we are looking at a bivariate comparison between features, this would belong to Category 2.
-
-There are two variables: BMI and Age. Even though it is not specified, it is clear that this statement is referring to these on “average”. We want contributions rather than feature values, so variable type for both of these would be “contribution to the prediction of”.
- 
-Variables: [
-        {
-          featureName: "bmi",
-          transform: "average",
-          type: "contribution to the value of",
-        },
-        {
-          featureName: "age",
-          transform: "average",
-          type: "contribution to the value of",
-        },
-      ]
-Numbers: []
-Type: Comparison
-Relationship: “greater than”. 
-Condition: {}
-GraphType: "Bar" - since we are comparing the average values of two different features.
-XValues would be "None".
-YValues would be "None".
-FeaturesToHighlight would be ["bmi", "age"]
-FeaturesToShow would be ["bmi", "age", "sex", "blood sugar level"],
-Annotation would be empty: {}
-
-Here is another full example:
-Suppose the user input statement was "There is a positive correlation between the contribution of bmi to predictions and the bmi values when the feature value is between 0.05 and 0.10".
-The final JSON would look like this:
-Category: 3
-Variables: [
-  {
-    featureName: "bmi",
-    transform: undefined,
-    type: "value of",
+  "Relationship": string,                  // enum depends on Type (see section 3)
+  "Condition": null | {
+    "featureName": string,
+    "range": [number, number] | [ [number, number], [number, number] ]
   },
-  {
-    featureName: "bmi",
-    transform: undefined,
-    type: "contribution to the value of",
-  },
-]
-Numbers: []
-Type: "correlation" 
-Relationship: "positively"
-Condition: {
-  featureName: "bmi",
-  range: [0.05, 0.10]
+
+  "GraphType": "SWARM" | "SCATTER" | "BAR" | "HEATMAP" | "TWO-SCATTER",
+  "XValues": string,
+  "YValues": string,
+  "FeaturesToHighlight": "None" | string[],
+  "FeaturesToShow": "None" | string[],
+  "Annotation": {} | {
+    "type": "highlightDataPoints",
+    "dataPoints": number[],
+    "label"?: string
+  } | {
+    "type": "highlightRange",
+    "xRange"?: [number, number],
+    "yRange"?: [number, number],
+    "label"?: string,
+    "feature"?: string
+  } | {
+    "type": "singleLine",
+    "xValue"?: number,
+    "yValue"?: number,
+    "label"?: string
+  } | {
+    "type": "twoColorRange",
+    "range": [ [number, number], [number, number] ],
+    "label"?: string
+  }
 }
-GraphType: "Scatter",
-XValues: "BMI Feature values",
-YValues: "BMI SHAP (Contribution) values",
-Features: "None",
-Annotation: {
-	type: "highlightRange",
-	xRange: [0.01, 0.1]
+
+TVariable (each entry in Variables):
+{
+  "featureName": string,                          // must be in FEATURE LIST
+  "transform": "average" | "deviation of" | "" | null,
+  "type": "value of"
+        | "contribution to the prediction of"
+        | "number of instances <restriction> of"
+        | ""
 }
 
-One thing that is important to note: Sometimes, constants (numbers) are implicitly present in the statement even if they are not explicitly stated. For example, in the sentence "bmi always contributes positively for predicting diabetes progression", the implied number is 0, since the sentence can be rewritten as "the contribution of bmi is always greater than 0".
-In these cases, make sure you include the implied constant in the numbers array.
+NOTES:
+- Use null for transform when unknown; do NOT invent transforms unless implied (e.g., "on average" => "average").
+- For "number of instances ...", embed the restriction inside the string, e.g.:
+  "number of instances above 0 of" or "number of instances below -1 of"
 
-There might be an implied number that is not 0 or infinity. If it helps, feel free to use the number table below for the average/median SHAP values of each feature: 
+============================================================
+2) INSIGHT TYPES (how to classify into Category + Type)
+============================================================
 
-age:
-  Average SHAP Value: -0.30
-  Median SHAP Value: -0.43
-sex:
-  Average SHAP Value: 0.00
-  Median SHAP Value: 0.69
-bmi:
-  Average SHAP Value: 0.59
-  Median SHAP Value: -16.36
-blood pressure:
-  Average SHAP Value: -0.04
-  Median SHAP Value: -2.60
-serum cholesterol:
-  Average SHAP Value: 0.62
-  Median SHAP Value: 0.49
-low-density lipoproteins:
-  Average SHAP Value: 0.40
-  Median SHAP Value: 0.12
-high-density lipoproteins:
-  Average SHAP Value: 0.32
-  Median SHAP Value: 1.36
-total/HDL cholesterol ratio:
-  Average SHAP Value: -0.26
-  Median SHAP Value: -0.82
-serum triglycerides level:
-  Average SHAP Value: 0.34
-  Median SHAP Value: -8.19
-blood sugar level:
-  Average SHAP Value: -0.17
-  Median SHAP Value: -1.27
-total average SHAP value (across ALL features): 0.15
+Category 1 => Type="read"
+- A single feature's attribution/value/instance-count compared to a constant.
+- Variables must be [one TVariable] and Numbers must contain exactly one constant.
+- Example meaning: "BMI attribution is greater than 0" or "average attribution of age is less than -0.2"
 
-For example, if someone was to provide a statement along the lines of "serum triglycerides has a higher than average contribution to the prediction", 
-this could get parsed as "the average contribution to the prediction of serum triglycerides level is greater than [average SHAP value for ALL features = 0.15]". 
+Category 2 => Type="comparison"
+- Compare two variables (often two features' attributions, or two instance-counts).
+- Variables must be [two TVariable]. Numbers is usually empty.
 
-Similarly, if a sentence is referring to the average/median SHAP value for a particular feature, insert the value from this table.
+Category 3 => Type="correlation"
+- Relationship between two variables (often feature value vs its attribution).
+- Variables must be [two TVariable]. Numbers usually empty.
 
-The final note: If you can't figure out any of these values (you can't fit the sentence the user inputs to any of these statement types meaningfully), then set the "type" field to ERROR.
+Category 4 => Type="featureInteraction"
+- Claim about how a relationship changes under two different ranges of a conditioning feature.
+- Variables must be [two TVariable] describing the relationship being compared.
+- Condition must contain TWO ranges: [ [a,b], [c,d] ] for the same conditioning feature.
+
+============================================================
+3) RELATIONSHIP ENUMS (must match Type)
+============================================================
+
+If Type="read" or "comparison":
+- Relationship must be exactly one of:
+  "greater than" | "less than" | "equal to"
+
+If Type="correlation":
+- Relationship must be exactly one of:
+  "positively correlated" | "negatively correlated" | "not correlated"
+
+If Type="featureInteraction":
+- Relationship must be exactly one of:
+  "same" | "different"
+
+============================================================
+4) CONDITIONS (range restrictions)
+============================================================
+
+- If the user includes a range restriction like "when age is between 30 and 50",
+  set Condition to:
+  { "featureName": "<age feature name>", "range": [30, 50] }
+
+- If there is NO condition, set:
+  "Condition": null
+
+- For Type="featureInteraction", you MUST use two ranges:
+  "Condition": { "featureName": "<conditioning feature>", "range": [[a,b],[c,d]] }
+
+IMPORTANT:
+- Numbers that appear inside Condition ranges DO NOT go in "Numbers".
+
+============================================================
+5) GRAPH SELECTION RULES (choose the most interpretable view)
+============================================================
+
+GraphType choices:
+
+SCATTER:
+- Best for Type="correlation"
+- XValues should describe the x variable, YValues the y variable.
+- Recommended convention:
+  - If variable is "value of" => "<FeatureName> feature values"
+  - If variable is "contribution..." => "<FeatureName> contribution values"
+
+BAR:
+- Best for "average" comparisons/reads.
+- Use for Type="read" or "comparison" when transform="average" is central.
+- XValues="None", YValues="None"
+
+SWARM:
+- Best for distribution / instance-count comparisons across features.
+- XValues="None", YValues="None"
+
+HEATMAP:
+- Best when the user is describing per-instance patterns across many features.
+- XValues="None", YValues="None"
+- Annotation MUST be {}
+
+TWO-SCATTER:
+- Use only when the insight explicitly compares two relationships (rare).
+- Otherwise prefer SCATTER.
+
+For BAR/SWARM/HEATMAP:
+- FeaturesToHighlight: list the features directly referenced by the insight (exact names).
+- FeaturesToShow: include FeaturesToHighlight plus 2-4 additional relevant features (3-6 total).
+- For SCATTER: set both FeaturesToHighlight and FeaturesToShow to "None"
+
+============================================================
+6) ANNOTATION RULES
+============================================================
+
+- If GraphType="HEATMAP" => Annotation must be {}
+
+- If the claim compares against a single threshold constant (Type="read"):
+  prefer:
+  { "type": "singleLine", "xValue": <constant> }
+  (BAR graphs: only xValue lines are allowed)
+
+- If the claim focuses on a range (from Condition) and GraphType is SCATTER or SWARM:
+  prefer highlightRange with xRange and/or yRange as appropriate.
+
+- If you cannot specify a meaningful annotation confidently:
+  set Annotation to {}
+
+============================================================
+7) IMPLIED CONSTANTS (when user omits the number)
+============================================================
+
+If the user says something equivalent to:
+- "always positive" => use 0 with "greater than"
+- "always negative" => use 0 with "less than"
+
+Only do this when the implication is very clear.
+
+============================================================
+8) ERROR HANDLING (MUST FOLLOW EXACTLY)
+============================================================
+
+If you cannot confidently parse the statement, OR it references unknown features:
+
+Return EXACTLY this JSON (no extra keys):
+{
+  "Category": 0,
+  "Type": "ERROR",
+  "Variables": [],
+  "Numbers": [],
+  "Relationship": "",
+  "Condition": null,
+  "GraphType": "BAR",
+  "XValues": "None",
+  "YValues": "None",
+  "FeaturesToHighlight": "None",
+  "FeaturesToShow": "None",
+  "Annotation": {}
+}
+
+============================================================
+9) FEW-SHOT EXAMPLES (follow these patterns closely)
+============================================================
+
+Example A (READ w/ implied constant):
+User: "BMI always contributes positively."
+Output:
+{
+  "Category": 1,
+  "Type": "read",
+  "Variables": [
+    { "featureName": "<BMI exact name>", "transform": null, "type": "contribution to the prediction of" }
+  ],
+  "Numbers": [0],
+  "Relationship": "greater than",
+  "Condition": null,
+  "GraphType": "BAR",
+  "XValues": "None",
+  "YValues": "None",
+  "FeaturesToHighlight": ["<BMI exact name>"],
+  "FeaturesToShow": ["<BMI exact name>", "<another feature>", "<another feature>"],
+  "Annotation": { "type": "singleLine", "xValue": 0 }
+}
+
+Example B (COMPARISON average contributions):
+User: "On average, BMI contributes more than age."
+Output:
+{
+  "Category": 2,
+  "Type": "comparison",
+  "Variables": [
+    { "featureName": "<BMI exact name>", "transform": "average", "type": "contribution to the prediction of" },
+    { "featureName": "<age exact name>", "transform": "average", "type": "contribution to the prediction of" }
+  ],
+  "Numbers": [],
+  "Relationship": "greater than",
+  "Condition": null,
+  "GraphType": "BAR",
+  "XValues": "None",
+  "YValues": "None",
+  "FeaturesToHighlight": ["<BMI exact name>", "<age exact name>"],
+  "FeaturesToShow": ["<BMI exact name>", "<age exact name>", "<another feature>"],
+  "Annotation": {}
+}
+
+Example C (CORRELATION with condition):
+User: "There is a negative correlation between age values and age contribution when age is between 30 and 50."
+Output:
+{
+  "Category": 3,
+  "Type": "correlation",
+  "Variables": [
+    { "featureName": "<age exact name>", "transform": null, "type": "value of" },
+    { "featureName": "<age exact name>", "transform": null, "type": "contribution to the prediction of" }
+  ],
+  "Numbers": [],
+  "Relationship": "negatively correlated",
+  "Condition": { "featureName": "<age exact name>", "range": [30, 50] },
+  "GraphType": "SCATTER",
+  "XValues": "<age exact name> feature values",
+  "YValues": "<age exact name> contribution values",
+  "FeaturesToHighlight": "None",
+  "FeaturesToShow": "None",
+  "Annotation": { "type": "highlightRange", "xRange": [30, 50] }
+}
+
+Example D (FEATURE INTERACTION w/ two ranges):
+User: "The relationship between BMI values and BMI contribution is different when age is 20-30 vs 60-70."
+Output:
+{
+  "Category": 4,
+  "Type": "featureInteraction",
+  "Variables": [
+    { "featureName": "<BMI exact name>", "transform": null, "type": "value of" },
+    { "featureName": "<BMI exact name>", "transform": null, "type": "contribution to the prediction of" }
+  ],
+  "Numbers": [],
+  "Relationship": "different",
+  "Condition": { "featureName": "<age exact name>", "range": [[20, 30], [60, 70]] },
+  "GraphType": "TWO-SCATTER",
+  "XValues": "<BMI exact name> feature values",
+  "YValues": "<BMI exact name> contribution values",
+  "FeaturesToHighlight": "None",
+  "FeaturesToShow": "None",
+  "Annotation": {}
+}
+
+Now process the next user insight.
 `;
 
 /**

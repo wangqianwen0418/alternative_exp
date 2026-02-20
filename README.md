@@ -39,29 +39,16 @@ http://localhost:3000/alternative_exp
 
 ## Available Scripts
 
-### Start Development Server
-
 ```bash
+# Runs the application in development mode
 npm start
-```
 
-Runs the app in development mode.
-
-### Lint the Codebase
-
-```bash
+# Runs ESLint to check for code quality and style issues
 npm run lint
-```
 
-Runs ESLint to check code quality and style consistency.
-
-### Format the Codebase
-
-```bash
+# Runs Prettier to automatically format the codebase
 npm run format
 ```
-
-Runs Prettier to automatically format project files.
 
 ## Project Structure
 
@@ -107,3 +94,15 @@ If you use this system or build upon this work, please cite:
   year={2025}
 }
 ```
+
+## AI Usage Notice
+
+Portions of this codebase were developed with the assistance of AI-based programming tools.
+
+AI tools were used to:
+
+- Provide high-level documentation comments for files
+- Assist in generating helper functions
+- Assist in speeding up development
+
+All architectural decisions, research design, visualization logic, and system behavior were determined and validated by the authors. AI-generated suggestions were reviewed, verified, and modified as necessary to ensure correctness and alignment with the research objectives.
